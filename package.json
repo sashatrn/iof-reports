@@ -1,6 +1,6 @@
 {
   "name": "side-by-side-pdf",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "IOF XML → PDF reports generator",
   "main": "dist/index.js",
   "type": "commonjs",
