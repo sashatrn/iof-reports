@@ -39,10 +39,7 @@ export function computeTeamResults(
   }
 
   if (womenClasses.size !== 3) {
-    logger?.error(
-      { count: womenClasses.size },
-      "Expected exactly 3 women classes",
-    );
+    logger?.error({ count: womenClasses.size }, "Expected exactly 3 women classes");
   }
 
   const byClub = new Map<string, Participant[]>();
@@ -65,6 +62,15 @@ export function computeTeamResults(
         .sort((a, b) => b.points - a.points)
         .slice(0, 2);
 
+      if (top2.length > 0) {
+        logger?.info(
+          { club, className, top2: top2.map((p) => ({ name: p.name, points: p.points })) },
+          "Top 2 participants for club and class",
+        );
+      } else {
+        logger?.debug({ club, className }, "No participants for club and class");
+      }
+      
       menPoints += top2.reduce((s, p) => s + p.points, 0);
     }
 
@@ -78,8 +84,12 @@ export function computeTeamResults(
       womenPoints += top2.reduce((s, p) => s + p.points, 0);
     }
 
-    menResults.push({ club, points: menPoints });
-    womenResults.push({ club, points: womenPoints });
+    if (menPoints > 0) {
+      menResults.push({ club, points: menPoints });
+    }
+    if (womenPoints > 0) {
+      womenResults.push({ club, points: womenPoints });
+    }
   }
 
   return {
