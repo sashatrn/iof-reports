@@ -63,7 +63,7 @@ export function computeTeamResults(
         .slice(0, 2);
 
       if (top2.length > 0) {
-        logger?.info(
+        logger?.debug(
           { club, className, top2: top2.map((p) => ({ name: p.name, points: p.points })) },
           "Top 2 participants for club and class",
         );
