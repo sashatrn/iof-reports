@@ -12,11 +12,11 @@ CLI-інструмент для перетворення результатів 
 1. Встановіть [Node.js](https://nodejs.org/en/download)
 1. Відкрийте термінал (командний рядок)
 1. Встановіть Playwright Chromium `npx playwright install chromium`
-1. Встановіть додаток `npm install -g side-by-side-pdf`
+1. Встановіть додаток `npm install -g iof-reports`
 
 ## Оновлення додатку
 
-Для оновлення додатку до останньої версії, в терміналі виконайте `npm update -g side-by-side-pdf`
+Для оновлення додатку до останньої версії, в терміналі виконайте `npm update -g iof-reports`
 
 ## Вивантаження данних з MeOS
 
@@ -28,7 +28,7 @@ CLI-інструмент для перетворення результатів 
 ## Запуск додатку
 
 1. Відкрийте командний рядок Windows
-1. Виконайте `side-by-side-pdf <results.xml>`, де `<results.xml>` - IOF XML файл результатів.
+1. Виконайте `iof-reports <results.xml>`, де `<results.xml>` - IOF XML файл результатів.
 
 Якщо є проблема з виводом кіриличних символів в консолі Windows, виконайте команду `chcp 65001` перед запуском додатку.
 

@@ -1,5 +1,5 @@
 {
-  "name": "side-by-side-pdf",
+  "name": "iof-reports",
   "version": "0.1.8",
   "description": "IOF XML → PDF reports generator",
   "main": "dist/index.js",
@@ -19,7 +19,7 @@
     "test:watch": "vitest --watch"
   },
   "bin": {
-    "side-by-side-pdf": "./dist/index.js"
+    "iof-reports": "./dist/index.js"
   },
   "keywords": [],
   "author": "Alex Trukhny",
