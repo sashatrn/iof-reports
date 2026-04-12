@@ -29,6 +29,9 @@ CLI-інструмент для перетворення результатів 
 
 1. Відкрийте командний рядок Windows
 1. Виконайте `iof-reports <results.xml>`, де `<results.xml>` - IOF XML файл результатів.
+1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual` або `iof-reports <results.xml> --report team`.
+
+Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`.
 
 Якщо є проблема з виводом кіриличних символів в консолі Windows, виконайте команду `chcp 65001` перед запуском додатку.
 

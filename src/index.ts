@@ -15,9 +15,9 @@ async function main(): Promise<void> {
   const config = loadConfig();
   const logger = createLogger(config);
 
-  const { inputPath } = parseCliArgs(process.argv, logger);
+  const { inputPath, report } = parseCliArgs(process.argv, logger);
 
-  logger.info({ file: inputPath }, "Reading XML file");
+  logger.info({ file: inputPath, report }, "Reading XML file");
 
   const xml = fs.readFileSync(inputPath, "utf-8");
   let { participants, eventDate } = parseIof(xml);
@@ -35,17 +35,19 @@ async function main(): Promise<void> {
     p.points = pointsFromPosition(p.position, p.status);
   }
 
-  const individualHtml = buildIndividualHtml(participants, eventDate);
-  await htmlToPdf(individualHtml, "individual.pdf");
+  if (report === "all" || report === "individual") {
+    const individualHtml = buildIndividualHtml(participants, eventDate);
+    await htmlToPdf(individualHtml, "individual.pdf");
+    logger.info("Individual PDF generated");
+  }
 
-  logger.info("Individual PDF generated");
+  if (report === "all" || report === "team") {
+    const teamResults = computeTeamResults(participants, config, logger);
+    const teamHtml = buildTeamHtml(teamResults, eventDate);
+    await htmlToPdf(teamHtml, "team.pdf");
+    logger.info("Team PDF generated");
+  }
 
-  const teamResults = computeTeamResults(participants, config, logger);
-
-  const teamHtml = buildTeamHtml(teamResults, eventDate);
-  await htmlToPdf(teamHtml, "team.pdf");
-
-  logger.info("Team PDF generated");
   logger.info("Report generation completed successfully");
 }
 
