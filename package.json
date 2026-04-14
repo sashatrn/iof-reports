@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "dev:sample": "tsx src/index.ts src/__fixtures__/sample.xml",
+    "dev:rogaining": "tsx src/index.ts src/__fixtures__/rogaining-test.xml --report rogaining",
     "clean": "rimraf dist",
     "build": "npm run clean && tsc && npm run copy-assets && npm run copy-templates",
     "copy-assets": "cpy \"src/assets/**/*\" dist/assets",

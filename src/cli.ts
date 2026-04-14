@@ -4,14 +4,14 @@ import { Logger } from "pino";
 
 export type CliOptions = {
   inputPath: string;
-  report: "all" | "individual" | "team";
+  report: "all" | "individual" | "team" | "rogaining";
 };
 
-const REPORT_VALUES = new Set(["all", "individual", "team"]);
+const REPORT_VALUES = new Set(["all", "individual", "team", "rogaining"]);
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--report all|individual|team]",
+    "Usage: node dist/index.js <file.xml> [--report all|individual|team|rogaining]",
   );
 }
 
@@ -35,7 +35,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       if (!value || !REPORT_VALUES.has(value)) {
         logger.error(
           { report: value },
-          "Invalid report type. Expected one of: all, individual, team.",
+          "Invalid report type. Expected one of: all, individual, team, rogaining.",
         );
         printUsage(logger);
         process.exit(1);

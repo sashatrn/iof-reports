@@ -33,6 +33,9 @@ export function parseIof(xml: string): ParsedIof {
 
   for (const cr of classes) {
     const className = cr.Class.Name;
+    if (!cr.PersonResult) {
+      continue;
+    }
 
     const persons = Array.isArray(cr.PersonResult)
       ? cr.PersonResult

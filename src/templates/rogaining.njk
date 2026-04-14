@@ -1,0 +1,42 @@
+{% extends "base.njk" %}
+
+{% block content %}
+
+{% for class in classes %}
+<div class="class-block">
+  <h3>{{ class.name }}</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Місце</th>
+        <th>Команда</th>
+        <th>Склад</th>
+        <th>Організація</th>
+        <th>КП</th>
+        <th>Штраф</th>
+        <th>Разом</th>
+        <th>Час</th>
+        <th>Статус</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for team in class.teams %}
+      <tr>
+        <td>{{ team.place }}</td>
+        <td>{{ team.teamName }}</td>
+        <td>{{ team.membersLine }}</td>
+        <td>{{ team.organisation }}</td>
+        <td>{{ team.score }}</td>
+        <td>{{ team.penalty }}</td>
+        <td>{{ team.totalScore }}</td>
+        <td>{{ team.formattedTime }}</td>
+        <td>{{ team.status }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endfor %}
+
+{% endblock %}

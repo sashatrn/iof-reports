@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ResultList xmlns="http://www.orienteering.org/datastandard/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" iofVersion="3.0" createTime="2026-04-12T13:55:54" creator="MeOS 5.0.1742 (Beta 1)" status="Snapshot">
+  <Event>
+    <Id></Id>
+    <Name>Рогейн тест</Name>
+    <StartTime>
+      <Date>2026-04-11</Date>
+      <Time>06:00:00+03:00</Time>
+    </StartTime>
+  </Event>
+  <ClassResult>
+    <Class>
+      <Id>1</Id>
+      <Name>Ч55</Name>
+    </Class>
+    <TeamResult>
+      <EntryId type="MeOS">1</EntryId>
+      <Name>Діди</Name>
+      <TeamMemberResult>
+        <Person>
+          <Name>
+            <Family></Family>
+            <Given>Дід1</Given>
+          </Name>
+        </Person>
+        <Organisation>
+          <Name>Київська</Name>
+        </Organisation>
+        <Result>
+          <Leg>1</Leg>
+          <LegOrder>1</LegOrder>
+          <StartTime>2026-04-11T09:00:00+03:00</StartTime>
+          <FinishTime>2026-04-11T11:05:00+03:00</FinishTime>
+          <Time>7500</Time>
+          <TimeBehind type="Leg">0</TimeBehind>
+          <TimeBehind type="Course">0</TimeBehind>
+          <Position type="Leg">1</Position>l
+          <Position type="Course">1</Position>
+          <Status>OK</Status>
+          <Score type="Score">8</Score>
+          <Score type="Penalty">0</Score>
+          <OverallResult>
+            <Time>7500</Time>
+            <TimeBehind>0</TimeBehind>
+            <Position>1</Position>
+            <Status>OK</Status>
+          </OverallResult>
+          <Course>
+            <Id>1</Id>
+            <Name>Всі КП</Name>
+          </Course>
+          <SplitTime status="Additional">
+            <ControlCode>21</ControlCode>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>22</ControlCode>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>45</ControlCode>
+          </SplitTime>
+          <AssignedFee>
+            <Fee type="Normal">
+              <Name>Entry fee</Name>
+              <Amount>900</Amount>
+            </Fee>
+          </AssignedFee>
+        </Result>
+      </TeamMemberResult>
+      <TeamMemberResult>
+        <Person>
+          <Name>
+            <Family></Family>
+            <Given>Дід2</Given>
+          </Name>
+        </Person>
+        <Organisation>
+          <Name>Київська</Name>
+        </Organisation>
+        <Result>
+          <Leg>1</Leg>
+          <LegOrder>2</LegOrder>
+          <StartTime>2026-04-11T09:00:00+03:00</StartTime>
+          <FinishTime>2026-04-11T11:06:00+03:00</FinishTime>
+          <Time>7560</Time>
+          <TimeBehind type="Leg">0</TimeBehind>
+          <TimeBehind type="Course">60</TimeBehind>
+          <Position type="Leg">1</Position>
+          <Position type="Course">2</Position>
+          <Status>OK</Status>
+          <Score type="Score">10</Score>
+          <Score type="Penalty">0</Score>
+          <OverallResult>
+            <Time>7560</Time>
+            <TimeBehind>0</TimeBehind>
+            <Position>1</Position>
+            <Status>OK</Status>
+          </OverallResult>
+          <Course>
+            <Id>1</Id>
+            <Name>Всі КП</Name>
+          </Course>
+          <SplitTime status="Additional">
+            <ControlCode>21</ControlCode>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>22</ControlCode>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>23</ControlCode>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>45</ControlCode>
+          </SplitTime>
+          <AssignedFee>
+            <Fee type="Normal">
+              <Name>Entry fee</Name>
+              <Amount>900</Amount>
+            </Fee>
+          </AssignedFee>
+        </Result>
+      </TeamMemberResult>
+    </TeamResult>
+  </ClassResult>
+  <ClassResult>
+    <Class>
+      <Id>3</Id>
+      <Name>Ч18</Name>
+    </Class>
+    <TeamResult>
+      <EntryId type="MeOS">6</EntryId>
+      <Name>Юнаки</Name>
+      <TeamMemberResult>
+        <Person>
+          <Name>
+            <Family>1</Family>
+            <Given>Юнак</Given>
+          </Name>
+        </Person>
+        <Result>
+          <Leg>1</Leg>
+          <LegOrder>1</LegOrder>
+          <StartTime>2026-04-11T09:00:00+03:00</StartTime>
+          <FinishTime>2026-04-11T13:03:00+03:00</FinishTime>
+          <Time>14580</Time>
+          <TimeBehind type="Leg">0</TimeBehind>
+          <TimeBehind type="Course">60</TimeBehind>
+          <Position type="Leg">1</Position>
+          <Position type="Course">2</Position>
+          <Status>OK</Status>
+          <Score type="Score">21</Score>
+          <Score type="Penalty">0</Score>
+          <OverallResult>
+            <Time>14580</Time>
+            <TimeBehind>0</TimeBehind>
+            <Position>1</Position>
+            <Status>OK</Status>
+          </OverallResult>
+          <Course>
+            <Id>1</Id>
+            <Name>Всі КП</Name>
+          </Course>
+          <SplitTime status="Additional">
+            <ControlCode>66</ControlCode>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>77</ControlCode>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>88</ControlCode>
+          </SplitTime>
+        </Result>
+      </TeamMemberResult>
+      <TeamMemberResult>
+        <Person>
+          <Name>
+            <Family>2</Family>
+            <Given>Юнак</Given>
+          </Name>
+        </Person>
+        <Result>
+          <Leg>1</Leg>
+          <LegOrder>2</LegOrder>
+          <StartTime>2026-04-11T09:00:00+03:00</StartTime>
+          <FinishTime>2026-04-11T13:05:00+03:00</FinishTime>
+          <Time>14700</Time>
+          <TimeBehind type="Leg">0</TimeBehind>
+          <TimeBehind type="Course">180</TimeBehind>
+          <Position type="Leg">1</Position>
+          <Position type="Course">3</Position>
+          <Status>OK</Status>
+          <Score type="Score">21</Score>
+          <Score type="Penalty">0</Score>
+          <OverallResult>
+            <Time>14700</Time>
+            <TimeBehind>0</TimeBehind>
+            <Position>1</Position>
+            <Status>OK</Status>
+          </OverallResult>
+          <Course>
+            <Id>1</Id>
+            <Name>Всі КП</Name>
+          </Course>
+          <SplitTime status="Additional">
+            <ControlCode>66</ControlCode>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>77</ControlCode>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>88</ControlCode>
+          </SplitTime>
+        </Result>
+      </TeamMemberResult>
+      <TeamMemberResult>
+        <Person>
+          <Name>
+            <Family>3</Family>
+            <Given>Юнак</Given>
+          </Name>
+        </Person>
+        <Result>
+          <Leg>1</Leg>
+          <LegOrder>3</LegOrder>
+          <StartTime>2026-04-11T09:00:00+03:00</StartTime>
+          <FinishTime>2026-04-11T13:02:00+03:00</FinishTime>
+          <Time>14520</Time>
+          <TimeBehind type="Leg">0</TimeBehind>
+          <TimeBehind type="Course">0</TimeBehind>
+          <Position type="Leg">1</Position>
+          <Position type="Course">1</Position>
+          <Status>OK</Status>
+          <Score type="Score">21</Score>
+          <Score type="Penalty">0</Score>
+          <OverallResult>
+            <Time>14700</Time>
+            <TimeBehind>0</TimeBehind>
+            <Position>1</Position>
+            <Status>OK</Status>
+          </OverallResult>
+          <Course>
+            <Id>1</Id>
+            <Name>Всі КП</Name>
+          </Course>
+          <SplitTime status="Additional">
+            <ControlCode>66</ControlCode>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>77</ControlCode>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>88</ControlCode>
+          </SplitTime>
+        </Result>
+      </TeamMemberResult>
+    </TeamResult>
+  </ClassResult>
+  <ClassResult>
+    <Class>
+      <Id>2</Id>
+      <Name>Ч</Name>
+    </Class>
+    <TeamResult>
+      <EntryId type="MeOS">5</EntryId>
+      <Name>Василі</Name>
+      <TeamMemberResult>
+        <Person>
+          <Name>
+            <Family></Family>
+            <Given>Василь1</Given>
+          </Name>
+        </Person>
+        <Result>
+          <Leg>1</Leg>
+          <LegOrder>1</LegOrder>
+          <StartTime>2026-04-11T09:00:00+03:00</StartTime>
+          <FinishTime>2026-04-11T20:01:00+03:00</FinishTime>
+          <Time>39660</Time>
+          <TimeBehind type="Leg">28740</TimeBehind>
+          <TimeBehind type="Course">28740</TimeBehind>
+          <Position type="Leg">1</Position>
+          <Position type="Course">3</Position>
+          <Status>OK</Status>
+          <Score type="Score">25</Score>
+          <Score type="Penalty">0</Score>
+          <OverallResult>
+            <Time>39660</Time>
+            <TimeBehind>28740</TimeBehind>
+            <Position>1</Position>
+            <Status>OK</Status>
+          </OverallResult>
+          <Course>
+            <Id>1</Id>
+            <Name>Всі КП</Name>
+          </Course>
+          <SplitTime status="Additional">
+            <ControlCode>88</ControlCode>
+            <Time>3600</Time>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>45</ControlCode>
+            <Time>4200</Time>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>66</ControlCode>
+            <Time>4800</Time>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>77</ControlCode>
+            <Time>5400</Time>
+          </SplitTime>
+          <AssignedFee>
+            <Fee type="Normal">
+              <Name>Entry fee</Name>
+              <Amount>900</Amount>
+            </Fee>
+          </AssignedFee>
+        </Result>
+      </TeamMemberResult>
+      <TeamMemberResult>
+        <Person>
+          <Name>
+            <Family></Family>
+            <Given>Василь2</Given>
+          </Name>
+        </Person>
+        <Result>
+          <Leg>1</Leg>
+          <LegOrder>2</LegOrder>
+          <StartTime>2026-04-11T09:00:00+03:00</StartTime>
+          <FinishTime>2026-04-11T20:00:00+03:00</FinishTime>
+          <Time>39600</Time>
+          <TimeBehind type="Leg">0</TimeBehind>
+          <TimeBehind type="Course">28680</TimeBehind>
+          <Position type="Leg">1</Position>
+          <Position type="Course">2</Position>
+          <Status>OK</Status>
+          <Score type="Score">25</Score>
+          <Score type="Penalty">0</Score>
+          <OverallResult>
+            <Time>39600</Time>
+            <TimeBehind>0</TimeBehind>
+            <Position>1</Position>
+            <Status>OK</Status>
+          </OverallResult>
+          <Course>
+            <Id>1</Id>
+            <Name>Всі КП</Name>
+          </Course>
+          <SplitTime status="Additional">
+            <ControlCode>88</ControlCode>
+            <Time>3720</Time>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>45</ControlCode>
+            <Time>7800</Time>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>66</ControlCode>
+            <Time>8400</Time>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>77</ControlCode>
+            <Time>9000</Time>
+          </SplitTime>
+          <AssignedFee>
+            <Fee type="Normal">
+              <Name>Entry fee</Name>
+              <Amount>900</Amount>
+            </Fee>
+          </AssignedFee>
+        </Result>
+      </TeamMemberResult>
+    </TeamResult>
+    <TeamResult>
+      <EntryId type="MeOS">3</EntryId>
+      <Name>Петри</Name>
+      <Organisation>
+        <Name>Житомирська</Name>
+      </Organisation>
+      <TeamMemberResult>
+        <Person>
+          <Name>
+            <Family></Family>
+            <Given>Петро</Given>
+          </Name>
+        </Person>
+        <Organisation>
+          <Name>Житомирська</Name>
+        </Organisation>
+        <Result>
+          <Leg>1</Leg>
+          <LegOrder>1</LegOrder>
+          <StartTime>2026-04-11T09:00:00+03:00</StartTime>
+          <FinishTime>2026-04-11T12:02:00+03:00</FinishTime>
+          <Time>10920</Time>
+          <TimeBehind type="Leg">0</TimeBehind>
+          <TimeBehind type="Course">0</TimeBehind>
+          <Position type="Leg">2</Position>
+          <Position type="Course">1</Position>
+          <Status>OK</Status>
+          <Score type="Score">16</Score>
+          <Score type="Penalty">0</Score>
+          <OverallResult>
+            <Time>10920</Time>
+            <TimeBehind>0</TimeBehind>
+            <Position>2</Position>
+            <Status>OK</Status>
+          </OverallResult>
+          <Course>
+            <Id>1</Id>
+            <Name>Всі КП</Name>
+          </Course>
+          <SplitTime status="Additional">
+            <ControlCode>45</ControlCode>
+            <Time>4200</Time>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>21</ControlCode>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>22</ControlCode>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>23</ControlCode>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>66</ControlCode>
+          </SplitTime>
+          <ControlCard>4563</ControlCard>
+          <AssignedFee>
+            <Fee type="Normal">
+              <Name>Entry fee</Name>
+              <Amount>900</Amount>
+            </Fee>
+          </AssignedFee>
+        </Result>
+      </TeamMemberResult>
+      <TeamMemberResult>
+        <Person>
+          <Name>
+            <Family></Family>
+            <Given>Петро2</Given>
+          </Name>
+        </Person>
+        <Organisation>
+          <Name>Житомирська</Name>
+        </Organisation>
+        <Result>
+          <Leg>1</Leg>
+          <LegOrder>2</LegOrder>
+          <StartTime>2026-04-11T09:00:00+03:00</StartTime>
+          <FinishTime>2026-04-11T21:02:20+03:00</FinishTime>
+          <Time>43340</Time>
+          <TimeBehind type="Leg">3740</TimeBehind>
+          <TimeBehind type="Course">32420</TimeBehind>
+          <Position type="Leg">2</Position>
+          <Position type="Course">5</Position>
+          <Status>OK</Status>
+          <Score type="Score">16</Score>
+          <Score type="Penalty">3</Score>
+          <OverallResult>
+            <Time>43340</Time>
+            <TimeBehind>3740</TimeBehind>
+            <Position>2</Position>
+            <Status>OK</Status>
+          </OverallResult>
+          <Course>
+            <Id>1</Id>
+            <Name>Всі КП</Name>
+          </Course>
+          <SplitTime status="Additional">
+            <ControlCode>21</ControlCode>
+            <Time>600</Time>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>45</ControlCode>
+            <Time>4200</Time>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>66</ControlCode>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>77</ControlCode>
+          </SplitTime>
+          <ControlCard>9870</ControlCard>
+          <AssignedFee>
+            <Fee type="Normal">
+              <Name>Entry fee</Name>
+              <Amount>900</Amount>
+            </Fee>
+          </AssignedFee>
+        </Result>
+      </TeamMemberResult>
+      <TeamMemberResult>
+        <Person>
+          <Name>
+            <Family></Family>
+            <Given>Петро3</Given>
+          </Name>
+        </Person>
+        <Organisation>
+          <Name>Житомирська</Name>
+        </Organisation>
+        <Result>
+          <Leg>1</Leg>
+          <LegOrder>3</LegOrder>
+          <StartTime>2026-04-11T09:00:00+03:00</StartTime>
+          <FinishTime>2026-04-11T21:00:48+03:00</FinishTime>
+          <Time>43248</Time>
+          <TimeBehind type="Leg">0</TimeBehind>
+          <TimeBehind type="Course">32328</TimeBehind>
+          <Position type="Leg">1</Position>
+          <Position type="Course">4</Position>
+          <Status>OK</Status>
+          <Score type="Score">16</Score>
+          <Score type="Penalty">1</Score>
+          <OverallResult>
+            <Time>43340</Time>
+            <TimeBehind>0</TimeBehind>
+            <Position>2</Position>
+            <Status>OK</Status>
+          </OverallResult>
+          <Course>
+            <Id>1</Id>
+            <Name>Всі КП</Name>
+          </Course>
+          <SplitTime status="Additional">
+            <ControlCode>45</ControlCode>
+            <Time>4200</Time>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>66</ControlCode>
+          </SplitTime>
+          <SplitTime status="Additional">
+            <ControlCode>77</ControlCode>
+          </SplitTime>
+          <AssignedFee>
+            <Fee type="Normal">
+              <Name>Entry fee</Name>
+              <Amount>900</Amount>
+            </Fee>
+          </AssignedFee>
+        </Result>
+      </TeamMemberResult>
+    </TeamResult>
+    <TeamResult>
+      <EntryId type="MeOS">4</EntryId>
+      <Name>Сашки</Name>
+      <Organisation>
+        <Name>Житомирська</Name>
+      </Organisation>
+      <TeamMemberResult>
+        <Person>
+          <Name>
+            <Family></Family>
+            <Given>Сашко</Given>
+          </Name>
+        </Person>
+        <Organisation>
+          <Name>Житомирська</Name>
+        </Organisation>
+        <Result>
+          <Leg>1</Leg>
+          <LegOrder>1</LegOrder>
+          <StartTime>2026-04-11T09:00:00+03:00</StartTime>
+          <Status>Active</Status>
+          <OverallResult>
+            <Status>Active</Status>
+          </OverallResult>
+          <Course>
+            <Id>1</Id>
+            <Name>Всі КП</Name>
+          </Course>
+          <ControlCard>3456</ControlCard>
+          <AssignedFee>
+            <Fee type="Normal">
+              <Name>Entry fee</Name>
+              <Amount>900</Amount>
+            </Fee>
+          </AssignedFee>
+        </Result>
+      </TeamMemberResult>
+      <TeamMemberResult>
+        <Person>
+          <Name>
+            <Family></Family>
+            <Given>Сашко2</Given>
+          </Name>
+        </Person>
+        <Organisation>
+          <Name>Житомирська</Name>
+        </Organisation>
+        <Result>
+          <Leg>1</Leg>
+          <LegOrder>2</LegOrder>
+          <StartTime>2026-04-11T09:00:00+03:00</StartTime>
+          <Status>Active</Status>
+          <OverallResult>
+            <Status>Active</Status>
+          </OverallResult>
+          <Course>
+            <Id>1</Id>
+            <Name>Всі КП</Name>
+          </Course>
+          <ControlCard>897</ControlCard>
+          <AssignedFee>
+            <Fee type="Normal">
+              <Name>Entry fee</Name>
+              <Amount>900</Amount>
+            </Fee>
+          </AssignedFee>
+        </Result>
+      </TeamMemberResult>
+    </TeamResult>
+  </ClassResult>
+</ResultList>

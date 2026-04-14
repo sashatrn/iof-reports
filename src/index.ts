@@ -5,11 +5,13 @@ import { parseIof } from "./io/parseIof";
 import { pointsFromPosition } from "./scoring/points";
 import { computeTeamResults } from "./scoring/team";
 import { buildIndividualHtml } from "./reports/individualReport";
+import { buildRogainingHtml } from "./reports/rogainingReport";
 import { buildTeamHtml } from "./reports/teamReport";
 import { htmlToPdf } from "./render/pdf";
 import { loadConfig } from "./config";
 import { createLogger } from "./logger";
 import { parseCliArgs } from "./cli";
+import { parseRogainingIof } from "./io/parseRogainingIof";
 
 async function main(): Promise<void> {
   const config = loadConfig();
@@ -20,10 +22,36 @@ async function main(): Promise<void> {
   logger.info({ file: inputPath, report }, "Reading XML file");
 
   const xml = fs.readFileSync(inputPath, "utf-8");
+
+  if (report === "rogaining") {
+    let { eventDate, eventName, teams } = parseRogainingIof(xml);
+
+    if (!eventDate) {
+      logger.warn("Event date not found in IOF XML. Defaulting to current date.");
+      eventDate = new Date();
+    }
+
+    logger.info({ count: teams.length }, "Rogaining teams parsed successfully");
+
+    const rogainingHtml = buildRogainingHtml(teams, eventDate, eventName);
+    await htmlToPdf(rogainingHtml, "rogaining.pdf");
+
+    logger.info("Rogaining PDF generated");
+    logger.info("Report generation completed successfully");
+    return;
+  }
+
   let { participants, eventDate } = parseIof(xml);
   if (!eventDate) {
     logger.warn("Event date not found in IOF XML. Defaulting to current date.");
     eventDate = new Date();
+  }
+
+  if (participants.length === 0) {
+    logger.error(
+      "No individual athlete results found in IOF XML. If this is a rogaining TeamResult export, use --report rogaining.",
+    );
+    process.exit(1);
   }
 
   logger.info(
