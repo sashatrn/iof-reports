@@ -14,6 +14,8 @@ type RankedRogainingTeam = RogainingTeam & {
 
 const PLACEABLE_STATUSES = new Set(["OK"]);
 const OPEN_AGE = Number.POSITIVE_INFINITY;
+const YOUTH_MAX_AGE = 23;
+const MASTER_MIN_AGE = 45;
 
 type ParsedRogainingClass = {
   genderPrefix: string;
@@ -110,27 +112,28 @@ function formatRogainingClassName(genderPrefix: string, ageLimit: number): strin
   return ageLimit === OPEN_AGE ? genderPrefix : `${genderPrefix}${ageLimit}`;
 }
 
-function getEligibleAgeLimits(ageLimit: number): number[] {
+function getEligibleAgeLimits(
+  ageLimit: number,
+  declaredAgeLimits: number[],
+): number[] {
   if (ageLimit === OPEN_AGE) {
     return [OPEN_AGE];
   }
 
   const eligible = new Set<number>([ageLimit, OPEN_AGE]);
+  const youthClasses = declaredAgeLimits.filter((declaredAgeLimit) => {
+    return declaredAgeLimit <= YOUTH_MAX_AGE && ageLimit <= declaredAgeLimit;
+  });
+  const masterClasses = declaredAgeLimits.filter((declaredAgeLimit) => {
+    return declaredAgeLimit >= MASTER_MIN_AGE && ageLimit >= declaredAgeLimit;
+  });
 
-  if (ageLimit <= 23) {
-    eligible.add(23);
+  for (const declaredAgeLimit of youthClasses) {
+    eligible.add(declaredAgeLimit);
   }
 
-  if (ageLimit >= 45) {
-    eligible.add(45);
-  }
-
-  if (ageLimit >= 55) {
-    eligible.add(55);
-  }
-
-  if (ageLimit >= 65) {
-    eligible.add(65);
+  for (const declaredAgeLimit of masterClasses) {
+    eligible.add(declaredAgeLimit);
   }
 
   return [...eligible];
@@ -163,14 +166,20 @@ function compareClassAgeLimits(left: number, right: number): number {
   return leftYouth ? -1 : 1;
 }
 
-function buildEligibleClassNames(team: RogainingTeam): string[] {
+function buildEligibleClassNames(
+  team: RogainingTeam,
+  declaredAgeLimitsByPrefix: Map<string, number[]>,
+): string[] {
   const parsedClass = parseRogainingClass(team.className);
 
   if (!parsedClass) {
     return [team.className];
   }
 
-  return getEligibleAgeLimits(parsedClass.ageLimit)
+  const declaredAgeLimits =
+    declaredAgeLimitsByPrefix.get(parsedClass.genderPrefix) ?? [];
+
+  return getEligibleAgeLimits(parsedClass.ageLimit, declaredAgeLimits)
     .sort(compareClassAgeLimits)
     .map((ageLimit) => formatRogainingClassName(parsedClass.genderPrefix, ageLimit));
 }
@@ -186,9 +195,29 @@ export function buildRogainingHtml(
 
   const byClass = new Map<string, RogainingTeam[]>();
   const declaredClasses = new Set(teams.map((team) => team.className));
+  const declaredAgeLimitsByPrefix = new Map<string, number[]>();
+
+  for (const declaredClass of declaredClasses) {
+    const parsedClass = parseRogainingClass(declaredClass);
+
+    if (!parsedClass || parsedClass.ageLimit === OPEN_AGE) {
+      continue;
+    }
+
+    if (!declaredAgeLimitsByPrefix.has(parsedClass.genderPrefix)) {
+      declaredAgeLimitsByPrefix.set(parsedClass.genderPrefix, []);
+    }
+
+    declaredAgeLimitsByPrefix.get(parsedClass.genderPrefix)!.push(
+      parsedClass.ageLimit,
+    );
+  }
 
   for (const team of teams) {
-    for (const className of buildEligibleClassNames(team)) {
+    for (const className of buildEligibleClassNames(
+      team,
+      declaredAgeLimitsByPrefix,
+    )) {
       if (!declaredClasses.has(className)) {
         continue;
       }

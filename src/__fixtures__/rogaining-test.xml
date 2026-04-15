@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 
-<ResultList xmlns="http://www.orienteering.org/datastandard/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" iofVersion="3.0" createTime="2026-04-15T18:29:25" creator="MeOS 5.0.1742 (Beta 1)" status="Snapshot">
+<ResultList xmlns="http://www.orienteering.org/datastandard/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" iofVersion="3.0" createTime="2026-04-15T20:55:46" creator="MeOS 5.0.1742 (Beta 1)" status="Snapshot">
 <Event>
 <Id></Id>
 <Name>Рогейн тест</Name>
@@ -36,14 +36,13 @@
 <Time>7500</Time>
 <TimeBehind type="Leg">0</TimeBehind>
 <TimeBehind type="Course">0</TimeBehind>
-<Position type="Leg">1</Position>
+<Position type="Leg">2</Position>
 <Position type="Course">1</Position>
 <Status>OK</Status>
 <Score type="Score">8</Score>
 <Score type="Penalty">0</Score>
 <OverallResult>
 <Time>7500</Time>
-<TimeBehind>0</TimeBehind>
 <Position>1</Position>
 <Status>OK</Status>
 </OverallResult>
@@ -149,14 +148,13 @@
 <Time>14580</Time>
 <TimeBehind type="Leg">0</TimeBehind>
 <TimeBehind type="Course">60</TimeBehind>
-<Position type="Leg">1</Position>
+<Position type="Leg">2</Position>
 <Position type="Course">2</Position>
 <Status>OK</Status>
 <Score type="Score">21</Score>
 <Score type="Penalty">0</Score>
 <OverallResult>
 <Time>14580</Time>
-<TimeBehind>0</TimeBehind>
 <Position>1</Position>
 <Status>OK</Status>
 </OverallResult>
@@ -193,7 +191,7 @@
 <Time>14700</Time>
 <TimeBehind type="Leg">0</TimeBehind>
 <TimeBehind type="Course">180</TimeBehind>
-<Position type="Leg">1</Position>
+<Position type="Leg">3</Position>
 <Position type="Course">3</Position>
 <Status>OK</Status>
 <Score type="Score">21</Score>
@@ -288,14 +286,14 @@
 <Time>39660</Time>
 <TimeBehind type="Leg">28740</TimeBehind>
 <TimeBehind type="Course">28740</TimeBehind>
-<Position type="Leg">1</Position>
+<Position type="Leg">2</Position>
 <Position type="Course">3</Position>
 <Status>OK</Status>
 <Score type="Score">25</Score>
 <Score type="Penalty">0</Score>
 <OverallResult>
 <Time>39660</Time>
-<TimeBehind>28740</TimeBehind>
+<TimeBehind>0</TimeBehind>
 <Position>1</Position>
 <Status>OK</Status>
 </OverallResult>
@@ -349,7 +347,6 @@
 <Score type="Penalty">0</Score>
 <OverallResult>
 <Time>39600</Time>
-<TimeBehind>0</TimeBehind>
 <Position>1</Position>
 <Status>OK</Status>
 </OverallResult>
@@ -406,14 +403,13 @@
 <Time>10920</Time>
 <TimeBehind type="Leg">0</TimeBehind>
 <TimeBehind type="Course">0</TimeBehind>
-<Position type="Leg">2</Position>
+<Position type="Leg">3</Position>
 <Position type="Course">1</Position>
 <Status>OK</Status>
 <Score type="Score">16</Score>
 <Score type="Penalty">0</Score>
 <OverallResult>
 <Time>10920</Time>
-<TimeBehind>0</TimeBehind>
 <Position>2</Position>
 <Status>OK</Status>
 </OverallResult>
@@ -464,14 +460,14 @@
 <Time>43340</Time>
 <TimeBehind type="Leg">3740</TimeBehind>
 <TimeBehind type="Course">32420</TimeBehind>
-<Position type="Leg">2</Position>
+<Position type="Leg">5</Position>
 <Position type="Course">5</Position>
 <Status>OK</Status>
 <Score type="Score">16</Score>
 <Score type="Penalty">3</Score>
 <OverallResult>
 <Time>43340</Time>
-<TimeBehind>3740</TimeBehind>
+<TimeBehind>3680</TimeBehind>
 <Position>2</Position>
 <Status>OK</Status>
 </OverallResult>
@@ -520,14 +516,14 @@
 <Time>43248</Time>
 <TimeBehind type="Leg">0</TimeBehind>
 <TimeBehind type="Course">32328</TimeBehind>
-<Position type="Leg">1</Position>
+<Position type="Leg">4</Position>
 <Position type="Course">4</Position>
 <Status>OK</Status>
 <Score type="Score">16</Score>
 <Score type="Penalty">1</Score>
 <OverallResult>
 <Time>43340</Time>
-<TimeBehind>0</TimeBehind>
+<TimeBehind>3680</TimeBehind>
 <Position>2</Position>
 <Status>OK</Status>
 </OverallResult>
@@ -568,14 +564,31 @@
 <Leg>1</Leg>
 <LegOrder>1</LegOrder>
 <StartTime>2026-04-11T09:00:00+03:00</StartTime>
-<Status>Active</Status>
+<FinishTime>2026-04-11T23:00:00+03:00</FinishTime>
+<Time>50400</Time>
+<TimeBehind type="Leg">39480</TimeBehind>
+<TimeBehind type="Course">39480</TimeBehind>
+<Status>Disqualified</Status>
 <OverallResult>
-<Status>Active</Status>
+<Time>50400</Time>
+<Status>Disqualified</Status>
 </OverallResult>
 <Course>
 <Id>1</Id>
 <Name>Всі КП</Name>
 </Course>
+<SplitTime status="Additional">
+<ControlCode>22</ControlCode>
+</SplitTime>
+<SplitTime status="Additional">
+<ControlCode>23</ControlCode>
+</SplitTime>
+<AssignedFee>
+<Fee type="Normal">
+<Name>Entry fee</Name>
+<Amount>900</Amount>
+</Fee>
+</AssignedFee>
 </Result>
 </TeamMemberResult>
 <TeamMemberResult>
@@ -589,14 +602,33 @@
 <Leg>1</Leg>
 <LegOrder>2</LegOrder>
 <StartTime>2026-04-11T09:00:00+03:00</StartTime>
-<Status>Active</Status>
+<FinishTime>2026-04-11T23:00:00+03:00</FinishTime>
+<Time>50400</Time>
+<TimeBehind type="Leg">10800</TimeBehind>
+<TimeBehind type="Course">39480</TimeBehind>
+<Position type="Leg">6</Position>
+<Position type="Course">6</Position>
+<Status>OK</Status>
 <OverallResult>
-<Status>Active</Status>
+<Time>50400</Time>
+<Status>Disqualified</Status>
 </OverallResult>
 <Course>
 <Id>1</Id>
 <Name>Всі КП</Name>
 </Course>
+<SplitTime status="Additional">
+<ControlCode>22</ControlCode>
+</SplitTime>
+<SplitTime status="Additional">
+<ControlCode>23</ControlCode>
+</SplitTime>
+<AssignedFee>
+<Fee type="Normal">
+<Name>Entry fee</Name>
+<Amount>900</Amount>
+</Fee>
+</AssignedFee>
 </Result>
 </TeamMemberResult>
 </TeamResult>
@@ -938,6 +970,318 @@
 </SplitTime>
 <SplitTime status="Additional">
 <ControlCode>88</ControlCode>
+</SplitTime>
+<AssignedFee>
+<Fee type="Normal">
+<Name>Entry fee</Name>
+<Amount>900</Amount>
+</Fee>
+</AssignedFee>
+</Result>
+</TeamMemberResult>
+</TeamResult>
+</ClassResult>
+<ClassResult>
+<Class>
+<Id>6</Id>
+<Name>МІКС</Name>
+</Class>
+<TeamResult>
+<EntryId type="MeOS">10</EntryId>
+<Name>Мікси</Name>
+<TeamMemberResult>
+<Person>
+<Name>
+<Family></Family>
+<Given>Він</Given>
+</Name>
+</Person>
+<Result>
+<Leg>1</Leg>
+<LegOrder>1</LegOrder>
+<StartTime>2026-04-11T09:00:00+03:00</StartTime>
+<FinishTime>2026-04-11T14:00:00+03:00</FinishTime>
+<Time>18000</Time>
+<TimeBehind type="Leg">0</TimeBehind>
+<TimeBehind type="Course">0</TimeBehind>
+<Position type="Leg">1</Position>
+<Position type="Course">1</Position>
+<Status>OK</Status>
+<Score type="Score">10</Score>
+<Score type="Penalty">0</Score>
+<OverallResult>
+<Time>18000</Time>
+<TimeBehind>0</TimeBehind>
+<Position>1</Position>
+<Status>OK</Status>
+</OverallResult>
+<Course>
+<Id>1</Id>
+<Name>Всі КП</Name>
+</Course>
+<SplitTime status="Additional">
+<ControlCode>22</ControlCode>
+</SplitTime>
+<SplitTime status="Additional">
+<ControlCode>23</ControlCode>
+</SplitTime>
+<SplitTime status="Additional">
+<ControlCode>66</ControlCode>
+</SplitTime>
+<AssignedFee>
+<Fee type="Normal">
+<Name>Entry fee</Name>
+<Amount>900</Amount>
+</Fee>
+</AssignedFee>
+</Result>
+</TeamMemberResult>
+<TeamMemberResult>
+<Person>
+<Name>
+<Family></Family>
+<Given>Вона</Given>
+</Name>
+</Person>
+<Result>
+<Leg>1</Leg>
+<LegOrder>2</LegOrder>
+<StartTime>2026-04-11T09:00:00+03:00</StartTime>
+<FinishTime>2026-04-11T14:00:00+03:00</FinishTime>
+<Time>18000</Time>
+<TimeBehind type="Leg">0</TimeBehind>
+<TimeBehind type="Course">0</TimeBehind>
+<Position type="Leg">2</Position>
+<Position type="Course">1</Position>
+<Status>OK</Status>
+<Score type="Score">9</Score>
+<Score type="Penalty">0</Score>
+<OverallResult>
+<Time>18000</Time>
+<TimeBehind>0</TimeBehind>
+<Position>1</Position>
+<Status>OK</Status>
+</OverallResult>
+<Course>
+<Id>1</Id>
+<Name>Всі КП</Name>
+</Course>
+<SplitTime status="Additional">
+<ControlCode>23</ControlCode>
+</SplitTime>
+<SplitTime status="Additional">
+<ControlCode>77</ControlCode>
+</SplitTime>
+<AssignedFee>
+<Fee type="Normal">
+<Name>Entry fee</Name>
+<Amount>900</Amount>
+</Fee>
+</AssignedFee>
+</Result>
+</TeamMemberResult>
+</TeamResult>
+</ClassResult>
+<ClassResult>
+<Class>
+<Id>7</Id>
+<Name>МІКС45</Name>
+</Class>
+<TeamResult>
+<EntryId type="MeOS">11</EntryId>
+<Name>Мікс-середні</Name>
+<TeamMemberResult>
+<Person>
+<Name>
+<Family></Family>
+<Given>Він45</Given>
+</Name>
+</Person>
+<Result>
+<Leg>1</Leg>
+<LegOrder>1</LegOrder>
+<StartTime>2026-04-11T09:00:00+03:00</StartTime>
+<FinishTime>2026-04-11T14:00:00+03:00</FinishTime>
+<Time>18000</Time>
+<TimeBehind type="Leg">0</TimeBehind>
+<TimeBehind type="Course">0</TimeBehind>
+<Position type="Leg">2</Position>
+<Position type="Course">1</Position>
+<Status>OK</Status>
+<Score type="Score">10</Score>
+<Score type="Penalty">0</Score>
+<OverallResult>
+<Time>18000</Time>
+<TimeBehind>0</TimeBehind>
+<Position>1</Position>
+<Status>OK</Status>
+</OverallResult>
+<Course>
+<Id>1</Id>
+<Name>Всі КП</Name>
+</Course>
+<SplitTime status="Additional">
+<ControlCode>45</ControlCode>
+</SplitTime>
+<SplitTime status="Additional">
+<ControlCode>66</ControlCode>
+</SplitTime>
+<AssignedFee>
+<Fee type="Normal">
+<Name>Entry fee</Name>
+<Amount>900</Amount>
+</Fee>
+</AssignedFee>
+</Result>
+</TeamMemberResult>
+<TeamMemberResult>
+<Person>
+<Name>
+<Family></Family>
+<Given>Вона45</Given>
+</Name>
+</Person>
+<Result>
+<Leg>1</Leg>
+<LegOrder>2</LegOrder>
+<StartTime>2026-04-11T09:00:00+03:00</StartTime>
+<FinishTime>2026-04-11T14:00:00+03:00</FinishTime>
+<Time>18000</Time>
+<TimeBehind type="Leg">0</TimeBehind>
+<TimeBehind type="Course">0</TimeBehind>
+<Position type="Leg">1</Position>
+<Position type="Course">1</Position>
+<Status>OK</Status>
+<Score type="Score">19</Score>
+<Score type="Penalty">0</Score>
+<OverallResult>
+<Time>18000</Time>
+<TimeBehind>0</TimeBehind>
+<Position>1</Position>
+<Status>OK</Status>
+</OverallResult>
+<Course>
+<Id>1</Id>
+<Name>Всі КП</Name>
+</Course>
+<SplitTime status="Additional">
+<ControlCode>22</ControlCode>
+</SplitTime>
+<SplitTime status="Additional">
+<ControlCode>45</ControlCode>
+</SplitTime>
+<SplitTime status="Additional">
+<ControlCode>66</ControlCode>
+</SplitTime>
+<SplitTime status="Additional">
+<ControlCode>77</ControlCode>
+</SplitTime>
+<AssignedFee>
+<Fee type="Normal">
+<Name>Entry fee</Name>
+<Amount>900</Amount>
+</Fee>
+</AssignedFee>
+</Result>
+</TeamMemberResult>
+</TeamResult>
+</ClassResult>
+<ClassResult>
+<Class>
+<Id>8</Id>
+<Name>МІКС55</Name>
+</Class>
+<TeamResult>
+<EntryId type="MeOS">12</EntryId>
+<Name>Мікси-старі</Name>
+<TeamMemberResult>
+<Person>
+<Name>
+<Family>55</Family>
+<Given>Він</Given>
+</Name>
+</Person>
+<Result>
+<Leg>1</Leg>
+<LegOrder>1</LegOrder>
+<StartTime>2026-04-11T09:00:00+03:00</StartTime>
+<FinishTime>2026-04-11T14:00:00+03:00</FinishTime>
+<Time>18000</Time>
+<TimeBehind type="Leg">0</TimeBehind>
+<TimeBehind type="Course">0</TimeBehind>
+<Position type="Leg">1</Position>
+<Position type="Course">1</Position>
+<Status>OK</Status>
+<Score type="Score">16</Score>
+<Score type="Penalty">0</Score>
+<OverallResult>
+<Time>18000</Time>
+<TimeBehind>0</TimeBehind>
+<Position>1</Position>
+<Status>OK</Status>
+</OverallResult>
+<Course>
+<Id>1</Id>
+<Name>Всі КП</Name>
+</Course>
+<SplitTime status="Additional">
+<ControlCode>21</ControlCode>
+</SplitTime>
+<SplitTime status="Additional">
+<ControlCode>23</ControlCode>
+</SplitTime>
+<SplitTime status="Additional">
+<ControlCode>45</ControlCode>
+</SplitTime>
+<SplitTime status="Additional">
+<ControlCode>88</ControlCode>
+</SplitTime>
+<AssignedFee>
+<Fee type="Normal">
+<Name>Entry fee</Name>
+<Amount>900</Amount>
+</Fee>
+</AssignedFee>
+</Result>
+</TeamMemberResult>
+<TeamMemberResult>
+<Person>
+<Name>
+<Family>55</Family>
+<Given>Вона</Given>
+</Name>
+</Person>
+<Result>
+<Leg>1</Leg>
+<LegOrder>2</LegOrder>
+<StartTime>2026-04-11T09:00:00+03:00</StartTime>
+<FinishTime>2026-04-11T14:00:00+03:00</FinishTime>
+<Time>18000</Time>
+<TimeBehind type="Leg">0</TimeBehind>
+<TimeBehind type="Course">0</TimeBehind>
+<Position type="Leg">2</Position>
+<Position type="Course">1</Position>
+<Status>OK</Status>
+<Score type="Score">13</Score>
+<Score type="Penalty">0</Score>
+<OverallResult>
+<Time>18000</Time>
+<TimeBehind>0</TimeBehind>
+<Position>1</Position>
+<Status>OK</Status>
+</OverallResult>
+<Course>
+<Id>1</Id>
+<Name>Всі КП</Name>
+</Course>
+<SplitTime status="Additional">
+<ControlCode>23</ControlCode>
+</SplitTime>
+<SplitTime status="Additional">
+<ControlCode>45</ControlCode>
+</SplitTime>
+<SplitTime status="Additional">
+<ControlCode>77</ControlCode>
 </SplitTime>
 <AssignedFee>
 <Fee type="Normal">
