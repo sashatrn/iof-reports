@@ -1,5 +1,5 @@
 import path from "path";
-import { renderTemplate } from "../render/templateEngine";
+import { renderTemplate } from "../render/template-engine";
 import { GenderTeamResult } from "../scoring/team";
 import { loadConfig } from "../config";
 import { formatDate } from "../utils/date";

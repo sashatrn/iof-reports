@@ -1,5 +1,5 @@
-import { Participant } from "../io/parseIof";
-import { renderTemplate } from "../render/templateEngine";
+import { Participant } from "../io/parse-iof";
+import { renderTemplate } from "../render/template-engine";
 import { formatDate } from "../utils/date";
 import { imageToBase64 } from "../utils/image";
 import { loadConfig } from "../config";

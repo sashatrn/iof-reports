@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 import fs from "fs";
 
-import { parseIof } from "./io/parseIof";
+import { parseIof } from "./io/parse-iof";
 import { pointsFromPosition } from "./scoring/points";
 import { computeTeamResults } from "./scoring/team";
-import { buildIndividualHtml } from "./reports/individualReport";
-import { buildRogainingHtml } from "./reports/rogainingReport";
-import { buildTeamHtml } from "./reports/teamReport";
+import { buildIndividualHtml } from "./reports/individual-report";
+import { buildRogainingHtml } from "./reports/rogaining-report";
+import { buildTeamHtml } from "./reports/team-report";
 import { htmlToPdf } from "./render/pdf";
 import { loadConfig } from "./config";
 import { createLogger } from "./logger";
 import { parseCliArgs } from "./cli";
-import { parseRogainingIof } from "./io/parseRogainingIof";
+import { parseRogainingIof } from "./io/parse-rogaining-iof";
 
 async function main(): Promise<void> {
   const config = loadConfig();

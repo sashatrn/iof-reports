@@ -1,4 +1,4 @@
-import { Participant } from "../io/parseIof";
+import { Participant } from "../io/parse-iof";
 import { AppConfig } from "../config";
 import { Logger } from "pino";
 

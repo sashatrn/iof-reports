@@ -1,7 +1,7 @@
 import path from "path";
 import { loadConfig } from "../config";
-import { RogainingTeam } from "../io/parseRogainingIof";
-import { renderTemplate } from "../render/templateEngine";
+import { RogainingTeam } from "../io/parse-rogaining-iof";
+import { renderTemplate } from "../render/template-engine";
 import { formatDate } from "../utils/date";
 import { imageToBase64 } from "../utils/image";
 
