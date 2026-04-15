@@ -9,9 +9,17 @@ type RankedRogainingTeam = RogainingTeam & {
   place: string;
   formattedTime: string;
   membersLine: string;
+  sourceClassName: string;
 };
 
 const PLACEABLE_STATUSES = new Set(["OK"]);
+const OPEN_AGE = Number.POSITIVE_INFINITY;
+
+type ParsedRogainingClass = {
+  genderPrefix: string;
+  ageLimit: number;
+  originalName: string;
+};
 
 function formatDuration(sec?: number): string {
   if (sec === undefined) {
@@ -72,8 +80,99 @@ function rankTeams(teams: RogainingTeam[]): RankedRogainingTeam[] {
       place: PLACEABLE_STATUSES.has(team.status) ? String(currentPlace) : "",
       formattedTime: formatDuration(team.timeSec),
       membersLine: team.members.join(", "),
+      sourceClassName: team.className,
     };
   });
+}
+
+function parseRogainingClass(className: string): ParsedRogainingClass | undefined {
+  const match = className.trim().match(/^([^\d]+?)\s*(\d+)?$/);
+
+  if (!match) {
+    return undefined;
+  }
+
+  const genderPrefix = match[1].trim();
+  const ageLimit = match[2] ? Number(match[2]) : OPEN_AGE;
+
+  if (!genderPrefix || Number.isNaN(ageLimit)) {
+    return undefined;
+  }
+
+  return {
+    genderPrefix,
+    ageLimit,
+    originalName: className,
+  };
+}
+
+function formatRogainingClassName(genderPrefix: string, ageLimit: number): string {
+  return ageLimit === OPEN_AGE ? genderPrefix : `${genderPrefix}${ageLimit}`;
+}
+
+function getEligibleAgeLimits(ageLimit: number): number[] {
+  if (ageLimit === OPEN_AGE) {
+    return [OPEN_AGE];
+  }
+
+  const eligible = new Set<number>([ageLimit, OPEN_AGE]);
+
+  if (ageLimit <= 23) {
+    eligible.add(23);
+  }
+
+  if (ageLimit >= 45) {
+    eligible.add(45);
+  }
+
+  if (ageLimit >= 55) {
+    eligible.add(55);
+  }
+
+  if (ageLimit >= 65) {
+    eligible.add(65);
+  }
+
+  return [...eligible];
+}
+
+function compareClassAgeLimits(left: number, right: number): number {
+  if (left === right) {
+    return 0;
+  }
+
+  if (left === OPEN_AGE) {
+    return 1;
+  }
+
+  if (right === OPEN_AGE) {
+    return -1;
+  }
+
+  const leftYouth = left <= 23;
+  const rightYouth = right <= 23;
+
+  if (leftYouth && rightYouth) {
+    return left - right;
+  }
+
+  if (!leftYouth && !rightYouth) {
+    return right - left;
+  }
+
+  return leftYouth ? -1 : 1;
+}
+
+function buildEligibleClassNames(team: RogainingTeam): string[] {
+  const parsedClass = parseRogainingClass(team.className);
+
+  if (!parsedClass) {
+    return [team.className];
+  }
+
+  return getEligibleAgeLimits(parsedClass.ageLimit)
+    .sort(compareClassAgeLimits)
+    .map((ageLimit) => formatRogainingClassName(parsedClass.genderPrefix, ageLimit));
 }
 
 export function buildRogainingHtml(
@@ -86,19 +185,47 @@ export function buildRogainingHtml(
   const logo2Path = path.resolve(__dirname, "../assets/logo2.png");
 
   const byClass = new Map<string, RogainingTeam[]>();
+  const declaredClasses = new Set(teams.map((team) => team.className));
 
   for (const team of teams) {
-    if (!byClass.has(team.className)) {
-      byClass.set(team.className, []);
-    }
+    for (const className of buildEligibleClassNames(team)) {
+      if (!declaredClasses.has(className)) {
+        continue;
+      }
 
-    byClass.get(team.className)!.push(team);
+      if (!byClass.has(className)) {
+        byClass.set(className, []);
+      }
+
+      byClass.get(className)!.push(team);
+    }
   }
 
-  const classes = [...byClass.keys()].sort().map((className) => ({
-    name: className,
-    teams: rankTeams(byClass.get(className)!),
-  }));
+  const classes = [...byClass.keys()]
+    .sort((left, right) => {
+      const leftParsed = parseRogainingClass(left);
+      const rightParsed = parseRogainingClass(right);
+
+      if (!leftParsed || !rightParsed) {
+        return left.localeCompare(right, "uk");
+      }
+
+      const prefixComparison = leftParsed.genderPrefix.localeCompare(
+        rightParsed.genderPrefix,
+        "uk",
+      );
+
+      if (prefixComparison !== 0) {
+        return prefixComparison;
+      }
+
+      return compareClassAgeLimits(leftParsed.ageLimit, rightParsed.ageLimit);
+    })
+    .map((className) => ({
+      name: className,
+      teams: rankTeams(byClass.get(className)!),
+    }))
+    .filter((classGroup) => classGroup.teams.length > 0);
 
   return renderTemplate("rogaining.njk", {
     reportTitle: "Протокол результатів рогейну",
@@ -108,7 +235,7 @@ export function buildRogainingHtml(
         `Всеукраїнські змагання "Пліч-о-пліч всеукраїнські шкільні ліги зі<br/>
         спортивного орієнтування"`,
       subtitle:
-        'Ранжування: очки мінус штраф; при рівності вище команда з ранішим фінішем.',
+        "Ранжування: очки мінус штраф; при рівності вище команда з ранішим фінішем. Команди автоматично входять у всі вікові класи, для яких вони придатні.",
       location: config.reportHeader.location,
       date: formatDate(eventDate),
       logo1: imageToBase64(logo1Path),
