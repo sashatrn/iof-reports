@@ -107,7 +107,11 @@
   <div class="layout">
     <div class="toolbar">
       <h1>{{ title }}</h1>
-      <div class="meta">source: {{ sourceFileName }} | report: {{ reportType }} | updated: <span id="updatedAt">{{ updatedAt }}</span></div>
+      <div class="meta">
+        source: <span id="sourceFileName">{{ sourceFileName }}</span>
+        | report: <span id="reportType">{{ reportType }}</span>
+        | updated: <span id="updatedAt">{{ updatedAt }}</span>
+      </div>
       <button id="toggle">Pause</button>
       <button id="direction">Down</button>
       <label>Speed <input id="speed" type="range" min="10" max="200" step="5" value="45" /></label>
@@ -126,6 +130,8 @@
     const speedInput = document.getElementById("speed");
     const pauseInput = document.getElementById("pause");
     const updatedAtNode = document.getElementById("updatedAt");
+    const sourceFileNameNode = document.getElementById("sourceFileName");
+    const reportTypeNode = document.getElementById("reportType");
 
     let running = true;
     let direction = 1;
@@ -141,6 +147,23 @@
     let activeFrame = frameA;
     let standbyFrame = frameB;
     let isReloading = false;
+
+    function formatBrowserLocalDateTime(value) {
+      const parsed = new Date(value);
+
+      if (Number.isNaN(parsed.getTime())) {
+        return value;
+      }
+
+      return new Intl.DateTimeFormat(undefined, {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }).format(parsed);
+    }
 
     function getScrollable(targetFrame = activeFrame) {
       const doc = targetFrame.contentDocument;
@@ -210,7 +233,13 @@
         if (!response.ok) return;
         const meta = await response.json();
         if (meta.updatedAt && updatedAtNode) {
-          updatedAtNode.textContent = meta.updatedAt;
+          updatedAtNode.textContent = formatBrowserLocalDateTime(meta.updatedAt);
+        }
+        if (meta.sourceFileName && sourceFileNameNode) {
+          sourceFileNameNode.textContent = meta.sourceFileName;
+        }
+        if (meta.reportType && reportTypeNode) {
+          reportTypeNode.textContent = meta.reportType;
         }
         if (meta.updatedAt && meta.updatedAt !== currentUpdatedAt) {
           currentUpdatedAt = meta.updatedAt;
@@ -284,6 +313,10 @@
 
     frameA.addEventListener("load", handleFrameLoad);
     frameB.addEventListener("load", handleFrameLoad);
+
+    if (updatedAtNode) {
+      updatedAtNode.textContent = formatBrowserLocalDateTime(updatedAtNode.textContent);
+    }
 
     requestAnimationFrame(step);
   </script>
