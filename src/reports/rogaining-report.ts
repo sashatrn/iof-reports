@@ -194,7 +194,7 @@ export function buildRogainingHtml(
 ): string {
   const config = loadConfig();
   const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
-  const logo2Path = path.resolve(__dirname, "../assets/logo2.png");
+  const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
 
   const byClass = new Map<string, RogainingTeam[]>();
   const declaredClasses = new Set(teams.map((team) => team.className));
@@ -264,10 +264,9 @@ export function buildRogainingHtml(
     event: {
       title:
         eventName ??
-        `Всеукраїнські змагання "Пліч-о-пліч всеукраїнські шкільні ліги зі<br/>
-        спортивного орієнтування"`,
-      subtitle:
-        "Ранжування: очки мінус штраф; при рівності вище команда з ранішим фінішем. Команди автоматично входять у всі вікові класи, для яких вони придатні.",
+        `Протокол результатів рогейну, ${formatDate(eventDate)}`,
+      subtitle: '',
+        // "Ранжування: очки мінус штраф; при рівності вище команда з ранішим фінішем. Команди автоматично входять у всі вікові класи, для яких вони придатні.",
       location: config.reportHeader.location,
       date: formatDate(eventDate),
       logo1: imageToBase64(logo1Path),
