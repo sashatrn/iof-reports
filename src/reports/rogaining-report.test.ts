@@ -95,7 +95,7 @@ describe("buildRogainingHtml", () => {
       },
     ];
 
-    const html = buildRogainingHtml(teams, new Date(2026, 3, 11), "Рогейн");
+    const html = buildRogainingHtml(teams, new Date(2026, 3, 11), "Рогейн", "view");
 
     expect(html).toContain("<h3>Ч18</h3>");
     expect(html).toContain("<h3>Ч23</h3>");
@@ -167,7 +167,7 @@ describe("buildRogainingHtml", () => {
       },
     ];
 
-    const html = buildRogainingHtml(teams, new Date(2026, 3, 11), "Рогейн");
+    const html = buildRogainingHtml(teams, new Date(2026, 3, 11), "Рогейн", "view");
     const openSection = getClassSection(html, "Ч");
 
     expectInOrder(openSection, [
@@ -343,7 +343,7 @@ describe("buildRogainingAwardsHtml", () => {
       },
     ];
 
-    const html = buildRogainingAwardsHtml(teams, new Date(2026, 3, 11), "Рогейн");
+    const html = buildRogainingAwardsHtml(teams, new Date(2026, 3, 11), "Рогейн", "view");
 
     expectInOrder(html, [
       "<h3>Ч55</h3>",

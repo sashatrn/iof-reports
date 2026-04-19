@@ -408,7 +408,9 @@ export function buildRogainingHtml(
   const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
   const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
 
-  const classes = buildRogainingClasses(teams, config);
+  const classes = buildRogainingClasses(teams, config).filter((classGroup) => {
+    return variant === "view" || classGroup.name !== AGGREGATE_OPEN_CLASS;
+  });
 
   return renderTemplate(`rogaining-${variant}.njk`, {
     reportTitle: "Протокол результатів рогейну",

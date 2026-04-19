@@ -55,7 +55,9 @@ describe("generateRogainingReportHtml", () => {
     expect(report.itemCount).toBeGreaterThan(0);
     expect(report.viewHtml).toContain("Протокол результатів рогейну");
     expect(report.viewHtml).toContain("Діди");
+    expect(report.viewHtml).toContain(">ALL</h3>");
     expect(report.pdfHtml).toContain("Протокол результатів рогейну");
+    expect(report.pdfHtml).not.toContain(">ALL</h3>");
     expect(report.viewHtml).toContain('class="page"');
     expect(report.pdfHtml).toContain("@page");
   });
@@ -68,7 +70,9 @@ describe("generateRogainingAwardsReportHtml", () => {
     expect(report.reportType).toBe("rogaining-awards");
     expect(report.itemCount).toBeGreaterThan(0);
     expect(report.viewHtml).toContain("Нагородний протокол рогейну");
+    expect(report.viewHtml).toContain(">ALL</h3>");
     expect(report.pdfHtml).toContain("Нагородний протокол рогейну");
+    expect(report.pdfHtml).toContain(">ALL</h3>");
   });
 });
 
