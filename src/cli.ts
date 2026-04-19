@@ -14,7 +14,7 @@ const HTML_VALUES = new Set<string>(["none", "view", "pdf", "both"]);
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--report all|individual|team|rogaining] [--html none|view|pdf|both]",
+    "Usage: node dist/index.js <file.xml> [--report all|individual|team|rogaining|rogaining-awards] [--html none|view|pdf|both]",
   );
 }
 
@@ -39,7 +39,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       if (!value || !REPORT_VALUES.has(value)) {
         logger.error(
           { report: value },
-          "Invalid report type. Expected one of: all, individual, team, rogaining.",
+          "Invalid report type. Expected one of: all, individual, team, rogaining, rogaining-awards.",
         );
         printUsage(logger);
         process.exit(1);

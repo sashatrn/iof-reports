@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { RogainingTeam } from "../io/parse-rogaining-iof";
-import { buildRogainingHtml } from "./rogaining-report";
+import { buildRogainingAwardsHtml, buildRogainingHtml } from "./rogaining-report";
 
 function expectInOrder(text: string, fragments: string[]): void {
   let previousIndex = -1;
@@ -179,5 +179,189 @@ describe("buildRogainingHtml", () => {
     ]);
     expect(openSection).toContain("<td></td>");
     expect(openSection).toContain("<td>3:03:20</td>");
+  });
+});
+
+describe("buildRogainingAwardsHtml", () => {
+  it("keeps only top three teams and sorts classes by youth, veterans, main, open with gender order", () => {
+    const teams: RogainingTeam[] = [
+      {
+        className: "Ч18",
+        teamName: "Ч18",
+        organisation: "A",
+        members: ["A1", "A2"],
+        memberCount: 2,
+        score: 30,
+        penalty: 0,
+        totalScore: 30,
+        timeSec: 10000,
+        status: "OK",
+      },
+      {
+        className: "Мікс18",
+        teamName: "Мікс18",
+        organisation: "B",
+        members: ["B1", "B2"],
+        memberCount: 2,
+        score: 29,
+        penalty: 0,
+        totalScore: 29,
+        timeSec: 10100,
+        status: "OK",
+      },
+      {
+        className: "Ж18",
+        teamName: "Ж18",
+        organisation: "C",
+        members: ["C1", "C2"],
+        memberCount: 2,
+        score: 28,
+        penalty: 0,
+        totalScore: 28,
+        timeSec: 10200,
+        status: "OK",
+      },
+      {
+        className: "Ч55",
+        teamName: "Ч55",
+        organisation: "D",
+        members: ["D1", "D2"],
+        memberCount: 2,
+        score: 27,
+        penalty: 0,
+        totalScore: 27,
+        timeSec: 10300,
+        status: "OK",
+      },
+      {
+        className: "Мікси-старі",
+        teamName: "Мікси-старі",
+        organisation: "E",
+        members: ["E1", "E2"],
+        memberCount: 2,
+        score: 26,
+        penalty: 0,
+        totalScore: 26,
+        timeSec: 10400,
+        status: "OK",
+      },
+      {
+        className: "Ж45",
+        teamName: "Ж45",
+        organisation: "F",
+        members: ["F1", "F2"],
+        memberCount: 2,
+        score: 25,
+        penalty: 0,
+        totalScore: 25,
+        timeSec: 10500,
+        status: "OK",
+      },
+      {
+        className: "Ж",
+        teamName: "Ж Open",
+        organisation: "G",
+        members: ["G1", "G2"],
+        memberCount: 2,
+        score: 24,
+        penalty: 0,
+        totalScore: 24,
+        timeSec: 10600,
+        status: "OK",
+      },
+      {
+        className: "Мікси",
+        teamName: "Мікси",
+        organisation: "H",
+        members: ["H1", "H2"],
+        memberCount: 2,
+        score: 23,
+        penalty: 0,
+        totalScore: 23,
+        timeSec: 10700,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "Ч Open",
+        organisation: "I",
+        members: ["I1", "I2"],
+        memberCount: 2,
+        score: 22,
+        penalty: 0,
+        totalScore: 22,
+        timeSec: 10800,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "1",
+        organisation: "J",
+        members: ["J1", "J2"],
+        memberCount: 2,
+        score: 40,
+        penalty: 0,
+        totalScore: 40,
+        timeSec: 9000,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "2",
+        organisation: "K",
+        members: ["K1", "K2"],
+        memberCount: 2,
+        score: 39,
+        penalty: 0,
+        totalScore: 39,
+        timeSec: 9100,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "3",
+        organisation: "L",
+        members: ["L1", "L2"],
+        memberCount: 2,
+        score: 38,
+        penalty: 0,
+        totalScore: 38,
+        timeSec: 9200,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "4",
+        organisation: "M",
+        members: ["M1", "M2"],
+        memberCount: 2,
+        score: 37,
+        penalty: 0,
+        totalScore: 37,
+        timeSec: 9300,
+        status: "OK",
+      },
+    ];
+
+    const html = buildRogainingAwardsHtml(teams, new Date(2026, 3, 11), "Рогейн");
+
+    expectInOrder(html, [
+      "<h3>Ж18</h3>",
+      "<h3>Мікс18</h3>",
+      "<h3>Ч18</h3>",
+      "<h3>Ч55</h3>",
+      "<h3>Ж45</h3>",
+      "<h3>Мікси-старі</h3>",
+      "<h3>Ж</h3>",
+      "<h3>Мікси</h3>",
+      "<h3>Ч</h3>",
+      "<h3>OPEN</h3>",
+    ]);
+
+    const menOpenSection = getClassSection(html, "Ч");
+    expect(menOpenSection).toContain(">1<");
+    expect(menOpenSection).toContain(">2<");
+    expect(menOpenSection).toContain(">3<");
+    expect(menOpenSection).not.toContain(">4<");
   });
 });

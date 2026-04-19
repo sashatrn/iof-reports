@@ -3,7 +3,7 @@ import { loadConfig } from "../config";
 import { parseIof } from "../io/parse-iof";
 import { parseRogainingIof } from "../io/parse-rogaining-iof";
 import { buildIndividualHtml } from "../reports/individual-report";
-import { buildRogainingHtml } from "../reports/rogaining-report";
+import { buildRogainingAwardsHtml, buildRogainingHtml } from "../reports/rogaining-report";
 import { buildTeamHtml } from "../reports/team-report";
 import { pointsFromPosition } from "../scoring/points";
 import { computeTeamResults } from "../scoring/team";
@@ -117,6 +117,29 @@ export function generateRogainingReportHtml(
   };
 }
 
+export function generateRogainingAwardsReportHtml(
+  xml: string,
+  options: GenerateReportOptions = {},
+): GeneratedReport {
+  const { logger } = options;
+  const parsed = parseRogainingIof(xml);
+  const eventDate = normalizeEventDate(parsed.eventDate, logger);
+
+  logger?.info(
+    { count: parsed.teams.length },
+    "Rogaining teams parsed successfully for awards report",
+  );
+
+  return {
+    reportType: "rogaining-awards",
+    viewHtml: buildRogainingAwardsHtml(parsed.teams, eventDate, parsed.eventName, "view"),
+    pdfHtml: buildRogainingAwardsHtml(parsed.teams, eventDate, parsed.eventName, "pdf"),
+    eventName: parsed.eventName,
+    eventDate: toIsoDate(eventDate),
+    itemCount: parsed.teams.length,
+  };
+}
+
 export function generateReportHtml(
   xml: string,
   reportType: SingleReportType,
@@ -129,6 +152,8 @@ export function generateReportHtml(
       return generateTeamReportHtml(xml, options);
     case "rogaining":
       return generateRogainingReportHtml(xml, options);
+    case "rogaining-awards":
+      return generateRogainingAwardsReportHtml(xml, options);
   }
 }
 

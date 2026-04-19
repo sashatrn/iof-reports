@@ -26,6 +26,11 @@ type ParsedRogainingClass = {
   originalName: string;
 };
 
+type RogainingClassGroup = {
+  name: string;
+  teams: RankedRogainingTeam[];
+};
+
 function formatDuration(sec?: number): string {
   if (sec === undefined) {
     return "";
@@ -187,18 +192,7 @@ function buildEligibleClassNames(
     .map((ageLimit) => formatRogainingClassName(parsedClass.genderPrefix, ageLimit));
 }
 
-export function buildRogainingHtml(
-  teams: RogainingTeam[],
-  eventDate: Date,
-  eventName?: string,
-  variant: HtmlVariant = "pdf",
-): string {
-  const config = loadConfig();
-  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
-  const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
-
-  const byClass = new Map<string, RogainingTeam[]>();
-  const declaredClasses = new Set(teams.map((team) => team.className));
+function getDeclaredAgeLimitsByPrefix(declaredClasses: Set<string>): Map<string, number[]> {
   const declaredAgeLimitsByPrefix = new Map<string, number[]>();
 
   for (const declaredClass of declaredClasses) {
@@ -216,6 +210,14 @@ export function buildRogainingHtml(
       parsedClass.ageLimit,
     );
   }
+
+  return declaredAgeLimitsByPrefix;
+}
+
+function buildRogainingClasses(teams: RogainingTeam[]): RogainingClassGroup[] {
+  const byClass = new Map<string, RogainingTeam[]>();
+  const declaredClasses = new Set(teams.map((team) => team.className));
+  const declaredAgeLimitsByPrefix = getDeclaredAgeLimitsByPrefix(declaredClasses);
 
   for (const team of teams) {
     for (const className of buildEligibleClassNames(
@@ -236,7 +238,7 @@ export function buildRogainingHtml(
 
   byClass.set(AGGREGATE_OPEN_CLASS, teams);
 
-  const classes = [...byClass.keys()]
+  return [...byClass.keys()]
     .sort((left, right) => {
       if (left === AGGREGATE_OPEN_CLASS) {
         return 1;
@@ -269,6 +271,114 @@ export function buildRogainingHtml(
       teams: rankTeams(byClass.get(className)!),
     }))
     .filter((classGroup) => classGroup.teams.length > 0);
+}
+
+function classifyAwardsClass(className: string): {
+  bucket: number;
+  ageOrder: number;
+  genderOrder: number;
+  normalizedName: string;
+} {
+  const normalizedName = className.trim();
+
+  if (normalizedName === AGGREGATE_OPEN_CLASS) {
+    return {
+      bucket: 3,
+      ageOrder: Number.MAX_SAFE_INTEGER,
+      genderOrder: 0,
+      normalizedName,
+    };
+  }
+
+  const lower = normalizedName.toLowerCase();
+  const parsedClass = parseRogainingClass(normalizedName);
+  const ageLimit = parsedClass?.ageLimit ?? OPEN_AGE;
+
+  let genderOrder = 3;
+  if (lower.startsWith("ж")) {
+    genderOrder = 0;
+  } else if (lower.startsWith("мікс") || lower.startsWith("mix")) {
+    genderOrder = 1;
+  } else if (lower.startsWith("ч")) {
+    genderOrder = 2;
+  }
+
+  if (ageLimit !== OPEN_AGE && ageLimit <= YOUTH_MAX_AGE) {
+    return {
+      bucket: 1,
+      ageOrder: ageLimit,
+      genderOrder,
+      normalizedName,
+    };
+  }
+
+  if (
+    lower.includes("стар") ||
+    lower.includes("вет") ||
+    (ageLimit !== OPEN_AGE && ageLimit >= MASTER_MIN_AGE)
+  ) {
+    const veteranOrder =
+      ageLimit !== OPEN_AGE && ageLimit >= MASTER_MIN_AGE ? -ageLimit : -MASTER_MIN_AGE;
+
+    return {
+      bucket: 0,
+      ageOrder: veteranOrder,
+      genderOrder,
+      normalizedName,
+    };
+  }
+
+  if (
+    lower.includes("юн") ||
+    lower.includes("jun") ||
+    lower.includes("молод")
+  ) {
+    return {
+      bucket: 1,
+      ageOrder: ageLimit !== OPEN_AGE ? ageLimit : YOUTH_MAX_AGE,
+      genderOrder,
+      normalizedName,
+    };
+  }
+
+  return {
+    bucket: 2,
+    ageOrder: 0,
+    genderOrder,
+    normalizedName,
+  };
+}
+
+function sortAwardsClasses(left: RogainingClassGroup, right: RogainingClassGroup): number {
+  const leftMeta = classifyAwardsClass(left.name);
+  const rightMeta = classifyAwardsClass(right.name);
+
+  if (leftMeta.bucket !== rightMeta.bucket) {
+    return leftMeta.bucket - rightMeta.bucket;
+  }
+
+  if (leftMeta.ageOrder !== rightMeta.ageOrder) {
+    return leftMeta.ageOrder - rightMeta.ageOrder;
+  }
+
+  if (leftMeta.genderOrder !== rightMeta.genderOrder) {
+    return leftMeta.genderOrder - rightMeta.genderOrder;
+  }
+
+  return leftMeta.normalizedName.localeCompare(rightMeta.normalizedName, "uk");
+}
+
+export function buildRogainingHtml(
+  teams: RogainingTeam[],
+  eventDate: Date,
+  eventName?: string,
+  variant: HtmlVariant = "pdf",
+): string {
+  const config = loadConfig();
+  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
+  const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
+
+  const classes = buildRogainingClasses(teams);
 
   return renderTemplate(`rogaining-${variant}.njk`, {
     reportTitle: "Протокол результатів рогейну",
@@ -279,6 +389,44 @@ export function buildRogainingHtml(
         `Протокол результатів рогейну, ${formatDate(eventDate)}`,
       subtitle: "",
       // "Ранжування: очки мінус штраф; при рівності вище команда з ранішим фінішем. Команди автоматично входять у всі вікові класи, для яких вони придатні.",
+      location: config.reportHeader.location,
+      date: formatDate(eventDate),
+      logo1: imageToBase64(logo1Path),
+      logo2: imageToBase64(logo2Path),
+    },
+    officials: config.officials,
+    classes,
+  });
+}
+
+export function buildRogainingAwardsHtml(
+  teams: RogainingTeam[],
+  eventDate: Date,
+  eventName?: string,
+  variant: HtmlVariant = "pdf",
+): string {
+  const config = loadConfig();
+  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
+  const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
+
+  const classes = buildRogainingClasses(teams)
+    .map((classGroup) => ({
+      ...classGroup,
+      teams: classGroup.teams
+        .filter((team) => team.place !== "")
+        .slice(0, 3),
+    }))
+    .filter((classGroup) => classGroup.teams.length > 0)
+    .sort(sortAwardsClasses);
+
+  return renderTemplate(`rogaining-awards-${variant}.njk`, {
+    reportTitle: "Нагородний протокол рогейну",
+    event: {
+      title:
+        config.reportHeader.title ??
+        eventName ??
+        `Нагородний протокол рогейну, ${formatDate(eventDate)}`,
+      subtitle: "",
       location: config.reportHeader.location,
       date: formatDate(eventDate),
       logo1: imageToBase64(logo1Path),

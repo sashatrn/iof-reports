@@ -30,10 +30,10 @@ CLI-інструмент для перетворення результатів 
 
 1. Відкрийте командний рядок Windows
 1. Виконайте `iof-reports <results.xml>`, де `<results.xml>` - IOF XML файл результатів.
-1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team` або `--report rogaining`.
+1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team`, `--report rogaining` або `--report rogaining-awards`.
 1. За потреби згенеруйте HTML-файли: `--html view`, `--html pdf` або `--html both`.
 
-Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `rogaining`.
+Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `rogaining`, `rogaining-awards`.
 Доступні значення для `--html`: `none` (за замовчуванням), `view`, `pdf`, `both`.
 
 Приклади:
@@ -52,7 +52,7 @@ CLI-інструмент для перетворення результатів 
 iof-reports watch \
   --input-dir ./incoming \
   --output-dir ./out \
-  --report rogaining \
+  --report rogaining-awards \
   --port 4173
 ```
 

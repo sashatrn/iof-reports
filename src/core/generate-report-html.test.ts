@@ -5,6 +5,7 @@ import {
   generateIndividualReportHtml,
   generateReportHtml,
   generateReportsHtml,
+  generateRogainingAwardsReportHtml,
   generateRogainingReportHtml,
   generateTeamReportHtml,
 } from "./generate-report-html";
@@ -60,6 +61,17 @@ describe("generateRogainingReportHtml", () => {
   });
 });
 
+describe("generateRogainingAwardsReportHtml", () => {
+  it("builds rogaining awards html from TeamResult IOF XML", () => {
+    const report = generateRogainingAwardsReportHtml(rogainingXml);
+
+    expect(report.reportType).toBe("rogaining-awards");
+    expect(report.itemCount).toBeGreaterThan(0);
+    expect(report.viewHtml).toContain("Нагородний протокол рогейну");
+    expect(report.pdfHtml).toContain("Нагородний протокол рогейну");
+  });
+});
+
 describe("generateReportsHtml", () => {
   it("builds two reports for all mode", () => {
     const reports = generateReportsHtml(sampleXml, "all");
@@ -79,5 +91,12 @@ describe("generateReportHtml", () => {
     expect(report.reportType).toBe("individual");
     expect(report.viewHtml).toContain("Індивідуальний протокол");
     expect(report.pdfHtml).toContain("Індивідуальний протокол");
+  });
+
+  it("dispatches to rogaining awards report generator", () => {
+    const report = generateReportHtml(rogainingXml, "rogaining-awards");
+
+    expect(report.reportType).toBe("rogaining-awards");
+    expect(report.viewHtml).toContain("Нагородний протокол рогейну");
   });
 });
