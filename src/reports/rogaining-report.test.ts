@@ -102,7 +102,7 @@ describe("buildRogainingHtml", () => {
     expect(html).toContain("<h3>Ч45</h3>");
     expect(html).toContain("<h3>Ч55</h3>");
     expect(html).toContain("<h3>Ч</h3>");
-    expect(html).toContain("<h3>OPEN</h3>");
+    expect(html).toContain("<h3>ALL</h3>");
     expect(html).not.toContain("<h3>Ч65</h3>");
 
     const openSection = getClassSection(html, "Ч");
@@ -120,7 +120,7 @@ describe("buildRogainingHtml", () => {
     expect(class23Section).toContain("Молодь");
     expect(class23Section).not.toContain("Open Team");
 
-    const aggregateOpenSection = getClassSection(html, "OPEN");
+    const aggregateOpenSection = getClassSection(html, "ALL");
     expect(aggregateOpenSection).toContain("Юнаки");
     expect(aggregateOpenSection).toContain("Молодь");
     expect(aggregateOpenSection).toContain("Майстри");
@@ -355,7 +355,7 @@ describe("buildRogainingAwardsHtml", () => {
       "<h3>Ж</h3>",
       "<h3>Мікси</h3>",
       "<h3>Ч</h3>",
-      "<h3>OPEN</h3>",
+      "<h3>ALL</h3>",
     ]);
 
     const menOpenSection = getClassSection(html, "Ч");

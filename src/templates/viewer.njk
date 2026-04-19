@@ -157,7 +157,7 @@
       <button id="toggle">Pause</button>
       <button id="direction">Down</button>
       <label><input id="activeToggle" type="checkbox" /> Show Active</label>
-      <label><input id="openClassToggle" type="checkbox" checked /> Show OPEN</label>
+      <label><input id="openClassToggle" type="checkbox" checked /> Show ALL</label>
       <label>Speed <input id="speed" type="range" min="10" max="200" step="5" value="45" /></label>
       <label>Pause edge <input id="pause" type="range" min="0" max="5000" step="250" value="1500" /></label>
     </div>
@@ -244,7 +244,7 @@
         return;
       }
 
-      const openClassBlocks = doc.querySelectorAll(".class-block[data-class-group='OPEN']");
+      const openClassBlocks = doc.querySelectorAll(".class-block[data-class-group='ALL']");
 
       for (const block of openClassBlocks) {
         block.style.display = showOpenClass ? "" : "none";

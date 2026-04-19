@@ -18,7 +18,7 @@ const PLACEABLE_STATUSES = new Set(["OK"]);
 const OPEN_AGE = Number.POSITIVE_INFINITY;
 const YOUTH_MAX_AGE = 23;
 const MASTER_MIN_AGE = 45;
-const AGGREGATE_OPEN_CLASS = "OPEN";
+const AGGREGATE_OPEN_CLASS = "ALL";
 
 type ParsedRogainingClass = {
   genderPrefix: string;
