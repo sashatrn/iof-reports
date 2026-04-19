@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title }}</title>
+  <style>
+    :root {
+      --bg: #0f1720;
+      --panel: rgba(15, 23, 32, 0.82);
+      --text: #e8eef2;
+      --muted: #9db0bd;
+      --accent: #f4b942;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(244,185,66,0.18), transparent 28%),
+        linear-gradient(180deg, #15212c 0%, #0f1720 100%);
+      color: var(--text);
+    }
+
+    .layout {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 18px;
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      flex-wrap: wrap;
+    }
+
+    .toolbar h1 {
+      font-size: 16px;
+      margin: 0 18px 0 0;
+      letter-spacing: 0.02em;
+    }
+
+    .toolbar .meta {
+      color: var(--muted);
+      font-size: 13px;
+      margin-right: auto;
+    }
+
+    .toolbar button,
+    .toolbar input {
+      font: inherit;
+    }
+
+    .toolbar button {
+      border: 0;
+      background: var(--accent);
+      color: #1c1607;
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .toolbar label {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    iframe {
+      width: 100%;
+      height: calc(100vh - 70px);
+      border: 0;
+      background: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <div class="toolbar">
+      <h1>{{ title }}</h1>
+      <div class="meta">source: {{ sourceFileName }} | report: {{ reportType }} | updated: <span id="updatedAt">{{ updatedAt }}</span></div>
+      <button id="toggle">Pause</button>
+      <button id="direction">Down</button>
+      <label>Speed <input id="speed" type="range" min="10" max="200" step="5" value="45" /></label>
+      <label>Pause edge <input id="pause" type="range" min="0" max="5000" step="250" value="1500" /></label>
+    </div>
+    <iframe id="reportFrame" src="./report.html" title="{{ title }}"></iframe>
+  </div>
+  <script>
+    const frame = document.getElementById("reportFrame");
+    const toggleButton = document.getElementById("toggle");
+    const directionButton = document.getElementById("direction");
+    const speedInput = document.getElementById("speed");
+    const pauseInput = document.getElementById("pause");
+    const updatedAtNode = document.getElementById("updatedAt");
+
+    let running = true;
+    let direction = 1;
+    let lastTick = 0;
+    let pauseUntil = 0;
+    let lastMetaFetch = 0;
+
+    function getScrollable() {
+      const doc = frame.contentDocument;
+      if (!doc) return null;
+      return doc.scrollingElement || doc.documentElement;
+    }
+
+    function reloadFrame() {
+      frame.src = "./report.html?t=" + Date.now();
+    }
+
+    async function refreshMeta() {
+      try {
+        const response = await fetch("./meta.json?t=" + Date.now(), { cache: "no-store" });
+        if (!response.ok) return;
+        const meta = await response.json();
+        if (meta.updatedAt && updatedAtNode) {
+          updatedAtNode.textContent = meta.updatedAt;
+        }
+      } catch {
+      }
+    }
+
+    function step(timestamp) {
+      if (!lastTick) {
+        lastTick = timestamp;
+      }
+
+      const scrollable = getScrollable();
+      const elapsed = (timestamp - lastTick) / 1000;
+      lastTick = timestamp;
+
+      if (running && scrollable && timestamp >= pauseUntil) {
+        const speed = Number(speedInput.value);
+        scrollable.scrollTop += direction * speed * elapsed;
+
+        const maxScroll = scrollable.scrollHeight - scrollable.clientHeight;
+
+        if (scrollable.scrollTop <= 0) {
+          scrollable.scrollTop = 0;
+          direction = 1;
+          directionButton.textContent = "Down";
+          pauseUntil = timestamp + Number(pauseInput.value);
+        } else if (scrollable.scrollTop >= maxScroll) {
+          scrollable.scrollTop = maxScroll;
+          direction = -1;
+          directionButton.textContent = "Up";
+          pauseUntil = timestamp + Number(pauseInput.value);
+        }
+      }
+
+      if (timestamp - lastMetaFetch > 5000) {
+        lastMetaFetch = timestamp;
+        reloadFrame();
+        refreshMeta();
+      }
+
+      requestAnimationFrame(step);
+    }
+
+    toggleButton.addEventListener("click", () => {
+      running = !running;
+      toggleButton.textContent = running ? "Pause" : "Resume";
+    });
+
+    directionButton.addEventListener("click", () => {
+      direction *= -1;
+      directionButton.textContent = direction === 1 ? "Down" : "Up";
+    });
+
+    frame.addEventListener("load", () => {
+      const scrollable = getScrollable();
+      if (scrollable) {
+        scrollable.scrollTop = 0;
+      }
+    });
+
+    requestAnimationFrame(step);
+  </script>
+</body>
+</html>

@@ -1,13 +1,14 @@
 import fs from "fs";
 import path from "path";
 import { Logger } from "pino";
+import { ReportType, REPORT_TYPES } from "./report-types";
 
 export type CliOptions = {
   inputPath: string;
-  report: "all" | "individual" | "team" | "rogaining";
+  report: ReportType;
 };
 
-const REPORT_VALUES = new Set(["all", "individual", "team", "rogaining"]);
+const REPORT_VALUES = new Set<string>(REPORT_TYPES);
 
 function printUsage(logger: Logger): void {
   logger.info(

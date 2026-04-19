@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "tsx src/index.ts",
+    "dev:watch": "tsx src/index.ts watch",
     "dev:sample": "tsx src/index.ts src/__fixtures__/sample.xml",
     "dev:rogaining": "tsx src/index.ts src/__fixtures__/rogaining-test.xml --report rogaining",
     "clean": "rimraf dist",
@@ -16,6 +17,7 @@
     "copy-assets": "cpy \"src/assets/**/*\" dist/assets",
     "copy-templates": "cpy \"src/templates/**/*\" dist/templates",
     "start": "node dist/index.js",
+    "start:watch": "node dist/index.js watch",
     "test": "vitest",
     "test:watch": "vitest --watch"
   },
