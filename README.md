@@ -52,7 +52,8 @@ CLI-інструмент для перетворення результатів 
 iof-reports watch \
   --input-dir ./incoming \
   --output-dir ./out \
-  --report rogaining
+  --report rogaining \
+  --port 4173
 ```
 
 Поведінка:
@@ -60,6 +61,7 @@ iof-reports watch \
 - програма кожні кілька секунд шукає найновіший `*.xml` у `--input-dir`
 - якщо файл новий або його вміст змінився, генерується новий HTML
 - якщо найновіший файл ще дописується, цикл пропускається
+- паралельно піднімається локальний HTTP-сервер для перегляду звіту
 
 Артефакти в `--output-dir`:
 
@@ -73,11 +75,18 @@ iof-reports watch \
 
 - `--poll-ms 3000` - інтервал перевірки папки
 - `--settle-ms 1000` - пауза для перевірки, що latest XML уже не дописується
+- `--port 4173` - порт локального HTTP-сервера
+
+Після запуску відкривайте viewer через браузер:
+
+- `http://127.0.0.1:4173/viewer` - viewer з автооновленням і автоскролом
+- `http://127.0.0.1:4173/report` - поточний HTML-звіт
+- `http://127.0.0.1:4173/meta` - метадані поточного звіту
 
 Для локальної розробки:
 
 ```bash
-npm run dev:watch -- --input-dir ./incoming --output-dir ./out --report rogaining
+npm run dev:watch -- --input-dir ./incoming --output-dir ./out --report rogaining --port 4173
 ```
 
 ## Конфігурація додатку

@@ -6,6 +6,7 @@ import { generateReportHtml } from "../core/generate-report-html";
 import { createLogger } from "../logger";
 import { parseWatchArgs } from "./cli";
 import { findLatestXml } from "./find-latest-xml";
+import { startWatchHttpServer } from "./http-server";
 import { renderViewerPage } from "./viewer-page";
 import { readWatchState, writeWatchState } from "./watch-state";
 
@@ -37,6 +38,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
   let running = false;
 
   fs.mkdirSync(options.outputDir, { recursive: true });
+  const httpServer = startWatchHttpServer(options.outputDir, options.port, logger);
 
   logger.info(
     {
@@ -45,6 +47,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
       report: options.reportType,
       pollMs: options.pollMs,
       settleMs: options.settleMs,
+      port: options.port,
     },
     "Watching directory for latest XML",
   );
@@ -129,6 +132,9 @@ export async function runWatchMode(argv: string[]): Promise<void> {
           file: latestFile.path,
           reportType: generatedReport.reportType,
           outputDir: options.outputDir,
+          viewerUrl: `http://127.0.0.1:${options.port}/viewer`,
+          reportUrl: `http://127.0.0.1:${options.port}/report`,
+          metaUrl: `http://127.0.0.1:${options.port}/meta`,
         },
         "HTML report regenerated from latest XML",
       );
@@ -147,6 +153,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
   await new Promise<void>((resolve) => {
     const stop = () => {
       clearInterval(timer);
+      httpServer.close();
       logger.info("Watch mode stopped");
       resolve();
     };

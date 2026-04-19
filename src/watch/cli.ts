@@ -9,11 +9,12 @@ export type WatchOptions = {
   reportType: SingleReportType;
   pollMs: number;
   settleMs: number;
+  port: number;
 };
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <individual|team|rogaining> [--poll-ms 3000] [--settle-ms 1000]",
+    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <individual|team|rogaining> [--poll-ms 3000] [--settle-ms 1000] [--port 4173]",
   );
 }
 
@@ -23,6 +24,7 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
   let reportType: SingleReportType | undefined;
   let pollMs = 3000;
   let settleMs = 1000;
+  let port = 4173;
 
   for (let i = 3; i < argv.length; i += 1) {
     const arg = argv[i];
@@ -67,6 +69,12 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
       continue;
     }
 
+    if (arg === "--port") {
+      port = Number(value);
+      i += 1;
+      continue;
+    }
+
     logger.error({ arg }, "Unknown watch argument.");
     printUsage(logger);
     process.exit(1);
@@ -93,11 +101,17 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
     process.exit(1);
   }
 
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    logger.error({ port }, "port must be an integer between 1 and 65535.");
+    process.exit(1);
+  }
+
   return {
     inputDir,
     outputDir,
     reportType,
     pollMs,
     settleMs,
+    port,
   };
 }

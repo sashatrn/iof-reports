@@ -78,11 +78,28 @@
       font-size: 13px;
     }
 
-    iframe {
-      width: 100%;
+    .frame-stack {
+      position: relative;
       height: calc(100vh - 70px);
+      background: white;
+      overflow: hidden;
+    }
+
+    iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
       border: 0;
       background: white;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 120ms linear;
+    }
+
+    iframe.active {
+      opacity: 1;
+      pointer-events: auto;
     }
   </style>
 </head>
@@ -96,10 +113,14 @@
       <label>Speed <input id="speed" type="range" min="10" max="200" step="5" value="45" /></label>
       <label>Pause edge <input id="pause" type="range" min="0" max="5000" step="250" value="1500" /></label>
     </div>
-    <iframe id="reportFrame" src="./report.html" title="{{ title }}"></iframe>
+    <div class="frame-stack">
+      <iframe id="reportFrameA" class="active" src="./report" title="{{ title }}"></iframe>
+      <iframe id="reportFrameB" src="about:blank" title="{{ title }}"></iframe>
+    </div>
   </div>
   <script>
-    const frame = document.getElementById("reportFrame");
+    const frameA = document.getElementById("reportFrameA");
+    const frameB = document.getElementById("reportFrameB");
     const toggleButton = document.getElementById("toggle");
     const directionButton = document.getElementById("direction");
     const speedInput = document.getElementById("speed");
@@ -111,24 +132,89 @@
     let lastTick = 0;
     let pauseUntil = 0;
     let lastMetaFetch = 0;
+    let currentUpdatedAt = "{{ updatedAt }}";
+    let pendingScrollTop = 0;
+    let pendingScrollRatio = 0;
+    let pendingDistanceFromBottom = 0;
+    let pendingDirection = 1;
+    let hasPendingScrollRestore = false;
+    let activeFrame = frameA;
+    let standbyFrame = frameB;
+    let isReloading = false;
 
-    function getScrollable() {
-      const doc = frame.contentDocument;
+    function getScrollable(targetFrame = activeFrame) {
+      const doc = targetFrame.contentDocument;
       if (!doc) return null;
       return doc.scrollingElement || doc.documentElement;
     }
 
     function reloadFrame() {
-      frame.src = "./report.html?t=" + Date.now();
+      if (isReloading) {
+        return;
+      }
+
+      const scrollable = getScrollable();
+
+      if (scrollable) {
+        const maxScroll = Math.max(0, scrollable.scrollHeight - scrollable.clientHeight);
+        pendingScrollTop = scrollable.scrollTop;
+        pendingScrollRatio = maxScroll > 0 ? scrollable.scrollTop / maxScroll : 0;
+        pendingDistanceFromBottom = Math.max(0, maxScroll - scrollable.scrollTop);
+        pendingDirection = direction;
+        hasPendingScrollRestore = true;
+      }
+
+      isReloading = true;
+      standbyFrame.src = "./report?t=" + Date.now();
+    }
+
+    function applyRestoredScroll(targetFrame) {
+      const scrollable = getScrollable(targetFrame);
+
+      if (!scrollable) {
+        return;
+      }
+
+      if (hasPendingScrollRestore) {
+        const maxScroll = Math.max(0, scrollable.scrollHeight - scrollable.clientHeight);
+        const restoredScrollTop = maxScroll <= 0
+          ? 0
+          : pendingDirection === -1
+            ? Math.min(maxScroll, Math.max(0, maxScroll - pendingDistanceFromBottom))
+            : Math.min(maxScroll, Math.max(0, pendingScrollRatio * maxScroll));
+
+        scrollable.scrollTop = restoredScrollTop || pendingScrollTop;
+        direction = pendingDirection;
+        pauseUntil = 0;
+        directionButton.textContent = direction === 1 ? "Down" : "Up";
+        hasPendingScrollRestore = false;
+        return;
+      }
+
+      scrollable.scrollTop = 0;
+    }
+
+    function swapFrames() {
+      activeFrame.classList.remove("active");
+      standbyFrame.classList.add("active");
+
+      const previousActive = activeFrame;
+      activeFrame = standbyFrame;
+      standbyFrame = previousActive;
+      isReloading = false;
     }
 
     async function refreshMeta() {
       try {
-        const response = await fetch("./meta.json?t=" + Date.now(), { cache: "no-store" });
+        const response = await fetch("./meta?t=" + Date.now(), { cache: "no-store" });
         if (!response.ok) return;
         const meta = await response.json();
         if (meta.updatedAt && updatedAtNode) {
           updatedAtNode.textContent = meta.updatedAt;
+        }
+        if (meta.updatedAt && meta.updatedAt !== currentUpdatedAt) {
+          currentUpdatedAt = meta.updatedAt;
+          reloadFrame();
         }
       } catch {
       }
@@ -164,7 +250,6 @@
 
       if (timestamp - lastMetaFetch > 5000) {
         lastMetaFetch = timestamp;
-        reloadFrame();
         refreshMeta();
       }
 
@@ -181,12 +266,24 @@
       directionButton.textContent = direction === 1 ? "Down" : "Up";
     });
 
-    frame.addEventListener("load", () => {
-      const scrollable = getScrollable();
-      if (scrollable) {
-        scrollable.scrollTop = 0;
+    function handleFrameLoad(event) {
+      const loadedFrame = event.target;
+      const isInitialActiveLoad = loadedFrame === activeFrame && !isReloading;
+      const isStandbyReload = loadedFrame === standbyFrame && isReloading;
+
+      if (!isInitialActiveLoad && !isStandbyReload) {
+        return;
       }
-    });
+
+      applyRestoredScroll(loadedFrame);
+
+      if (isStandbyReload) {
+        swapFrames();
+      }
+    }
+
+    frameA.addEventListener("load", handleFrameLoad);
+    frameB.addEventListener("load", handleFrameLoad);
 
     requestAnimationFrame(step);
   </script>
