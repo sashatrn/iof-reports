@@ -23,7 +23,7 @@
     </thead>
     <tbody>
       {% for team in class.teams %}
-      <tr>
+      <tr data-status="{{ team.status }}">
         <td>{{ team.place }}</td>
         <td>{{ team.teamName }}</td>
         <td>{{ team.sourceClassName }}</td>

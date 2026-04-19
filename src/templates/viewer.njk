@@ -30,6 +30,10 @@
       grid-template-rows: auto 1fr;
     }
 
+    .layout.toolbar-hidden {
+      grid-template-rows: 1fr;
+    }
+
     .toolbar {
       display: flex;
       gap: 12px;
@@ -41,6 +45,10 @@
       top: 0;
       z-index: 2;
       flex-wrap: wrap;
+    }
+
+    .layout.toolbar-hidden .toolbar {
+      display: none;
     }
 
     .toolbar h1 {
@@ -85,6 +93,10 @@
       overflow: hidden;
     }
 
+    .layout.toolbar-hidden .frame-stack {
+      height: 100vh;
+    }
+
     iframe {
       position: absolute;
       inset: 0;
@@ -101,10 +113,26 @@
       opacity: 1;
       pointer-events: auto;
     }
+
+    .panel-toggle {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 3;
+      border: 0;
+      background: var(--accent);
+      color: #1c1607;
+      padding: 10px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 600;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+    }
   </style>
 </head>
 <body>
-  <div class="layout">
+  <div class="layout" id="layout">
     <div class="toolbar">
       <h1>{{ title }}</h1>
       <div class="meta">
@@ -113,7 +141,9 @@
         | updated: <span id="updatedAt">{{ updatedAt }}</span>
       </div>
       <button id="toggle">Pause</button>
+      <button id="panelToggleInline">Hide Panel</button>
       <button id="direction">Down</button>
+      <label><input id="activeToggle" type="checkbox" /> Show Active</label>
       <label>Speed <input id="speed" type="range" min="10" max="200" step="5" value="45" /></label>
       <label>Pause edge <input id="pause" type="range" min="0" max="5000" step="250" value="1500" /></label>
     </div>
@@ -122,11 +152,16 @@
       <iframe id="reportFrameB" src="about:blank" title="{{ title }}"></iframe>
     </div>
   </div>
+  <button id="panelToggleFloating" class="panel-toggle" type="button">Hide Panel</button>
   <script>
+    const layout = document.getElementById("layout");
     const frameA = document.getElementById("reportFrameA");
     const frameB = document.getElementById("reportFrameB");
+    const panelToggleInlineButton = document.getElementById("panelToggleInline");
+    const panelToggleFloatingButton = document.getElementById("panelToggleFloating");
     const toggleButton = document.getElementById("toggle");
     const directionButton = document.getElementById("direction");
+    const activeToggle = document.getElementById("activeToggle");
     const speedInput = document.getElementById("speed");
     const pauseInput = document.getElementById("pause");
     const updatedAtNode = document.getElementById("updatedAt");
@@ -147,6 +182,8 @@
     let activeFrame = frameA;
     let standbyFrame = frameB;
     let isReloading = false;
+    let toolbarHidden = false;
+    let showActive = false;
 
     function formatBrowserLocalDateTime(value) {
       const parsed = new Date(value);
@@ -171,6 +208,19 @@
       return doc.scrollingElement || doc.documentElement;
     }
 
+    function applyActiveVisibility(targetFrame = activeFrame) {
+      const doc = targetFrame.contentDocument;
+      if (!doc) {
+        return;
+      }
+
+      const activeRows = doc.querySelectorAll("tr[data-status='Active']");
+
+      for (const row of activeRows) {
+        row.style.display = showActive ? "" : "none";
+      }
+    }
+
     function reloadFrame() {
       if (isReloading) {
         return;
@@ -192,6 +242,8 @@
     }
 
     function applyRestoredScroll(targetFrame) {
+      applyActiveVisibility(targetFrame);
+
       const scrollable = getScrollable(targetFrame);
 
       if (!scrollable) {
@@ -225,6 +277,13 @@
       activeFrame = standbyFrame;
       standbyFrame = previousActive;
       isReloading = false;
+    }
+
+    function renderPanelToggle() {
+      const label = toolbarHidden ? "Show Panel" : "Hide Panel";
+      panelToggleInlineButton.textContent = label;
+      panelToggleFloatingButton.textContent = label;
+      layout.classList.toggle("toolbar-hidden", toolbarHidden);
     }
 
     async function refreshMeta() {
@@ -290,6 +349,20 @@
       toggleButton.textContent = running ? "Pause" : "Resume";
     });
 
+    activeToggle.addEventListener("change", () => {
+      showActive = activeToggle.checked;
+      applyActiveVisibility(activeFrame);
+      applyActiveVisibility(standbyFrame);
+    });
+
+    function togglePanelVisibility() {
+      toolbarHidden = !toolbarHidden;
+      renderPanelToggle();
+    }
+
+    panelToggleInlineButton.addEventListener("click", togglePanelVisibility);
+    panelToggleFloatingButton.addEventListener("click", togglePanelVisibility);
+
     directionButton.addEventListener("click", () => {
       direction *= -1;
       directionButton.textContent = direction === 1 ? "Down" : "Up";
@@ -317,6 +390,8 @@
     if (updatedAtNode) {
       updatedAtNode.textContent = formatBrowserLocalDateTime(updatedAtNode.textContent);
     }
+
+    renderPanelToggle();
 
     requestAnimationFrame(step);
   </script>
