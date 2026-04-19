@@ -8,6 +8,7 @@ export type AppConfig = {
   genderMapping: {
     menPrefixes: string[];
     womenPrefixes: string[];
+    mixPrefixes: string[];
   };
   teamRules: {
     menCount: number;
@@ -32,6 +33,7 @@ const defaultConfig: AppConfig = {
   genderMapping: {
     menPrefixes: ["M", "Ч", "Х"],
     womenPrefixes: ["W", "Ж", "Д"],
+    mixPrefixes: ["Mix", "Мікс", "Мікси"],
   },
   teamRules: {
     menCount: 3,

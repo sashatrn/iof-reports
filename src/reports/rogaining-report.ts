@@ -1,5 +1,5 @@
 import path from "path";
-import { loadConfig } from "../config";
+import { AppConfig, loadConfig } from "../config";
 import { RogainingTeam } from "../io/parse-rogaining-iof";
 import { renderTemplate } from "../render/template-engine";
 import { formatDate } from "../utils/date";
@@ -22,6 +22,7 @@ const AGGREGATE_OPEN_CLASS = "OPEN";
 
 type ParsedRogainingClass = {
   genderPrefix: string;
+  genderGroup: "women" | "mix" | "men" | "unknown";
   ageLimit: number;
   originalName: string;
 };
@@ -95,7 +96,48 @@ function rankTeams(teams: RogainingTeam[]): RankedRogainingTeam[] {
   });
 }
 
-function parseRogainingClass(className: string): ParsedRogainingClass | undefined {
+function startsWithAnyPrefix(value: string, prefixes: string[]): boolean {
+  const normalizedValue = value.trim().toLowerCase();
+
+  return prefixes.some((prefix) => normalizedValue.startsWith(prefix.trim().toLowerCase()));
+}
+
+function resolveGenderGroup(
+  prefix: string,
+  config: AppConfig,
+): ParsedRogainingClass["genderGroup"] {
+  if (startsWithAnyPrefix(prefix, config.genderMapping.womenPrefixes)) {
+    return "women";
+  }
+
+  if (startsWithAnyPrefix(prefix, config.genderMapping.mixPrefixes)) {
+    return "mix";
+  }
+
+  if (startsWithAnyPrefix(prefix, config.genderMapping.menPrefixes)) {
+    return "men";
+  }
+
+  return "unknown";
+}
+
+function getGenderOrder(genderGroup: ParsedRogainingClass["genderGroup"]): number {
+  switch (genderGroup) {
+    case "women":
+      return 0;
+    case "mix":
+      return 1;
+    case "men":
+      return 2;
+    default:
+      return 3;
+  }
+}
+
+function parseRogainingClass(
+  className: string,
+  config: AppConfig,
+): ParsedRogainingClass | undefined {
   const match = className.trim().match(/^([^\d]+?)\s*(\d+)?$/);
 
   if (!match) {
@@ -111,6 +153,7 @@ function parseRogainingClass(className: string): ParsedRogainingClass | undefine
 
   return {
     genderPrefix,
+    genderGroup: resolveGenderGroup(genderPrefix, config),
     ageLimit,
     originalName: className,
   };
@@ -176,54 +219,47 @@ function compareClassAgeLimits(left: number, right: number): number {
 
 function buildEligibleClassNames(
   team: RogainingTeam,
-  declaredAgeLimitsByPrefix: Map<string, number[]>,
+  declaredClasses: ParsedRogainingClass[],
+  config: AppConfig,
 ): string[] {
-  const parsedClass = parseRogainingClass(team.className);
+  const parsedClass = parseRogainingClass(team.className, config);
 
   if (!parsedClass) {
     return [team.className];
   }
 
-  const declaredAgeLimits =
-    declaredAgeLimitsByPrefix.get(parsedClass.genderPrefix) ?? [];
+  const declaredAgeLimits = declaredClasses
+    .filter((declaredClass) => declaredClass.genderGroup === parsedClass.genderGroup)
+    .map((declaredClass) => declaredClass.ageLimit);
 
   return getEligibleAgeLimits(parsedClass.ageLimit, declaredAgeLimits)
     .sort(compareClassAgeLimits)
-    .map((ageLimit) => formatRogainingClassName(parsedClass.genderPrefix, ageLimit));
-}
-
-function getDeclaredAgeLimitsByPrefix(declaredClasses: Set<string>): Map<string, number[]> {
-  const declaredAgeLimitsByPrefix = new Map<string, number[]>();
-
-  for (const declaredClass of declaredClasses) {
-    const parsedClass = parseRogainingClass(declaredClass);
-
-    if (!parsedClass || parsedClass.ageLimit === OPEN_AGE) {
-      continue;
-    }
-
-    if (!declaredAgeLimitsByPrefix.has(parsedClass.genderPrefix)) {
-      declaredAgeLimitsByPrefix.set(parsedClass.genderPrefix, []);
-    }
-
-    declaredAgeLimitsByPrefix.get(parsedClass.genderPrefix)!.push(
-      parsedClass.ageLimit,
+    .flatMap((ageLimit) =>
+      declaredClasses
+        .filter((declaredClass) => {
+          return (
+            declaredClass.genderGroup === parsedClass.genderGroup &&
+            declaredClass.ageLimit === ageLimit
+          );
+        })
+        .map((declaredClass) => declaredClass.originalName),
     );
-  }
-
-  return declaredAgeLimitsByPrefix;
 }
 
-function buildRogainingClasses(teams: RogainingTeam[]): RogainingClassGroup[] {
+function buildRogainingClasses(
+  teams: RogainingTeam[],
+  config: AppConfig,
+): RogainingClassGroup[] {
   const byClass = new Map<string, RogainingTeam[]>();
   const declaredClasses = new Set(teams.map((team) => team.className));
-  const declaredAgeLimitsByPrefix = getDeclaredAgeLimitsByPrefix(declaredClasses);
+  const parsedDeclaredClasses = [...declaredClasses]
+    .map((declaredClass) => parseRogainingClass(declaredClass, config))
+    .filter((declaredClass): declaredClass is ParsedRogainingClass => {
+      return declaredClass !== undefined;
+    });
 
   for (const team of teams) {
-    for (const className of buildEligibleClassNames(
-      team,
-      declaredAgeLimitsByPrefix,
-    )) {
+    for (const className of buildEligibleClassNames(team, parsedDeclaredClasses, config)) {
       if (!declaredClasses.has(className)) {
         continue;
       }
@@ -248,20 +284,18 @@ function buildRogainingClasses(teams: RogainingTeam[]): RogainingClassGroup[] {
         return -1;
       }
 
-      const leftParsed = parseRogainingClass(left);
-      const rightParsed = parseRogainingClass(right);
+      const leftParsed = parseRogainingClass(left, config);
+      const rightParsed = parseRogainingClass(right, config);
 
       if (!leftParsed || !rightParsed) {
         return left.localeCompare(right, "uk");
       }
 
-      const prefixComparison = leftParsed.genderPrefix.localeCompare(
-        rightParsed.genderPrefix,
-        "uk",
-      );
+      const genderComparison =
+        getGenderOrder(leftParsed.genderGroup) - getGenderOrder(rightParsed.genderGroup);
 
-      if (prefixComparison !== 0) {
-        return prefixComparison;
+      if (genderComparison !== 0) {
+        return genderComparison;
       }
 
       return compareClassAgeLimits(leftParsed.ageLimit, rightParsed.ageLimit);
@@ -273,7 +307,7 @@ function buildRogainingClasses(teams: RogainingTeam[]): RogainingClassGroup[] {
     .filter((classGroup) => classGroup.teams.length > 0);
 }
 
-function classifyAwardsClass(className: string): {
+function classifyAwardsClass(className: string, config: AppConfig): {
   bucket: number;
   ageOrder: number;
   genderOrder: number;
@@ -291,17 +325,9 @@ function classifyAwardsClass(className: string): {
   }
 
   const lower = normalizedName.toLowerCase();
-  const parsedClass = parseRogainingClass(normalizedName);
+  const parsedClass = parseRogainingClass(normalizedName, config);
   const ageLimit = parsedClass?.ageLimit ?? OPEN_AGE;
-
-  let genderOrder = 3;
-  if (lower.startsWith("ж")) {
-    genderOrder = 0;
-  } else if (lower.startsWith("мікс") || lower.startsWith("mix")) {
-    genderOrder = 1;
-  } else if (lower.startsWith("ч")) {
-    genderOrder = 2;
-  }
+  const genderOrder = getGenderOrder(parsedClass?.genderGroup ?? "unknown");
 
   if (ageLimit !== OPEN_AGE && ageLimit <= YOUTH_MAX_AGE) {
     return {
@@ -349,9 +375,13 @@ function classifyAwardsClass(className: string): {
   };
 }
 
-function sortAwardsClasses(left: RogainingClassGroup, right: RogainingClassGroup): number {
-  const leftMeta = classifyAwardsClass(left.name);
-  const rightMeta = classifyAwardsClass(right.name);
+function sortAwardsClasses(
+  left: RogainingClassGroup,
+  right: RogainingClassGroup,
+  config: AppConfig,
+): number {
+  const leftMeta = classifyAwardsClass(left.name, config);
+  const rightMeta = classifyAwardsClass(right.name, config);
 
   if (leftMeta.bucket !== rightMeta.bucket) {
     return leftMeta.bucket - rightMeta.bucket;
@@ -378,7 +408,7 @@ export function buildRogainingHtml(
   const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
   const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
 
-  const classes = buildRogainingClasses(teams);
+  const classes = buildRogainingClasses(teams, config);
 
   return renderTemplate(`rogaining-${variant}.njk`, {
     reportTitle: "Протокол результатів рогейну",
@@ -409,7 +439,7 @@ export function buildRogainingAwardsHtml(
   const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
   const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
 
-  const classes = buildRogainingClasses(teams)
+  const classes = buildRogainingClasses(teams, config)
     .map((classGroup) => ({
       ...classGroup,
       teams: classGroup.teams
@@ -417,7 +447,7 @@ export function buildRogainingAwardsHtml(
         .slice(0, 3),
     }))
     .filter((classGroup) => classGroup.teams.length > 0)
-    .sort(sortAwardsClasses);
+    .sort((left, right) => sortAwardsClasses(left, right, config));
 
   return renderTemplate(`rogaining-awards-${variant}.njk`, {
     reportTitle: "Нагородний протокол рогейну",

@@ -4,7 +4,8 @@
   },
   "genderMapping": {
     "menPrefixes": ["M", "Ч", "Х"],
-    "womenPrefixes": ["W", "Ж", "Д"]
+    "womenPrefixes": ["W", "Ж", "Д"],
+    "mixPrefixes": ["Mix", "Мікс", "Мікси"]
   },
   "reportHeader": {
     "stage": "ІІІ Етап",

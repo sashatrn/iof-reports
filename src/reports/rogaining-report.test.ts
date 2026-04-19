@@ -346,12 +346,12 @@ describe("buildRogainingAwardsHtml", () => {
     const html = buildRogainingAwardsHtml(teams, new Date(2026, 3, 11), "Рогейн");
 
     expectInOrder(html, [
-      "<h3>Ж18</h3>",
-      "<h3>Мікс18</h3>",
-      "<h3>Ч18</h3>",
       "<h3>Ч55</h3>",
       "<h3>Ж45</h3>",
       "<h3>Мікси-старі</h3>",
+      "<h3>Ж18</h3>",
+      "<h3>Мікс18</h3>",
+      "<h3>Ч18</h3>",
       "<h3>Ж</h3>",
       "<h3>Мікси</h3>",
       "<h3>Ч</h3>",

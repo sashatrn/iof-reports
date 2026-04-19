@@ -95,6 +95,12 @@ npm run dev:watch -- --input-dir ./incoming --output-dir ./out --report rogainin
 
 За потреби можна перевизначити верхній заголовок звіту через `reportHeader.title`. Поле підтримує HTML, наприклад `<br/>`.
 
+Для визначення гендерної належності в рогейн-звітах використовуються налаштування `genderMapping`:
+
+- `womenPrefixes`
+- `mixPrefixes`
+- `menPrefixes`
+
 ## Вимоги до проекту
 
 - Node.js 18+
