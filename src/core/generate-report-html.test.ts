@@ -24,8 +24,11 @@ describe("generateIndividualReportHtml", () => {
 
     expect(report.reportType).toBe("individual");
     expect(report.itemCount).toBeGreaterThan(0);
-    expect(report.html).toContain("Індивідуальний протокол");
-    expect(report.html).toContain("Ч 5-6");
+    expect(report.viewHtml).toContain("Індивідуальний протокол");
+    expect(report.viewHtml).toContain("Ч 5-6");
+    expect(report.pdfHtml).toContain("Індивідуальний протокол");
+    expect(report.viewHtml).toContain('class="page"');
+    expect(report.pdfHtml).toContain("@page");
   });
 });
 
@@ -35,8 +38,11 @@ describe("generateTeamReportHtml", () => {
 
     expect(report.reportType).toBe("team");
     expect(report.itemCount).toBeGreaterThan(0);
-    expect(report.html).toContain("Командний протокол");
-    expect(report.html).toContain("Чоловіки");
+    expect(report.viewHtml).toContain("Командний протокол");
+    expect(report.viewHtml).toContain("Чоловіки");
+    expect(report.pdfHtml).toContain("Командний протокол");
+    expect(report.viewHtml).toContain('class="page"');
+    expect(report.pdfHtml).toContain("@page");
   });
 });
 
@@ -46,8 +52,11 @@ describe("generateRogainingReportHtml", () => {
 
     expect(report.reportType).toBe("rogaining");
     expect(report.itemCount).toBeGreaterThan(0);
-    expect(report.html).toContain("Протокол результатів рогейну");
-    expect(report.html).toContain("Діди");
+    expect(report.viewHtml).toContain("Протокол результатів рогейну");
+    expect(report.viewHtml).toContain("Діди");
+    expect(report.pdfHtml).toContain("Протокол результатів рогейну");
+    expect(report.viewHtml).toContain('class="page"');
+    expect(report.pdfHtml).toContain("@page");
   });
 });
 
@@ -68,6 +77,7 @@ describe("generateReportHtml", () => {
     const report = generateReportHtml(sampleXml, "individual");
 
     expect(report.reportType).toBe("individual");
-    expect(report.html).toContain("Індивідуальний протокол");
+    expect(report.viewHtml).toContain("Індивідуальний протокол");
+    expect(report.pdfHtml).toContain("Індивідуальний протокол");
   });
 });

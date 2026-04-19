@@ -5,18 +5,21 @@ import { loadConfig } from "../config";
 import { formatDate } from "../utils/date";
 import { imageToBase64 } from "../utils/image";
 
+type HtmlVariant = "view" | "pdf";
+
 export function buildTeamHtml(
   teamResults: {
     men: GenderTeamResult[];
     women: GenderTeamResult[];
   },
   eventDate: Date,
+  variant: HtmlVariant = "pdf",
 ): string {
   const config = loadConfig();
   const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
   const logo2Path = path.resolve(__dirname, "../assets/logo2.png");
 
-  return renderTemplate("team.njk", {
+  return renderTemplate(`team-${variant}.njk`, {
     reportTitle: "Командний протокол",
     event: {
       title: `Всеукраїнські змагання "Пліч-о-пліч всеукраїнські шкільні ліги зі<br/>

@@ -87,7 +87,8 @@ export async function runWatchMode(argv: string[]): Promise<void> {
       });
       const updatedAt = new Date().toISOString();
 
-      fs.writeFileSync(path.join(options.outputDir, "report.html"), generatedReport.html);
+      fs.writeFileSync(path.join(options.outputDir, "report.html"), generatedReport.viewHtml);
+      fs.writeFileSync(path.join(options.outputDir, "report.pdf.html"), generatedReport.pdfHtml);
       fs.writeFileSync(
         path.join(options.outputDir, "meta.json"),
         JSON.stringify(

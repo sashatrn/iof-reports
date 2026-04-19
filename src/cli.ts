@@ -6,13 +6,15 @@ import { ReportType, REPORT_TYPES } from "./report-types";
 export type CliOptions = {
   inputPath: string;
   report: ReportType;
+  html: "none" | "view" | "pdf" | "both";
 };
 
 const REPORT_VALUES = new Set<string>(REPORT_TYPES);
+const HTML_VALUES = new Set<string>(["none", "view", "pdf", "both"]);
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--report all|individual|team|rogaining]",
+    "Usage: node dist/index.js <file.xml> [--report all|individual|team|rogaining] [--html none|view|pdf|both]",
   );
 }
 
@@ -26,6 +28,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
   }
 
   let report: CliOptions["report"] = "all";
+  let html: CliOptions["html"] = "none";
 
   for (let i = 3; i < argv.length; i += 1) {
     const arg = argv[i];
@@ -47,6 +50,23 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       continue;
     }
 
+    if (arg === "--html") {
+      const value = argv[i + 1];
+
+      if (!value || !HTML_VALUES.has(value)) {
+        logger.error(
+          { html: value },
+          "Invalid html mode. Expected one of: none, view, pdf, both.",
+        );
+        printUsage(logger);
+        process.exit(1);
+      }
+
+      html = value as CliOptions["html"];
+      i += 1;
+      continue;
+    }
+
     logger.error({ arg }, "Unknown CLI argument.");
     printUsage(logger);
     process.exit(1);
@@ -62,5 +82,6 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
   return {
     inputPath: absolutePath,
     report,
+    html,
   };
 }

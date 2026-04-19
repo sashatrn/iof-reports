@@ -1,0 +1,34 @@
+{% extends "base-pdf.njk" %}
+
+{% block content %}
+
+{% for class in classes %}
+<div class="class-block">
+  <h3>{{ class.name }}</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Місце</th>
+        <th>Учасник</th>
+        <th>Команда</th>
+        <th>Час</th>
+        <th>Бал</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in class.participants %}
+      <tr>
+        <td>{{ p.position }}</td>
+        <td>{{ p.name }}</td>
+        <td>{{ p.club }}</td>
+        <td>{{ p.time }}</td>
+        <td>{{ p.points }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endfor %}
+
+{% endblock %}

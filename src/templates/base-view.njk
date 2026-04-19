@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --page-bg: #d8e0e8;
+      --sheet-bg: #ffffff;
+      --sheet-border: #c0ccd7;
+      --text: #17212b;
+      --muted: #4f6172;
+      --accent: #1f6aa5;
+      --header-bg: linear-gradient(135deg, #f4f8fb 0%, #e5edf4 100%);
+      --table-head-bg: #dce8f2;
+      --row-alt: #f7fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(31,106,165,0.14), transparent 26%),
+        linear-gradient(180deg, #eef3f7 0%, #d8e0e8 100%);
+    }
+
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 32px 36px;
+      background: var(--sheet-bg);
+      border: 1px solid var(--sheet-border);
+      border-radius: 20px;
+      box-shadow: 0 18px 60px rgba(30, 45, 62, 0.14);
+    }
+
+    .top-content {
+      padding: 20px 24px;
+      border-radius: 16px;
+      background: var(--header-bg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .top-content::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(255,255,255,0.35), transparent 45%);
+      pointer-events: none;
+    }
+
+    .header-brand {
+      display: grid;
+      grid-template-columns: 72px 1fr 72px;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+
+    .logo-slot {
+      min-height: 72px;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .logo-slot.right {
+      justify-content: flex-end;
+    }
+
+    .logo-slot img {
+      max-width: 72px;
+      max-height: 72px;
+      object-fit: contain;
+    }
+
+    .event-head {
+      text-align: center;
+    }
+
+    .event-title {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.35;
+      margin: 0 0 10px 0;
+    }
+
+    .report-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      color: var(--accent);
+      margin: 0 0 10px 0;
+      text-transform: uppercase;
+    }
+
+    .event-subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 18px 0 0 0;
+      padding-top: 14px;
+      border-top: 1px solid rgba(31,106,165,0.16);
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .class-block {
+      margin-top: 24px;
+    }
+
+    h3 {
+      margin: 0 0 10px 0;
+      font-size: 18px;
+      color: var(--accent);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid var(--sheet-border);
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #dde6ee;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: var(--table-head-bg);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    tbody tr:nth-child(even) {
+      background: var(--row-alt);
+    }
+
+    tbody tr:hover {
+      background: #edf5fb;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .footer {
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid #d6e0ea;
+    }
+
+    .official-row {
+      display: grid;
+      grid-template-columns: minmax(180px, 280px) 1fr;
+      gap: 12px;
+      padding: 8px 0;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 12px;
+      }
+
+      .page {
+        padding: 18px 16px 24px;
+        border-radius: 14px;
+      }
+
+      .header-brand {
+        grid-template-columns: 1fr;
+      }
+
+      .logo-slot,
+      .logo-slot.right {
+        justify-content: center;
+      }
+
+      .header-row,
+      .official-row {
+        grid-template-columns: 1fr;
+        flex-direction: column;
+      }
+
+      .header-row {
+        display: flex;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top-content">
+      <div class="header-brand">
+        <div class="logo-slot">
+          {% if event.logo1 %}
+          <img src="{{ event.logo1 }}" alt="Logo1" />
+          {% endif %}
+        </div>
+        <div class="event-head">
+          <div class="event-title">
+            {{ event.title | safe }}
+          </div>
+
+          <div class="report-title">
+            {{ reportTitle }}
+          </div>
+
+          {% if event.subtitle %}
+          <div class="event-subtitle">
+            {{ event.subtitle | safe }}
+          </div>
+          {% endif %}
+        </div>
+        <div class="logo-slot right">
+          {% if event.logo2 %}
+          <img src="{{ event.logo2 }}" alt="Logo2" />
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="header-row">
+        <div>{{ event.location }}</div>
+        <div>{{ event.date }}</div>
+      </div>
+    </div>
+
+    {% block content %}{% endblock %}
+
+    <div class="footer">
+      <div class="official-row">
+        <div>Головний суддя</div>
+        <div>{{ officials.chiefJudge }}</div>
+      </div>
+
+      <div class="official-row">
+        <div>Головний секретар</div>
+        <div>{{ officials.chiefSecretary }}</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

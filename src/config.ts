@@ -26,7 +26,7 @@ export type AppConfig = {
 
 const defaultConfig: AppConfig = {
   logging: {
-    level: "info",
+    level: "debug",
   },
   genderMapping: {
     menPrefixes: ["M", "Ч", "Х"],

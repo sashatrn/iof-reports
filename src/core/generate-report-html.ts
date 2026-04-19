@@ -11,7 +11,8 @@ import { ReportType, SingleReportType } from "../report-types";
 
 export type GeneratedReport = {
   reportType: SingleReportType;
-  html: string;
+  viewHtml: string;
+  pdfHtml: string;
   eventName?: string;
   eventDate?: string;
   itemCount: number;
@@ -68,7 +69,8 @@ export function generateIndividualReportHtml(
 
   return {
     reportType: "individual",
-    html: buildIndividualHtml(participants, eventDate),
+    viewHtml: buildIndividualHtml(participants, eventDate, "view"),
+    pdfHtml: buildIndividualHtml(participants, eventDate, "pdf"),
     eventDate: toIsoDate(eventDate),
     itemCount: participants.length,
   };
@@ -85,7 +87,8 @@ export function generateTeamReportHtml(
 
   return {
     reportType: "team",
-    html: buildTeamHtml(teamResults, eventDate),
+    viewHtml: buildTeamHtml(teamResults, eventDate, "view"),
+    pdfHtml: buildTeamHtml(teamResults, eventDate, "pdf"),
     eventDate: toIsoDate(eventDate),
     itemCount: teamResults.men.length + teamResults.women.length,
   };
@@ -106,7 +109,8 @@ export function generateRogainingReportHtml(
 
   return {
     reportType: "rogaining",
-    html: buildRogainingHtml(parsed.teams, eventDate, parsed.eventName),
+    viewHtml: buildRogainingHtml(parsed.teams, eventDate, parsed.eventName, "view"),
+    pdfHtml: buildRogainingHtml(parsed.teams, eventDate, parsed.eventName, "pdf"),
     eventName: parsed.eventName,
     eventDate: toIsoDate(eventDate),
     itemCount: parsed.teams.length,

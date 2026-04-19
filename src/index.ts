@@ -8,6 +8,21 @@ import { parseCliArgs } from "./cli";
 import { generateReportsHtml } from "./core/generate-report-html";
 import { runWatchMode } from "./watch/run-watch-mode";
 
+function writeHtmlOutputs(
+  reportType: string,
+  htmlMode: "none" | "view" | "pdf" | "both",
+  viewHtml: string,
+  pdfHtml: string,
+): void {
+  if (htmlMode === "view" || htmlMode === "both") {
+    fs.writeFileSync(`${reportType}.html`, viewHtml);
+  }
+
+  if (htmlMode === "pdf" || htmlMode === "both") {
+    fs.writeFileSync(`${reportType}.pdf.html`, pdfHtml);
+  }
+}
+
 async function main(): Promise<void> {
   if (process.argv[2] === "watch") {
     await runWatchMode(process.argv);
@@ -17,15 +32,21 @@ async function main(): Promise<void> {
   const config = loadConfig();
   const logger = createLogger(config);
 
-  const { inputPath, report } = parseCliArgs(process.argv, logger);
+  const { inputPath, report, html } = parseCliArgs(process.argv, logger);
 
-  logger.info({ file: inputPath, report }, "Reading XML file");
+  logger.info({ file: inputPath, report, html }, "Reading XML file");
 
   const xml = fs.readFileSync(inputPath, "utf-8");
   const generatedReports = generateReportsHtml(xml, report, { logger });
 
   for (const generatedReport of generatedReports) {
-    await htmlToPdf(generatedReport.html, `${generatedReport.reportType}.pdf`);
+    writeHtmlOutputs(
+      generatedReport.reportType,
+      html,
+      generatedReport.viewHtml,
+      generatedReport.pdfHtml,
+    );
+    await htmlToPdf(generatedReport.pdfHtml, `${generatedReport.reportType}.pdf`);
     logger.info(
       `${generatedReport.reportType[0].toUpperCase()}${generatedReport.reportType.slice(1)} PDF generated`,
     );

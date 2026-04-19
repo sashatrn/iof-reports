@@ -31,8 +31,16 @@ CLI-інструмент для перетворення результатів 
 1. Відкрийте командний рядок Windows
 1. Виконайте `iof-reports <results.xml>`, де `<results.xml>` - IOF XML файл результатів.
 1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team` або `--report rogaining`.
+1. За потреби згенеруйте HTML-файли: `--html view`, `--html pdf` або `--html both`.
 
 Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `rogaining`.
+Доступні значення для `--html`: `none` (за замовчуванням), `view`, `pdf`, `both`.
+
+Приклади:
+
+- `iof-reports results.xml --report rogaining --html view` - створити `rogaining.html` для перегляду
+- `iof-reports results.xml --report rogaining --html pdf` - створити `rogaining.pdf.html` для PDF-рендерингу
+- `iof-reports results.xml --report rogaining --html both` - створити обидва HTML-файли і PDF
 
 Якщо є проблема з виводом кіриличних символів в консолі Windows, виконайте команду `chcp 65001` перед запуском додатку.
 
@@ -56,6 +64,7 @@ iof-reports watch \
 Артефакти в `--output-dir`:
 
 - `report.html` - останній згенерований протокол
+- `report.pdf.html` - HTML-версія для формування PDF
 - `viewer.html` - оболонка для перегляду з автооновленням і автоскролом
 - `meta.json` - метадані останнього згенерованого репорту
 - `.watch-state.json` - службовий state з hash останнього XML

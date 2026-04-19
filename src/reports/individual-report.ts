@@ -5,6 +5,8 @@ import { imageToBase64 } from "../utils/image";
 import { loadConfig } from "../config";
 import path from "path";
 
+type HtmlVariant = "view" | "pdf";
+
 function formatTime(sec?: number) {
   if (!sec) return "";
   const h = Math.floor(sec / 3600);
@@ -18,6 +20,7 @@ function formatTime(sec?: number) {
 export function buildIndividualHtml(
   participants: Participant[],
   eventDate: Date,
+  variant: HtmlVariant = "pdf",
 ): string {
   const byClass = new Map<string, Participant[]>();
 
@@ -46,7 +49,7 @@ export function buildIndividualHtml(
   const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
   const logo2Path = path.resolve(__dirname, "../assets/logo2.png");
 
-  return renderTemplate("individual.njk", {
+  return renderTemplate(`individual-${variant}.njk`, {
     reportTitle: "Індивідуальний протокол",
     event: {
       title: `Всеукраїнські змагання "Пліч-о-пліч всеукраїнські шкільні ліги зі<br/>

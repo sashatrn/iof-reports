@@ -5,6 +5,8 @@ import { renderTemplate } from "../render/template-engine";
 import { formatDate } from "../utils/date";
 import { imageToBase64 } from "../utils/image";
 
+type HtmlVariant = "view" | "pdf";
+
 type RankedRogainingTeam = RogainingTeam & {
   place: string;
   formattedTime: string;
@@ -188,6 +190,7 @@ export function buildRogainingHtml(
   teams: RogainingTeam[],
   eventDate: Date,
   eventName?: string,
+  variant: HtmlVariant = "pdf",
 ): string {
   const config = loadConfig();
   const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
@@ -256,7 +259,7 @@ export function buildRogainingHtml(
     }))
     .filter((classGroup) => classGroup.teams.length > 0);
 
-  return renderTemplate("rogaining.njk", {
+  return renderTemplate(`rogaining-${variant}.njk`, {
     reportTitle: "Протокол результатів рогейну",
     event: {
       title:
