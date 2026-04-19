@@ -23,46 +23,55 @@
       background: white;
     }
 
-    .logo1 {
-      position: absolute;
-      left: 0;
+    .top-content {
+      margin: 0 0 5mm 0;
     }
 
-    .logo1 img {
+    .header-brand {
+      display: grid;
+      grid-template-columns: 24mm 1fr 24mm;
+      gap: 6mm;
+      align-items: start;
+    }
+
+    .logo-slot {
+      min-height: 20mm;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .logo-slot.right {
+      justify-content: flex-end;
+    }
+
+    .logo-slot img {
       height: 20mm;
       width: auto;
+      max-width: 24mm;
+      object-fit: contain;
     }
 
-    .logo2 {
-      position: absolute;
-      right: 0;
-    }
-
-    .logo2 img {
-      height: 20mm;
-      width: auto;
+    .event-head {
+      text-align: center;
     }
 
     .event-title {
-      text-align: center;
       margin: 0 0 2mm 0;
     }
 
     .report-title {
-      text-align: center;
       font-size: 14pt;
       margin: 3mm 0 3mm 0;
     }
 
     .event-subtitle {
-      text-align: center;
       margin: 0 0 4mm 0;
     }
 
     .header-row {
       display: flex;
       justify-content: space-between;
-      margin: 0 0 5mm 0;
+      margin: 3mm 0 0 0;
       font-size: 10pt;
     }
 
@@ -106,32 +115,34 @@
 </head>
 <body>
 
-{% if event.logo1 %}
-<div class="logo1">
-  <img src="{{ event.logo1 }}" alt="Logo1" />
-</div>
-{% endif %}
-
-{% if event.logo2 %}
-<div class="logo2">
-  <img src="{{ event.logo2 }}" alt="Logo2" />
-</div>
-{% endif %}
-
 <div class="top-content">
-  <div class="event-title">
-    {{ event.title | safe }}
-  </div>
+  <div class="header-brand">
+    <div class="logo-slot">
+      {% if event.logo1 %}
+      <img src="{{ event.logo1 }}" alt="Logo1" />
+      {% endif %}
+    </div>
+    <div class="event-head">
+      <div class="event-title">
+        {{ event.title | safe }}
+      </div>
 
-  <div class="report-title">
-    {{ reportTitle }}
-  </div>
+      <div class="report-title">
+        {{ reportTitle }}
+      </div>
 
-  {% if event.subtitle %}
-  <div class="event-subtitle">
-    {{ event.subtitle | safe }}
+      {% if event.subtitle %}
+      <div class="event-subtitle">
+        {{ event.subtitle | safe }}
+      </div>
+      {% endif %}
+    </div>
+    <div class="logo-slot right">
+      {% if event.logo2 %}
+      <img src="{{ event.logo2 }}" alt="Logo2" />
+      {% endif %}
+    </div>
   </div>
-  {% endif %}
 
   <div class="header-row">
     <div>{{ event.location }}</div>
