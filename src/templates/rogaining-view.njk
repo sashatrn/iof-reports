@@ -3,7 +3,7 @@
 {% block content %}
 
 {% for class in classes %}
-<div class="class-block">
+<div class="class-block" data-class-group="{{ class.name }}">
   <h3>{{ class.name }}</h3>
 
   <table>

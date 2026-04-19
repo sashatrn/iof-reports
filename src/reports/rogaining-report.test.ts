@@ -102,6 +102,7 @@ describe("buildRogainingHtml", () => {
     expect(html).toContain("<h3>Ч45</h3>");
     expect(html).toContain("<h3>Ч55</h3>");
     expect(html).toContain("<h3>Ч</h3>");
+    expect(html).toContain("<h3>OPEN</h3>");
     expect(html).not.toContain("<h3>Ч65</h3>");
 
     const openSection = getClassSection(html, "Ч");
@@ -118,6 +119,12 @@ describe("buildRogainingHtml", () => {
     expect(class23Section).toContain("Юнаки");
     expect(class23Section).toContain("Молодь");
     expect(class23Section).not.toContain("Open Team");
+
+    const aggregateOpenSection = getClassSection(html, "OPEN");
+    expect(aggregateOpenSection).toContain("Юнаки");
+    expect(aggregateOpenSection).toContain("Молодь");
+    expect(aggregateOpenSection).toContain("Майстри");
+    expect(aggregateOpenSection).toContain("Open Team");
   });
 
   it("ranks teams by total score, then by time, and leaves non-OK teams unplaced", () => {
@@ -164,9 +171,9 @@ describe("buildRogainingHtml", () => {
     const openSection = getClassSection(html, "Ч");
 
     expectInOrder(openSection, [
-      "<td>1</td>",
+      "<td><strong>1</strong></td>",
       "Швидші",
-      "<td>2</td>",
+      "<td><strong>2</strong></td>",
       "Повільніші",
       "Не фінішували",
     ]);

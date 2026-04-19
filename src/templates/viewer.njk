@@ -144,6 +144,7 @@
       <button id="panelToggleInline">Hide Panel</button>
       <button id="direction">Down</button>
       <label><input id="activeToggle" type="checkbox" /> Show Active</label>
+      <label><input id="openClassToggle" type="checkbox" checked /> Show OPEN</label>
       <label>Speed <input id="speed" type="range" min="10" max="200" step="5" value="45" /></label>
       <label>Pause edge <input id="pause" type="range" min="0" max="5000" step="250" value="1500" /></label>
     </div>
@@ -162,6 +163,7 @@
     const toggleButton = document.getElementById("toggle");
     const directionButton = document.getElementById("direction");
     const activeToggle = document.getElementById("activeToggle");
+    const openClassToggle = document.getElementById("openClassToggle");
     const speedInput = document.getElementById("speed");
     const pauseInput = document.getElementById("pause");
     const updatedAtNode = document.getElementById("updatedAt");
@@ -184,6 +186,7 @@
     let isReloading = false;
     let toolbarHidden = false;
     let showActive = false;
+    let showOpenClass = true;
 
     function formatBrowserLocalDateTime(value) {
       const parsed = new Date(value);
@@ -221,6 +224,19 @@
       }
     }
 
+    function applyOpenClassVisibility(targetFrame = activeFrame) {
+      const doc = targetFrame.contentDocument;
+      if (!doc) {
+        return;
+      }
+
+      const openClassBlocks = doc.querySelectorAll(".class-block[data-class-group='OPEN']");
+
+      for (const block of openClassBlocks) {
+        block.style.display = showOpenClass ? "" : "none";
+      }
+    }
+
     function reloadFrame() {
       if (isReloading) {
         return;
@@ -243,6 +259,7 @@
 
     function applyRestoredScroll(targetFrame) {
       applyActiveVisibility(targetFrame);
+      applyOpenClassVisibility(targetFrame);
 
       const scrollable = getScrollable(targetFrame);
 
@@ -353,6 +370,12 @@
       showActive = activeToggle.checked;
       applyActiveVisibility(activeFrame);
       applyActiveVisibility(standbyFrame);
+    });
+
+    openClassToggle.addEventListener("change", () => {
+      showOpenClass = openClassToggle.checked;
+      applyOpenClassVisibility(activeFrame);
+      applyOpenClassVisibility(standbyFrame);
     });
 
     function togglePanelVisibility() {

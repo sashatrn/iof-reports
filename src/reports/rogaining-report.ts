@@ -18,6 +18,7 @@ const PLACEABLE_STATUSES = new Set(["OK"]);
 const OPEN_AGE = Number.POSITIVE_INFINITY;
 const YOUTH_MAX_AGE = 23;
 const MASTER_MIN_AGE = 45;
+const AGGREGATE_OPEN_CLASS = "OPEN";
 
 type ParsedRogainingClass = {
   genderPrefix: string;
@@ -233,8 +234,18 @@ export function buildRogainingHtml(
     }
   }
 
+  byClass.set(AGGREGATE_OPEN_CLASS, teams);
+
   const classes = [...byClass.keys()]
     .sort((left, right) => {
+      if (left === AGGREGATE_OPEN_CLASS) {
+        return 1;
+      }
+
+      if (right === AGGREGATE_OPEN_CLASS) {
+        return -1;
+      }
+
       const leftParsed = parseRogainingClass(left);
       const rightParsed = parseRogainingClass(right);
 
