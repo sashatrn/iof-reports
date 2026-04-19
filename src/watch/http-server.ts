@@ -1,5 +1,6 @@
 import fs from "fs";
 import http from "http";
+import net from "net";
 import path from "path";
 import { Logger } from "pino";
 
@@ -25,11 +26,16 @@ function sendFile(response: http.ServerResponse, filePath: string): void {
   response.end(fs.readFileSync(filePath));
 }
 
+export type WatchHttpServer = {
+  server: http.Server;
+  close: () => Promise<void>;
+};
+
 export function startWatchHttpServer(
   outputDir: string,
   port: number,
   logger: Logger,
-): http.Server {
+): WatchHttpServer {
   const routes: Record<string, string> = {
     "/": "viewer.html",
     "/viewer": "viewer.html",
@@ -54,6 +60,14 @@ export function startWatchHttpServer(
 
     sendFile(response, path.join(outputDir, fileName));
   });
+  const sockets = new Set<net.Socket>();
+
+  server.on("connection", (socket) => {
+    sockets.add(socket);
+    socket.on("close", () => {
+      sockets.delete(socket);
+    });
+  });
 
   server.on("error", (error) => {
     logger.error({ err: error, port }, "Watch HTTP server failed");
@@ -70,5 +84,22 @@ export function startWatchHttpServer(
     );
   });
 
-  return server;
+  return {
+    server,
+    close: () =>
+      new Promise<void>((resolve, reject) => {
+        for (const socket of sockets) {
+          socket.destroy();
+        }
+
+        server.close((error) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+
+          resolve();
+        });
+      }),
+  };
 }

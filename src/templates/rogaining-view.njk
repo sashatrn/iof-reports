@@ -12,7 +12,7 @@
         <th>Місце</th>
         <th>Команда</th>
         <th>Заявл. клас</th>
-        <th>Склад</th>
+        <th>Учасники</th>
         <th>Організація</th>
         <th>КП</th>
         <th>Штраф</th>
@@ -24,14 +24,14 @@
     <tbody>
       {% for team in class.teams %}
       <tr data-status="{{ team.status }}">
-        <td>{{ team.place }}</td>
-        <td>{{ team.teamName }}</td>
+        <td><strong>{{ team.place }}</strong></td>
+        <td><strong>{{ team.teamName }}</strong></td>
         <td>{{ team.sourceClassName }}</td>
         <td>{{ team.membersLine }}</td>
         <td>{{ team.organisation }}</td>
         <td>{{ team.score }}</td>
-        <td>{{ team.penalty }}</td>
-        <td>{{ team.totalScore }}</td>
+        <td><strong>{{ team.penalty }}</strong></td>
+        <td><strong>{{ team.totalScore }}</strong></td>
         <td>{{ team.formattedTime }}</td>
         <td>{{ team.status }}</td>
       </tr>

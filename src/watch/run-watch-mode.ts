@@ -36,6 +36,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
   const statePath = path.join(options.outputDir, ".watch-state.json");
   let state = readWatchState(statePath);
   let running = false;
+  let stopping = false;
 
   fs.mkdirSync(options.outputDir, { recursive: true });
   const httpServer = startWatchHttpServer(options.outputDir, options.port, logger);
@@ -152,10 +153,22 @@ export async function runWatchMode(argv: string[]): Promise<void> {
 
   await new Promise<void>((resolve) => {
     const stop = () => {
+      if (stopping) {
+        return;
+      }
+
+      stopping = true;
       clearInterval(timer);
-      httpServer.close();
-      logger.info("Watch mode stopped");
-      resolve();
+
+      void httpServer
+        .close()
+        .catch((error) => {
+          logger.error({ err: error }, "Failed to stop watch HTTP server cleanly");
+        })
+        .finally(() => {
+          logger.info("Watch mode stopped");
+          resolve();
+        });
     };
 
     process.on("SIGINT", stop);

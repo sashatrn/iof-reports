@@ -263,10 +263,11 @@ export function buildRogainingHtml(
     reportTitle: "Протокол результатів рогейну",
     event: {
       title:
+        config.reportHeader.title ??
         eventName ??
         `Протокол результатів рогейну, ${formatDate(eventDate)}`,
-      subtitle: '',
-        // "Ранжування: очки мінус штраф; при рівності вище команда з ранішим фінішем. Команди автоматично входять у всі вікові класи, для яких вони придатні.",
+      subtitle: "",
+      // "Ранжування: очки мінус штраф; при рівності вище команда з ранішим фінішем. Команди автоматично входять у всі вікові класи, для яких вони придатні.",
       location: config.reportHeader.location,
       date: formatDate(eventDate),
       logo1: imageToBase64(logo1Path),

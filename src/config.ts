@@ -14,6 +14,7 @@ export type AppConfig = {
     womenCount: number;
   };
   reportHeader: {
+    title?: string;
     stage: string;
     region_of: string;
     location: string;
@@ -37,6 +38,10 @@ const defaultConfig: AppConfig = {
     womenCount: 3,
   },
   reportHeader: {
+    title:
+      `Всеукраїнські змагання "Пліч-о-пліч всеукраїнські шкільні ліги зі<br/>
+        спортивного орієнтування" серед учнів закладів загальної середньої<br/>
+        освіти "РАЗОМ ПЕРЕМОЖЕМО"`,
     stage: "ІІІ Етап",
     region_of: "Житомирського району",
     location: "м. Житомир",
@@ -72,6 +77,14 @@ export function loadConfig(configPath?: string): AppConfig {
     teamRules: {
       ...defaultConfig.teamRules,
       ...parsed.teamRules,
+    },
+    reportHeader: {
+      ...defaultConfig.reportHeader,
+      ...parsed.reportHeader,
+    },
+    officials: {
+      ...defaultConfig.officials,
+      ...parsed.officials,
     },
   };
 }
