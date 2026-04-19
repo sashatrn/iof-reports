@@ -129,6 +129,18 @@
       font-weight: 600;
       box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
     }
+
+    .layout:fullscreen {
+      background: #000;
+    }
+
+    .layout:fullscreen .frame-stack {
+      height: calc(100vh - 70px);
+    }
+
+    .layout.toolbar-hidden:fullscreen .frame-stack {
+      height: 100vh;
+    }
   </style>
 </head>
 <body>
@@ -140,8 +152,9 @@
         | report: <span id="reportType">{{ reportType }}</span>
         | updated: <span id="updatedAt">{{ updatedAt }}</span>
       </div>
-      <button id="toggle">Pause</button>
       <button id="panelToggleInline">Hide Panel</button>
+      <button id="fullscreenToggle">Fullscreen</button>
+      <button id="toggle">Pause</button>
       <button id="direction">Down</button>
       <label><input id="activeToggle" type="checkbox" /> Show Active</label>
       <label><input id="openClassToggle" type="checkbox" checked /> Show OPEN</label>
@@ -160,6 +173,7 @@
     const frameB = document.getElementById("reportFrameB");
     const panelToggleInlineButton = document.getElementById("panelToggleInline");
     const panelToggleFloatingButton = document.getElementById("panelToggleFloating");
+    const fullscreenToggleButton = document.getElementById("fullscreenToggle");
     const toggleButton = document.getElementById("toggle");
     const directionButton = document.getElementById("direction");
     const activeToggle = document.getElementById("activeToggle");
@@ -303,6 +317,12 @@
       layout.classList.toggle("toolbar-hidden", toolbarHidden);
     }
 
+    function renderFullscreenToggle() {
+      fullscreenToggleButton.textContent = document.fullscreenElement === layout
+        ? "Exit Fullscreen"
+        : "Fullscreen";
+    }
+
     async function refreshMeta() {
       try {
         const response = await fetch("./meta?t=" + Date.now(), { cache: "no-store" });
@@ -386,6 +406,26 @@
     panelToggleInlineButton.addEventListener("click", togglePanelVisibility);
     panelToggleFloatingButton.addEventListener("click", togglePanelVisibility);
 
+    fullscreenToggleButton.addEventListener("click", async () => {
+      if (document.fullscreenElement === layout) {
+        await document.exitFullscreen();
+        return;
+      }
+
+      toolbarHidden = true;
+      renderPanelToggle();
+      await layout.requestFullscreen();
+    });
+
+    document.addEventListener("fullscreenchange", () => {
+      if (!document.fullscreenElement) {
+        toolbarHidden = false;
+        renderPanelToggle();
+      }
+
+      renderFullscreenToggle();
+    });
+
     directionButton.addEventListener("click", () => {
       direction *= -1;
       directionButton.textContent = direction === 1 ? "Down" : "Up";
@@ -415,6 +455,7 @@
     }
 
     renderPanelToggle();
+    renderFullscreenToggle();
 
     requestAnimationFrame(step);
   </script>
