@@ -49,6 +49,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
       pollMs: options.pollMs,
       settleMs: options.settleMs,
       port: options.port,
+      diplomaTemplate: options.diplomaTemplate,
     },
     "Watching directory for latest XML",
   );
@@ -88,6 +89,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
 
       const generatedReport = generateReportHtml(xml, options.reportType, {
         logger,
+        includeDiplomaBackground: options.diplomaTemplate === "on",
       });
       const updatedAt = new Date().toISOString();
 

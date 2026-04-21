@@ -3,7 +3,11 @@ import { loadConfig } from "../config";
 import { parseIof } from "../io/parse-iof";
 import { parseRogainingIof } from "../io/parse-rogaining-iof";
 import { buildIndividualHtml } from "../reports/individual-report";
-import { buildRogainingAwardsHtml, buildRogainingHtml } from "../reports/rogaining-report";
+import {
+  buildRogainingAwardsHtml,
+  buildRogainingDiplomasHtml,
+  buildRogainingHtml,
+} from "../reports/rogaining-report";
 import { buildTeamHtml } from "../reports/team-report";
 import { pointsFromPosition } from "../scoring/points";
 import { computeTeamResults } from "../scoring/team";
@@ -20,6 +24,7 @@ export type GeneratedReport = {
 
 type GenerateReportOptions = {
   logger?: Logger;
+  includeDiplomaBackground?: boolean;
 };
 
 function normalizeEventDate(eventDate: Date | undefined, logger?: Logger): Date {
@@ -140,6 +145,33 @@ export function generateRogainingAwardsReportHtml(
   };
 }
 
+export function generateRogainingDiplomasReportHtml(
+  xml: string,
+  options: GenerateReportOptions = {},
+): GeneratedReport {
+  const { logger, includeDiplomaBackground } = options;
+  const parsed = parseRogainingIof(xml);
+  const eventDate = normalizeEventDate(parsed.eventDate, logger);
+
+  logger?.info(
+    { count: parsed.teams.length },
+    "Rogaining teams parsed successfully for diplomas report",
+  );
+
+  return {
+    reportType: "rogaining-diplomas",
+    viewHtml: buildRogainingDiplomasHtml(parsed.teams, eventDate, parsed.eventName, "view", {
+      includeBackground: includeDiplomaBackground ?? false,
+    }),
+    pdfHtml: buildRogainingDiplomasHtml(parsed.teams, eventDate, parsed.eventName, "pdf", {
+      includeBackground: includeDiplomaBackground ?? false,
+    }),
+    eventName: parsed.eventName,
+    eventDate: toIsoDate(eventDate),
+    itemCount: parsed.teams.length,
+  };
+}
+
 export function generateReportHtml(
   xml: string,
   reportType: SingleReportType,
@@ -154,6 +186,8 @@ export function generateReportHtml(
       return generateRogainingReportHtml(xml, options);
     case "rogaining-awards":
       return generateRogainingAwardsReportHtml(xml, options);
+    case "rogaining-diplomas":
+      return generateRogainingDiplomasReportHtml(xml, options);
   }
 }
 

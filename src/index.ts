@@ -32,12 +32,15 @@ async function main(): Promise<void> {
   const config = loadConfig();
   const logger = createLogger(config);
 
-  const { inputPath, report, html } = parseCliArgs(process.argv, logger);
+  const { inputPath, report, html, diplomaTemplate } = parseCliArgs(process.argv, logger);
 
-  logger.info({ file: inputPath, report, html }, "Reading XML file");
+  logger.info({ file: inputPath, report, html, diplomaTemplate }, "Reading XML file");
 
   const xml = fs.readFileSync(inputPath, "utf-8");
-  const generatedReports = generateReportsHtml(xml, report, { logger });
+  const generatedReports = generateReportsHtml(xml, report, {
+    logger,
+    includeDiplomaBackground: diplomaTemplate === "on",
+  });
 
   for (const generatedReport of generatedReports) {
     writeHtmlOutputs(

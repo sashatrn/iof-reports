@@ -1,4 +1,11 @@
-export const REPORT_TYPES = ["all", "individual", "team", "rogaining", "rogaining-awards"] as const;
+export const REPORT_TYPES = [
+  "all",
+  "individual",
+  "team",
+  "rogaining",
+  "rogaining-awards",
+  "rogaining-diplomas",
+] as const;
 
 export type ReportType = (typeof REPORT_TYPES)[number];
 export type SingleReportType = Exclude<ReportType, "all">;
@@ -12,6 +19,7 @@ export function isSingleReportType(value: string): value is SingleReportType {
     value === "individual" ||
     value === "team" ||
     value === "rogaining" ||
-    value === "rogaining-awards"
+    value === "rogaining-awards" ||
+    value === "rogaining-diplomas"
   );
 }

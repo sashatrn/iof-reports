@@ -30,10 +30,11 @@ CLI-інструмент для перетворення результатів 
 
 1. Відкрийте командний рядок Windows
 1. Виконайте `iof-reports <results.xml>`, де `<results.xml>` - IOF XML файл результатів.
-1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team`, `--report rogaining` або `--report rogaining-awards`.
+1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team`, `--report rogaining`, `--report rogaining-awards` або `--report rogaining-diplomas`.
 1. За потреби згенеруйте HTML-файли: `--html view`, `--html pdf` або `--html both`.
+1. Для `rogaining-diplomas` за потреби увімкніть друк фону диплома через `--diploma-template on`. За замовчуванням `off`.
 
-Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `rogaining`, `rogaining-awards`.
+Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`.
 Доступні значення для `--html`: `none` (за замовчуванням), `view`, `pdf`, `both`.
 
 Приклади:
@@ -41,6 +42,8 @@ CLI-інструмент для перетворення результатів 
 - `iof-reports results.xml --report rogaining --html view` - створити `rogaining.html` для перегляду
 - `iof-reports results.xml --report rogaining --html pdf` - створити `rogaining.pdf.html` для PDF-рендерингу
 - `iof-reports results.xml --report rogaining --html both` - створити обидва HTML-файли і PDF
+- `iof-reports results.xml --report rogaining-diplomas` - створити PDF для друку на готові дипломи
+- `iof-reports results.xml --report rogaining-diplomas --diploma-template on` - створити дипломи разом із фоновим бланком у PDF
 
 Якщо є проблема з виводом кіриличних символів в консолі Windows, виконайте команду `chcp 65001` перед запуском додатку.
 
@@ -76,6 +79,7 @@ iof-reports watch \
 - `--poll-ms 3000` - інтервал перевірки папки
 - `--settle-ms 1000` - пауза для перевірки, що latest XML уже не дописується
 - `--port 4173` - порт локального HTTP-сервера
+- `--diploma-template off|on` - чи вкладати фон диплома в `rogaining-diplomas`
 
 Після запуску відкривайте viewer через браузер:
 

@@ -32,6 +32,17 @@ type RogainingClassGroup = {
   teams: RankedRogainingTeam[];
 };
 
+type RogainingDiplomaEntry = {
+  participantName: string;
+  teamName: string;
+  className: string;
+  place: string;
+};
+
+type RogainingDiplomasOptions = {
+  includeBackground: boolean;
+};
+
 function formatDuration(sec?: number): string {
   if (sec === undefined) {
     return "";
@@ -398,6 +409,21 @@ function sortAwardsClasses(
   return leftMeta.normalizedName.localeCompare(rightMeta.normalizedName, "uk");
 }
 
+function buildAwardsClasses(
+  teams: RogainingTeam[],
+  config: AppConfig,
+): RogainingClassGroup[] {
+  return buildRogainingClasses(teams, config)
+    .map((classGroup) => ({
+      ...classGroup,
+      teams: classGroup.teams
+        .filter((team) => team.place !== "")
+        .slice(0, 3),
+    }))
+    .filter((classGroup) => classGroup.teams.length > 0)
+    .sort((left, right) => sortAwardsClasses(left, right, config));
+}
+
 export function buildRogainingHtml(
   teams: RogainingTeam[],
   eventDate: Date,
@@ -440,18 +466,10 @@ export function buildRogainingAwardsHtml(
   const config = loadConfig();
   const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
   const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
+  void variant;
+  const classes = buildAwardsClasses(teams, config);
 
-  const classes = buildRogainingClasses(teams, config)
-    .map((classGroup) => ({
-      ...classGroup,
-      teams: classGroup.teams
-        .filter((team) => team.place !== "")
-        .slice(0, 3),
-    }))
-    .filter((classGroup) => classGroup.teams.length > 0)
-    .sort((left, right) => sortAwardsClasses(left, right, config));
-
-  return renderTemplate(`rogaining-awards-${variant}.njk`, {
+  return renderTemplate("rogaining-awards-pdf.njk", {
     reportTitle: "Нагородний протокол рогейну",
     event: {
       title:
@@ -466,5 +484,48 @@ export function buildRogainingAwardsHtml(
     },
     officials: config.officials,
     classes,
+  });
+}
+
+export function buildRogainingDiplomasHtml(
+  teams: RogainingTeam[],
+  eventDate: Date,
+  eventName?: string,
+  variant: HtmlVariant = "pdf",
+  options: RogainingDiplomasOptions = { includeBackground: false },
+): string {
+  const config = loadConfig();
+  const diplomaTemplatePath = path.resolve(
+    __dirname,
+    "../assets/rogaining-diploma-template.png",
+  );
+  void variant;
+  const entries: RogainingDiplomaEntry[] = buildAwardsClasses(teams, config)
+    .filter((classGroup) => classGroup.name !== AGGREGATE_OPEN_CLASS)
+    .flatMap((classGroup) =>
+      classGroup.teams.flatMap((team) =>
+        team.members.map((participantName) => ({
+          participantName,
+          teamName: team.teamName,
+          className: classGroup.name,
+          place: team.place,
+        })),
+      ),
+    );
+
+  return renderTemplate("rogaining-diplomas-pdf.njk", {
+    reportTitle: "Дипломи рогейну",
+    event: {
+      title:
+        config.reportHeader.title ??
+        eventName ??
+        `Дипломи рогейну, ${formatDate(eventDate)}`,
+      subtitle: "",
+      location: config.reportHeader.location,
+      date: formatDate(eventDate),
+    },
+    includeBackground: options.includeBackground,
+    diplomaTemplate: options.includeBackground ? imageToBase64(diplomaTemplatePath) : undefined,
+    entries,
   });
 }

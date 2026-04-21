@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Shantell+Sans:wght@400;500;600;700&display=swap");
+
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      color: #111;
+      background: white;
+      font-family: "Shantell Sans", cursive;
+    }
+
+    .diploma-page {
+      position: relative;
+      box-sizing: border-box;
+      width: 210mm;
+      height: 297mm;
+      page-break-after: always;
+      overflow: hidden;
+    }
+
+    .diploma-background {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      text-align: center;
+    }
+
+    .field {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #1f2c27;
+      padding: 0 2mm;
+    }
+
+    .participant-line {
+      top: 89mm;
+      left: 16mm;
+      width: 178mm;
+      height: 9mm;
+      font-size: 20pt;
+      line-height: 1.08;
+      font-weight: 600;
+    }
+
+    .team-line {
+      top: 102mm;
+      left: 53mm;
+      width: 144mm;
+      height: 9mm;
+      font-size: 18pt;
+      line-height: 1.08;
+      font-weight: 600;
+    }
+
+    .place-line {
+      top: 115mm;
+      left: 36mm;
+      width: 25mm;
+      height: 8mm;
+      font-size: 20pt;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    .class-line {
+      top: 115mm;
+      left: 132mm;
+      width: 48mm;
+      height: 8mm;
+      font-size: 16pt;
+      line-height: 1;
+      font-weight: 600;
+    }
+
+    .diploma-page:last-child {
+      page-break-after: auto;
+    }
+  </style>
+</head>
+<body>
+
+{% for entry in entries %}
+<div class="diploma-page">
+  {% if includeBackground and diplomaTemplate %}
+  <img class="diploma-background" src="{{ diplomaTemplate }}" alt="Diploma template" />
+  {% endif %}
+  <div class="overlay">
+    <div class="field participant-line">{{ entry.participantName }}</div>
+    <div class="field team-line">{{ entry.teamName }}</div>
+    <div class="field place-line">{{ entry.place }}</div>
+    <div class="field class-line">{{ entry.className }}</div>
+  </div>
+</div>
+{% endfor %}
+
+</body>
+</html>

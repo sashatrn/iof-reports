@@ -10,11 +10,12 @@ export type WatchOptions = {
   pollMs: number;
   settleMs: number;
   port: number;
+  diplomaTemplate: "off" | "on";
 };
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <individual|team|rogaining|rogaining-awards> [--poll-ms 3000] [--settle-ms 1000] [--port 4173]",
+    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <individual|team|rogaining|rogaining-awards|rogaining-diplomas> [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
   );
 }
 
@@ -25,6 +26,7 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
   let pollMs = 3000;
   let settleMs = 1000;
   let port = 4173;
+  let diplomaTemplate: WatchOptions["diplomaTemplate"] = "off";
 
   for (let i = 3; i < argv.length; i += 1) {
     const arg = argv[i];
@@ -46,7 +48,7 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
       if (!value || !isSingleReportType(value)) {
         logger.error(
           { report: value },
-          "Invalid watch report type. Expected one of: individual, team, rogaining, rogaining-awards.",
+          "Invalid watch report type. Expected one of: individual, team, rogaining, rogaining-awards, rogaining-diplomas.",
         );
         printUsage(logger);
         process.exit(1);
@@ -71,6 +73,21 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
 
     if (arg === "--port") {
       port = Number(value);
+      i += 1;
+      continue;
+    }
+
+    if (arg === "--diploma-template") {
+      if (value !== "off" && value !== "on") {
+        logger.error(
+          { diplomaTemplate: value },
+          "diploma-template must be one of: off, on.",
+        );
+        printUsage(logger);
+        process.exit(1);
+      }
+
+      diplomaTemplate = value;
       i += 1;
       continue;
     }
@@ -113,5 +130,6 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
     pollMs,
     settleMs,
     port,
+    diplomaTemplate,
   };
 }

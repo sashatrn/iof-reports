@@ -6,6 +6,7 @@ import {
   generateReportHtml,
   generateReportsHtml,
   generateRogainingAwardsReportHtml,
+  generateRogainingDiplomasReportHtml,
   generateRogainingReportHtml,
   generateTeamReportHtml,
 } from "./generate-report-html";
@@ -76,6 +77,28 @@ describe("generateRogainingAwardsReportHtml", () => {
   });
 });
 
+describe("generateRogainingDiplomasReportHtml", () => {
+  it("builds rogaining diplomas html from TeamResult IOF XML", () => {
+    const report = generateRogainingDiplomasReportHtml(rogainingXml);
+
+    expect(report.reportType).toBe("rogaining-diplomas");
+    expect(report.itemCount).toBeGreaterThan(0);
+    expect(report.viewHtml).toContain("diploma-page");
+    expect(report.pdfHtml).toContain("@page");
+    expect(report.pdfHtml).not.toContain(">ALL<");
+    expect(report.pdfHtml).toContain("participant-line");
+    expect(report.pdfHtml).not.toContain("Diploma template");
+  });
+
+  it("can include diploma background when requested", () => {
+    const report = generateRogainingDiplomasReportHtml(rogainingXml, {
+      includeDiplomaBackground: true,
+    });
+
+    expect(report.pdfHtml).toContain("Diploma template");
+  });
+});
+
 describe("generateReportsHtml", () => {
   it("builds two reports for all mode", () => {
     const reports = generateReportsHtml(sampleXml, "all");
@@ -102,5 +125,12 @@ describe("generateReportHtml", () => {
 
     expect(report.reportType).toBe("rogaining-awards");
     expect(report.viewHtml).toContain("Нагородний протокол рогейну");
+  });
+
+  it("dispatches to rogaining diplomas report generator", () => {
+    const report = generateReportHtml(rogainingXml, "rogaining-diplomas");
+
+    expect(report.reportType).toBe("rogaining-diplomas");
+    expect(report.pdfHtml).toContain("participant-line");
   });
 });

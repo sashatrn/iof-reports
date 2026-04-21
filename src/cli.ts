@@ -7,14 +7,16 @@ export type CliOptions = {
   inputPath: string;
   report: ReportType;
   html: "none" | "view" | "pdf" | "both";
+  diplomaTemplate: "off" | "on";
 };
 
 const REPORT_VALUES = new Set<string>(REPORT_TYPES);
 const HTML_VALUES = new Set<string>(["none", "view", "pdf", "both"]);
+const DIPLOMA_TEMPLATE_VALUES = new Set<string>(["off", "on"]);
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--report all|individual|team|rogaining|rogaining-awards] [--html none|view|pdf|both]",
+    "Usage: node dist/index.js <file.xml> [--report all|individual|team|rogaining|rogaining-awards|rogaining-diplomas] [--html none|view|pdf|both] [--diploma-template off|on]",
   );
 }
 
@@ -29,6 +31,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
 
   let report: CliOptions["report"] = "all";
   let html: CliOptions["html"] = "none";
+  let diplomaTemplate: CliOptions["diplomaTemplate"] = "off";
 
   for (let i = 3; i < argv.length; i += 1) {
     const arg = argv[i];
@@ -39,7 +42,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       if (!value || !REPORT_VALUES.has(value)) {
         logger.error(
           { report: value },
-          "Invalid report type. Expected one of: all, individual, team, rogaining, rogaining-awards.",
+          "Invalid report type. Expected one of: all, individual, team, rogaining, rogaining-awards, rogaining-diplomas.",
         );
         printUsage(logger);
         process.exit(1);
@@ -67,6 +70,23 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       continue;
     }
 
+    if (arg === "--diploma-template") {
+      const value = argv[i + 1];
+
+      if (!value || !DIPLOMA_TEMPLATE_VALUES.has(value)) {
+        logger.error(
+          { diplomaTemplate: value },
+          "Invalid diploma template mode. Expected one of: off, on.",
+        );
+        printUsage(logger);
+        process.exit(1);
+      }
+
+      diplomaTemplate = value as CliOptions["diplomaTemplate"];
+      i += 1;
+      continue;
+    }
+
     logger.error({ arg }, "Unknown CLI argument.");
     printUsage(logger);
     process.exit(1);
@@ -83,5 +103,6 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
     inputPath: absolutePath,
     report,
     html,
+    diplomaTemplate,
   };
 }
