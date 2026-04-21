@@ -13,11 +13,14 @@
         <th>Команда</th>
         <th>Заявл. клас</th>
         <th>Учасники</th>
-        <th>Організація</th>
+        <th>Регіон</th>
         <th>КП</th>
         <th>Штраф</th>
         <th>Разом</th>
         <th>Час</th>
+        {% if showControlGateColumn %}
+        <th>{{ controlGateLabel }}</th>
+        {% endif %}
         <th>Статус</th>
       </tr>
     </thead>
@@ -33,6 +36,9 @@
         <td><strong>{{ team.penalty }}</strong></td>
         <td><strong>{{ team.totalScore }}</strong></td>
         <td>{{ team.formattedTime }}</td>
+        {% if showControlGateColumn %}
+        <td>{{ team.controlGateStatus }}</td>
+        {% endif %}
         <td>{{ team.status }}</td>
       </tr>
       {% endfor %}

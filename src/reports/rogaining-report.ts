@@ -12,6 +12,7 @@ type RankedRogainingTeam = RogainingTeam & {
   formattedTime: string;
   membersLine: string;
   sourceClassName: string;
+  controlGateStatus: "OK" | "-" | "DSQ";
 };
 
 const PLACEABLE_STATUSES = new Set(["OK"]);
@@ -42,6 +43,67 @@ type RogainingDiplomaEntry = {
 type RogainingDiplomasOptions = {
   includeBackground: boolean;
 };
+
+type ControlGateRuleStatus = "OK" | "-" | "DSQ";
+
+function evaluateControlGateRule(
+  team: RogainingTeam,
+  config: AppConfig,
+): {
+  status: string;
+  controlGateStatus: ControlGateRuleStatus;
+} {
+  const rule = config.rogaining.controlGateRule;
+
+  if (!rule.enabled || team.status !== "OK") {
+    return {
+      status: team.status,
+      controlGateStatus: "-",
+    };
+  }
+
+  const restrictedControls = new Set(rule.restrictedControls);
+  const memberControls =
+    team.memberControls && team.memberControls.length > 0
+      ? team.memberControls
+      : [];
+
+  let visitedRestrictedControl = false;
+
+  for (const controls of memberControls) {
+    for (let index = 0; index < controls.length; index += 1) {
+      if (!restrictedControls.has(controls[index])) {
+        continue;
+      }
+
+      visitedRestrictedControl = true;
+
+      if (controls[index - 1] !== rule.gateControl || controls[index + 1] !== rule.gateControl) {
+        return {
+          status: rule.disqualifiedStatus,
+          controlGateStatus: "DSQ",
+        };
+      }
+    }
+  }
+
+  return {
+    status: team.status,
+    controlGateStatus: visitedRestrictedControl ? "OK" : "-",
+  };
+}
+
+function applyRogainingRules(teams: RogainingTeam[], config: AppConfig): RogainingTeam[] {
+  return teams.map((team) => {
+    const controlGateRuleResult = evaluateControlGateRule(team, config);
+
+    return {
+      ...team,
+      status: controlGateRuleResult.status,
+      controlGateStatus: controlGateRuleResult.controlGateStatus,
+    };
+  });
+}
 
 function formatDuration(sec?: number): string {
   if (sec === undefined) {
@@ -92,7 +154,7 @@ function rankTeams(teams: RogainingTeam[]): RankedRogainingTeam[] {
 
   let currentPlace = 0;
 
-  return sortableTeams.map((team, index) => {
+  return sortableTeams.map((team) => {
     if (PLACEABLE_STATUSES.has(team.status)) {
       currentPlace += 1;
     }
@@ -103,6 +165,7 @@ function rankTeams(teams: RogainingTeam[]): RankedRogainingTeam[] {
       formattedTime: formatDuration(team.timeSec),
       membersLine: team.members.join(", "),
       sourceClassName: team.className,
+      controlGateStatus: team.controlGateStatus ?? "-",
     };
   });
 }
@@ -431,10 +494,11 @@ export function buildRogainingHtml(
   variant: HtmlVariant = "pdf",
 ): string {
   const config = loadConfig();
+  const normalizedTeams = applyRogainingRules(teams, config);
   const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
   const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
 
-  const classes = buildRogainingClasses(teams, config).filter((classGroup) => {
+  const classes = buildRogainingClasses(normalizedTeams, config).filter((classGroup) => {
     return variant === "view" || classGroup.name !== AGGREGATE_OPEN_CLASS;
   });
 
@@ -454,6 +518,8 @@ export function buildRogainingHtml(
     },
     officials: config.officials,
     classes,
+    showControlGateColumn: config.rogaining.controlGateRule.enabled,
+    controlGateLabel: `КП ${config.rogaining.controlGateRule.gateControl}`,
   });
 }
 
@@ -464,10 +530,11 @@ export function buildRogainingAwardsHtml(
   variant: HtmlVariant = "pdf",
 ): string {
   const config = loadConfig();
+  const normalizedTeams = applyRogainingRules(teams, config);
   const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
   const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
   void variant;
-  const classes = buildAwardsClasses(teams, config);
+  const classes = buildAwardsClasses(normalizedTeams, config);
 
   return renderTemplate("rogaining-awards-pdf.njk", {
     reportTitle: "Нагородний протокол рогейну",
@@ -495,12 +562,13 @@ export function buildRogainingDiplomasHtml(
   options: RogainingDiplomasOptions = { includeBackground: false },
 ): string {
   const config = loadConfig();
+  const normalizedTeams = applyRogainingRules(teams, config);
   const diplomaTemplatePath = path.resolve(
     __dirname,
     "../assets/rogaining-diploma-template.png",
   );
   void variant;
-  const entries: RogainingDiplomaEntry[] = buildAwardsClasses(teams, config)
+  const entries: RogainingDiplomaEntry[] = buildAwardsClasses(normalizedTeams, config)
     .filter((classGroup) => classGroup.name !== AGGREGATE_OPEN_CLASS)
     .flatMap((classGroup) =>
       classGroup.teams.flatMap((team) =>

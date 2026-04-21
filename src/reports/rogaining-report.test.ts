@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { RogainingTeam } from "../io/parse-rogaining-iof";
-import { buildRogainingAwardsHtml, buildRogainingHtml } from "./rogaining-report";
+import {
+  buildRogainingAwardsHtml,
+  buildRogainingDiplomasHtml,
+  buildRogainingHtml,
+} from "./rogaining-report";
 
 function expectInOrder(text: string, fragments: string[]): void {
   let previousIndex = -1;
@@ -179,6 +183,62 @@ describe("buildRogainingHtml", () => {
     ]);
     expect(openSection).toContain("<td></td>");
     expect(openSection).toContain("<td>3:03:20</td>");
+  });
+
+  it("disqualifies OK teams that enter restricted controls without 22 before and after", () => {
+    const teams: RogainingTeam[] = [
+      {
+        className: "Ч",
+        teamName: "Валідний маршрут",
+        organisation: "Київ",
+        members: ["A", "B"],
+        memberControls: [["21", "22", "70", "22", "45"]],
+        memberCount: 2,
+        score: 20,
+        penalty: 0,
+        totalScore: 20,
+        timeSec: 12000,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "Порушення зони",
+        organisation: "Львів",
+        members: ["C", "D"],
+        memberControls: [["21", "22", "70", "45"]],
+        memberCount: 2,
+        score: 25,
+        penalty: 0,
+        totalScore: 25,
+        timeSec: 11000,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "Не були в зоні",
+        organisation: "Одеса",
+        members: ["E", "F"],
+        memberControls: [["21", "45", "66"]],
+        memberCount: 2,
+        score: 30,
+        penalty: 0,
+        totalScore: 30,
+        timeSec: 10000,
+        status: "OK",
+      },
+    ];
+
+    const html = buildRogainingHtml(teams, new Date(2026, 3, 11), "Рогейн", "view");
+    const openSection = getClassSection(html, "Ч");
+
+    expect(openSection).toContain("<th>КП 22</th>");
+    expect(openSection).toContain("Валідний маршрут");
+    expect(openSection).toContain("<td>OK</td>");
+    expect(openSection).toContain("Не були в зоні");
+    expect(openSection).toContain("<td>-</td>");
+    expect(openSection).toContain("Порушення зони");
+    expect(openSection).toContain("<td>DSQ</td>");
+    expect(openSection).toContain("<td>disqualified</td>");
   });
 });
 
@@ -363,5 +423,82 @@ describe("buildRogainingAwardsHtml", () => {
     expect(menOpenSection).toContain(">2<");
     expect(menOpenSection).toContain(">3<");
     expect(menOpenSection).not.toContain(">4<");
+  });
+
+  it("applies control gate disqualification to awards without adding a gate column", () => {
+    const teams: RogainingTeam[] = [
+      {
+        className: "Ч",
+        teamName: "Коректний вхід",
+        organisation: "A",
+        members: ["A1", "A2"],
+        memberControls: [["21", "22", "70", "22", "45"]],
+        memberCount: 2,
+        score: 30,
+        penalty: 0,
+        totalScore: 30,
+        timeSec: 10000,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "Порушник",
+        organisation: "B",
+        members: ["B1", "B2"],
+        memberControls: [["21", "22", "70", "45"]],
+        memberCount: 2,
+        score: 40,
+        penalty: 0,
+        totalScore: 40,
+        timeSec: 9000,
+        status: "OK",
+      },
+    ];
+
+    const html = buildRogainingAwardsHtml(teams, new Date(2026, 3, 11), "Рогейн", "pdf");
+
+    expect(html).toContain("Коректний вхід");
+    expect(html).not.toContain("Порушник");
+    expect(html).not.toContain("КП 22");
+  });
+});
+
+describe("buildRogainingDiplomasHtml", () => {
+  it("applies control gate disqualification to diplomas", () => {
+    const teams: RogainingTeam[] = [
+      {
+        className: "Ч",
+        teamName: "Фінішери",
+        organisation: "A",
+        members: ["A1", "A2"],
+        memberControls: [["21", "22", "70", "22", "45"]],
+        memberCount: 2,
+        score: 30,
+        penalty: 0,
+        totalScore: 30,
+        timeSec: 10000,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "DSQ команда",
+        organisation: "B",
+        members: ["B1", "B2"],
+        memberControls: [["21", "22", "70", "45"]],
+        memberCount: 2,
+        score: 40,
+        penalty: 0,
+        totalScore: 40,
+        timeSec: 9000,
+        status: "OK",
+      },
+    ];
+
+    const html = buildRogainingDiplomasHtml(teams, new Date(2026, 3, 11), "Рогейн");
+
+    expect(html).toContain("Фінішери");
+    expect(html).toContain("A1");
+    expect(html).not.toContain("DSQ команда");
+    expect(html).not.toContain("B1");
   });
 });

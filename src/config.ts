@@ -5,6 +5,14 @@ export type AppConfig = {
   logging: {
     level: string;
   };
+  rogaining: {
+    controlGateRule: {
+      enabled: boolean;
+      gateControl: string;
+      restrictedControls: string[];
+      disqualifiedStatus: string;
+    };
+  };
   genderMapping: {
     menPrefixes: string[];
     womenPrefixes: string[];
@@ -29,6 +37,14 @@ export type AppConfig = {
 const defaultConfig: AppConfig = {
   logging: {
     level: "debug",
+  },
+  rogaining: {
+    controlGateRule: {
+      enabled: false,
+      gateControl: "22",
+      restrictedControls: ["70", "87", "100", "30", "96", "110"],
+      disqualifiedStatus: "disqualified",
+    },
   },
   genderMapping: {
     menPrefixes: ["M", "Ч", "Х"],
@@ -68,6 +84,14 @@ export function loadConfig(configPath?: string): AppConfig {
   return {
     ...defaultConfig,
     ...parsed,
+    rogaining: {
+      ...defaultConfig.rogaining,
+      ...parsed.rogaining,
+      controlGateRule: {
+        ...defaultConfig.rogaining.controlGateRule,
+        ...parsed.rogaining?.controlGateRule,
+      },
+    },
     genderMapping: {
       ...defaultConfig.genderMapping,
       ...parsed.genderMapping,

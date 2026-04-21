@@ -9,6 +9,7 @@ type IofScoreEntry = {
 type RogainingMember = {
   name: string;
   organisation: string;
+  controls: string[];
   finishTimeSec?: number;
   score?: number;
   penalty?: number;
@@ -22,6 +23,8 @@ export type RogainingTeam = {
   teamName: string;
   organisation: string;
   members: string[];
+  memberControls?: string[][];
+  controlGateStatus?: "OK" | "-" | "DSQ";
   memberCount: number;
   score: number;
   penalty: number;
@@ -81,6 +84,21 @@ function extractMemberName(memberResult: {
   const given = String(memberResult.Person?.Name?.Given ?? "").trim();
   const family = String(memberResult.Person?.Name?.Family ?? "").trim();
   return [given, family].filter(Boolean).join(" ") || "Unknown";
+}
+
+function extractControls(
+  splitTime:
+    | {
+        ControlCode?: string | number;
+      }
+    | {
+        ControlCode?: string | number;
+      }[]
+    | undefined,
+): string[] {
+  return asArray(splitTime)
+    .map((entry) => String(entry?.ControlCode ?? "").trim())
+    .filter(Boolean);
 }
 
 function normalizeTeam(memberResults: RogainingMember[]): {
@@ -151,6 +169,7 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
           return {
             name: extractMemberName(teamMemberResult),
             organisation: teamMemberResult?.Organisation?.Name ?? "Unknown",
+            controls: extractControls(result?.SplitTime),
             finishTimeSec: toNumber(result?.Time),
             score: findScoreByType(result?.Score, "Score"),
             penalty: findScoreByType(result?.Score, "Penalty"),
@@ -178,6 +197,7 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
         teamName: teamResult?.Name ?? "Unknown",
         organisation,
         members: memberResults.map((member) => member.name),
+        memberControls: memberResults.map((member) => member.controls),
         memberCount: memberResults.length,
         score: normalizedTeam.score,
         penalty: normalizedTeam.penalty,

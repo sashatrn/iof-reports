@@ -2,6 +2,14 @@
   "logging": {
     "level": "info"
   },
+  "rogaining": {
+    "controlGateRule": {
+      "enabled": true,
+      "gateControl": "22",
+      "restrictedControls": ["70", "87", "100", "30", "96", "110"],
+      "disqualifiedStatus": "disqualified"
+    }
+  },
   "genderMapping": {
     "menPrefixes": ["M", "Ч", "Х"],
     "womenPrefixes": ["W", "Ж", "Д"],
