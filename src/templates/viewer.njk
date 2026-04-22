@@ -86,6 +86,15 @@
       font-size: 13px;
     }
 
+    .toolbar-controls {
+      flex: 1 0 100%;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
     .frame-stack {
       position: relative;
       height: calc(100vh - 70px);
@@ -156,10 +165,13 @@
       <button id="fullscreenToggle">Fullscreen</button>
       <button id="toggle">Pause</button>
       <button id="direction">Down</button>
-      <label><input id="activeToggle" type="checkbox" /> Show Active</label>
-      <label><input id="openClassToggle" type="checkbox" checked /> Show ALL</label>
-      <label>Speed <input id="speed" type="range" min="10" max="200" step="5" value="45" /></label>
-      <label>Pause edge <input id="pause" type="range" min="0" max="5000" step="250" value="1500" /></label>
+      <div class="toolbar-controls">
+        <label><input id="activeToggle" type="checkbox" /> Show Active</label>
+        <label><input id="openClassToggle" type="checkbox" checked /> Show ALL</label>
+        <label><input id="clubToggle" type="checkbox" checked /> Show Club</label>
+        <label>Speed <input id="speed" type="range" min="10" max="200" step="5" value="45" /></label>
+        <label>Pause edge <input id="pause" type="range" min="0" max="5000" step="250" value="1500" /></label>
+      </div>
     </div>
     <div class="frame-stack">
       <iframe id="reportFrameA" class="active" src="./report" title="{{ title }}"></iframe>
@@ -178,6 +190,7 @@
     const directionButton = document.getElementById("direction");
     const activeToggle = document.getElementById("activeToggle");
     const openClassToggle = document.getElementById("openClassToggle");
+    const clubToggle = document.getElementById("clubToggle");
     const speedInput = document.getElementById("speed");
     const pauseInput = document.getElementById("pause");
     const updatedAtNode = document.getElementById("updatedAt");
@@ -201,6 +214,7 @@
     let toolbarHidden = false;
     let showActive = false;
     let showOpenClass = true;
+    let showClub = true;
 
     function formatBrowserLocalDateTime(value) {
       const parsed = new Date(value);
@@ -251,6 +265,41 @@
       }
     }
 
+    function applyClubVisibility(targetFrame = activeFrame) {
+      const doc = targetFrame.contentDocument;
+      if (!doc) {
+        return;
+      }
+
+      const tables = doc.querySelectorAll("table");
+
+      for (const table of tables) {
+        const headerRow = table.querySelector("thead tr");
+        if (!headerRow) {
+          continue;
+        }
+
+        const headerCells = [...headerRow.children];
+        const clubColumnIndex = headerCells.findIndex((cell) => {
+          const label = (cell.textContent || "").trim();
+          return label === "Регіон" || label === "Організація";
+        });
+
+        if (clubColumnIndex === -1) {
+          continue;
+        }
+
+        const rows = table.querySelectorAll("tr");
+
+        for (const row of rows) {
+          const cell = row.children[clubColumnIndex];
+          if (cell && "style" in cell) {
+            cell.style.display = showClub ? "" : "none";
+          }
+        }
+      }
+    }
+
     function reloadFrame() {
       if (isReloading) {
         return;
@@ -274,6 +323,7 @@
     function applyRestoredScroll(targetFrame) {
       applyActiveVisibility(targetFrame);
       applyOpenClassVisibility(targetFrame);
+      applyClubVisibility(targetFrame);
 
       const scrollable = getScrollable(targetFrame);
 
@@ -396,6 +446,12 @@
       showOpenClass = openClassToggle.checked;
       applyOpenClassVisibility(activeFrame);
       applyOpenClassVisibility(standbyFrame);
+    });
+
+    clubToggle.addEventListener("change", () => {
+      showClub = clubToggle.checked;
+      applyClubVisibility(activeFrame);
+      applyClubVisibility(standbyFrame);
     });
 
     function togglePanelVisibility() {
