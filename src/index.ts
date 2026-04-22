@@ -2,6 +2,7 @@
 import fs from "fs";
 
 import { htmlToPdf } from "./render/pdf";
+import { getAppVersion } from "./app-version";
 import { loadConfig } from "./config";
 import { createLogger } from "./logger";
 import { parseCliArgs } from "./cli";
@@ -31,6 +32,7 @@ async function main(): Promise<void> {
 
   const config = loadConfig();
   const logger = createLogger(config);
+  logger.info({ version: getAppVersion() }, "iof-reports starting");
 
   const { inputPath, report, html, diplomaTemplate } = parseCliArgs(process.argv, logger);
 

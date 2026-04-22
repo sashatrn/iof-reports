@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
+import { getAppVersion } from "../app-version";
 import { loadConfig } from "../config";
 import { generateReportHtml } from "../core/generate-report-html";
 import { createLogger } from "../logger";
@@ -32,6 +33,7 @@ async function isFileStable(filePath: string, settleMs: number): Promise<boolean
 export async function runWatchMode(argv: string[]): Promise<void> {
   const config = loadConfig();
   const logger = createLogger(config);
+  logger.info({ version: getAppVersion() }, "iof-reports watch starting");
   const options = parseWatchArgs(argv, logger);
   const statePath = path.join(options.outputDir, ".watch-state.json");
   let state = readWatchState(statePath);
