@@ -208,6 +208,7 @@
     let pendingDistanceFromBottom = 0;
     let pendingDirection = 1;
     let hasPendingScrollRestore = false;
+    let virtualScrollTop = 0;
     let activeFrame = frameA;
     let standbyFrame = frameB;
     let isReloading = false;
@@ -340,6 +341,7 @@
             : Math.min(maxScroll, Math.max(0, pendingScrollRatio * maxScroll));
 
         scrollable.scrollTop = restoredScrollTop || pendingScrollTop;
+        virtualScrollTop = scrollable.scrollTop;
         direction = pendingDirection;
         pauseUntil = 0;
         directionButton.textContent = direction === 1 ? "Down" : "Up";
@@ -348,6 +350,7 @@
       }
 
       scrollable.scrollTop = 0;
+      virtualScrollTop = 0;
     }
 
     function swapFrames() {
@@ -406,20 +409,28 @@
 
       if (running && scrollable && timestamp >= pauseUntil) {
         const speed = Number(speedInput.value);
-        scrollable.scrollTop += direction * speed * elapsed;
+        const maxScroll = Math.max(0, scrollable.scrollHeight - scrollable.clientHeight);
 
-        const maxScroll = scrollable.scrollHeight - scrollable.clientHeight;
+        if (Math.abs(scrollable.scrollTop - virtualScrollTop) > 1) {
+          virtualScrollTop = scrollable.scrollTop;
+        }
 
-        if (scrollable.scrollTop <= 0) {
+        virtualScrollTop += direction * speed * elapsed;
+
+        if (virtualScrollTop <= 0) {
+          virtualScrollTop = 0;
           scrollable.scrollTop = 0;
           direction = 1;
           directionButton.textContent = "Down";
           pauseUntil = timestamp + Number(pauseInput.value);
-        } else if (scrollable.scrollTop >= maxScroll) {
+        } else if (virtualScrollTop >= maxScroll) {
+          virtualScrollTop = maxScroll;
           scrollable.scrollTop = maxScroll;
           direction = -1;
           directionButton.textContent = "Up";
           pauseUntil = timestamp + Number(pauseInput.value);
+        } else {
+          scrollable.scrollTop = virtualScrollTop;
         }
       }
 
