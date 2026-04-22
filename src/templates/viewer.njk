@@ -150,6 +150,27 @@
     .layout.toolbar-hidden:fullscreen .frame-stack {
       height: 100vh;
     }
+
+    .debug-overlay {
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      z-index: 4;
+      width: min(420px, calc(100vw - 32px));
+      max-height: min(45vh, 360px);
+      overflow: auto;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(8, 12, 18, 0.9);
+      color: #dce6ec;
+      font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+      white-space: pre-wrap;
+    }
+
+    .debug-overlay[hidden] {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -179,6 +200,7 @@
     </div>
   </div>
   <button id="panelToggleFloating" class="panel-toggle" type="button">Hide Panel</button>
+  <div id="debugOverlay" class="debug-overlay" hidden></div>
   <script>
     const layout = document.getElementById("layout");
     const frameA = document.getElementById("reportFrameA");
@@ -196,6 +218,9 @@
     const updatedAtNode = document.getElementById("updatedAt");
     const sourceFileNameNode = document.getElementById("sourceFileName");
     const reportTypeNode = document.getElementById("reportType");
+    const debugOverlay = document.getElementById("debugOverlay");
+    const urlParams = new URLSearchParams(window.location.search);
+    const debugScroll = urlParams.get("debugScroll") === "1";
 
     let running = true;
     let direction = 1;
@@ -216,6 +241,45 @@
     let showActive = false;
     let showOpenClass = true;
     let showClub = true;
+    let lastDebugLogAt = 0;
+    let lastObservedScrollTop = 0;
+    let lastObservedDirection = 1;
+    let stalledFrameCount = 0;
+    const debugEvents = [];
+
+    function renderDebugOverlay(snapshot) {
+      if (!debugScroll || !debugOverlay) {
+        return;
+      }
+
+      debugOverlay.hidden = false;
+
+      const lines = [
+        "debugScroll=1",
+        `running=${running} direction=${direction} pauseUntil=${Math.round(pauseUntil)}`,
+        `scrollTop=${snapshot.scrollTop} virtualScrollTop=${snapshot.virtualScrollTop}`,
+        `maxScroll=${snapshot.maxScroll} elapsed=${snapshot.elapsed} speed=${snapshot.speed}`,
+        `activeFrame=${activeFrame.id} isReloading=${isReloading} stalledFrames=${stalledFrameCount}`,
+        "",
+        ...debugEvents.slice(-8),
+      ];
+
+      debugOverlay.textContent = lines.join("\n");
+    }
+
+    function debugLog(event, details = {}) {
+      if (!debugScroll) {
+        return;
+      }
+
+      const entry = `${new Date().toLocaleTimeString()} ${event} ${JSON.stringify(details)}`;
+      debugEvents.push(entry);
+      if (debugEvents.length > 20) {
+        debugEvents.shift();
+      }
+
+      console.log("[viewer-scroll]", event, details);
+    }
 
     function formatBrowserLocalDateTime(value) {
       const parsed = new Date(value);
@@ -315,6 +379,13 @@
         pendingDistanceFromBottom = Math.max(0, maxScroll - scrollable.scrollTop);
         pendingDirection = direction;
         hasPendingScrollRestore = true;
+        debugLog("reload-frame", {
+          scrollTop: scrollable.scrollTop,
+          maxScroll,
+          pendingScrollRatio,
+          pendingDistanceFromBottom,
+          pendingDirection,
+        });
       }
 
       isReloading = true;
@@ -346,11 +417,21 @@
         pauseUntil = 0;
         directionButton.textContent = direction === 1 ? "Down" : "Up";
         hasPendingScrollRestore = false;
+        debugLog("restore-scroll", {
+          restoredScrollTop: scrollable.scrollTop,
+          virtualScrollTop,
+          maxScroll,
+          direction,
+        });
         return;
       }
 
       scrollable.scrollTop = 0;
       virtualScrollTop = 0;
+      debugLog("initial-scroll", {
+        scrollTop: 0,
+        virtualScrollTop: 0,
+      });
     }
 
     function swapFrames() {
@@ -406,12 +487,26 @@
       const scrollable = getScrollable();
       const elapsed = (timestamp - lastTick) / 1000;
       lastTick = timestamp;
+      const debugSnapshot = {
+        scrollTop: scrollable ? Math.round(scrollable.scrollTop * 100) / 100 : null,
+        virtualScrollTop: Math.round(virtualScrollTop * 100) / 100,
+        maxScroll: scrollable
+          ? Math.max(0, scrollable.scrollHeight - scrollable.clientHeight)
+          : null,
+        elapsed: Math.round(elapsed * 1000) / 1000,
+        speed: Number(speedInput.value),
+      };
 
       if (running && scrollable && timestamp >= pauseUntil) {
         const speed = Number(speedInput.value);
         const maxScroll = Math.max(0, scrollable.scrollHeight - scrollable.clientHeight);
 
         if (Math.abs(scrollable.scrollTop - virtualScrollTop) > 1) {
+          debugLog("sync-virtual-scroll", {
+            scrollTop: scrollable.scrollTop,
+            virtualScrollTopBefore: virtualScrollTop,
+            direction,
+          });
           virtualScrollTop = scrollable.scrollTop;
         }
 
@@ -423,16 +518,69 @@
           direction = 1;
           directionButton.textContent = "Down";
           pauseUntil = timestamp + Number(pauseInput.value);
+          stalledFrameCount = 0;
+          debugLog("edge-top", {
+            scrollTop: scrollable.scrollTop,
+            virtualScrollTop,
+            pauseUntil,
+          });
         } else if (virtualScrollTop >= maxScroll) {
           virtualScrollTop = maxScroll;
           scrollable.scrollTop = maxScroll;
           direction = -1;
           directionButton.textContent = "Up";
           pauseUntil = timestamp + Number(pauseInput.value);
+          stalledFrameCount = 0;
+          debugLog("edge-bottom", {
+            scrollTop: scrollable.scrollTop,
+            virtualScrollTop,
+            maxScroll,
+            pauseUntil,
+          });
         } else {
           scrollable.scrollTop = virtualScrollTop;
+
+          if (
+            Math.round(scrollable.scrollTop) === Math.round(lastObservedScrollTop) &&
+            direction === lastObservedDirection
+          ) {
+            stalledFrameCount += 1;
+          } else {
+            stalledFrameCount = 0;
+          }
+
+          if (stalledFrameCount >= 20) {
+            debugLog("stall-detected", {
+              scrollTop: scrollable.scrollTop,
+              virtualScrollTop,
+              maxScroll,
+              direction,
+              elapsed,
+              speed,
+              stalledFrameCount,
+            });
+            stalledFrameCount = 0;
+          }
+        }
+
+        lastObservedScrollTop = scrollable.scrollTop;
+        lastObservedDirection = direction;
+
+        if (debugScroll && timestamp - lastDebugLogAt > 1000) {
+          lastDebugLogAt = timestamp;
+          debugLog("tick", {
+            scrollTop: scrollable.scrollTop,
+            virtualScrollTop,
+            maxScroll,
+            direction,
+            running,
+            pauseUntil,
+            speed,
+          });
         }
       }
+
+      renderDebugOverlay(debugSnapshot);
 
       if (timestamp - lastMetaFetch > 5000) {
         lastMetaFetch = timestamp;
@@ -506,6 +654,12 @@
       if (!isInitialActiveLoad && !isStandbyReload) {
         return;
       }
+
+      debugLog("frame-load", {
+        target: loadedFrame.id,
+        isInitialActiveLoad,
+        isStandbyReload,
+      });
 
       applyRestoredScroll(loadedFrame);
 
