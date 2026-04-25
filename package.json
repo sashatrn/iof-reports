@@ -1,6 +1,6 @@
 {
   "name": "iof-reports",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "IOF XML → PDF reports generator",
   "main": "dist/index.js",
   "type": "commonjs",
