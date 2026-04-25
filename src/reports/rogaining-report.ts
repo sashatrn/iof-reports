@@ -13,6 +13,7 @@ type RankedRogainingTeam = RogainingTeam & {
   membersLine: string;
   sourceClassName: string;
   controlGateStatus: "OK" | "-" | "DSQ";
+  grossScore: number;
 };
 
 const PLACEABLE_STATUSES = new Set(["OK"]);
@@ -166,6 +167,7 @@ function rankTeams(teams: RogainingTeam[]): RankedRogainingTeam[] {
       membersLine: team.members.join(", "),
       sourceClassName: team.className,
       controlGateStatus: team.controlGateStatus ?? "-",
+      grossScore: team.totalScore + team.penalty,
     };
   });
 }

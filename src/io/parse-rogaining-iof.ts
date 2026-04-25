@@ -201,7 +201,7 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
         memberCount: memberResults.length,
         score: normalizedTeam.score,
         penalty: normalizedTeam.penalty,
-        totalScore: normalizedTeam.score - normalizedTeam.penalty,
+        totalScore: normalizedTeam.score,
         timeSec: normalizedTeam.timeSec,
         status: normalizedTeam.status,
       });

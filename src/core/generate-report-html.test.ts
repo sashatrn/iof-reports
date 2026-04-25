@@ -55,7 +55,7 @@ describe("generateRogainingReportHtml", () => {
     expect(report.reportType).toBe("rogaining");
     expect(report.itemCount).toBeGreaterThan(0);
     expect(report.viewHtml).toContain("Протокол результатів рогейну");
-    expect(report.viewHtml).toContain("Діди");
+    expect(report.viewHtml).toContain("Leader tour");
     expect(report.viewHtml).toContain(">ALL</h3>");
     expect(report.pdfHtml).toContain("Протокол результатів рогейну");
     expect(report.pdfHtml).not.toContain(">ALL</h3>");

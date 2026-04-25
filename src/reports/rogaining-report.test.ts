@@ -185,6 +185,30 @@ describe("buildRogainingHtml", () => {
     expect(openSection).toContain("<td>3:03:20</td>");
   });
 
+  it("shows points before penalty and total after penalty", () => {
+    const teams: RogainingTeam[] = [
+      {
+        className: "Ч",
+        teamName: "Штрафні",
+        organisation: "Київ",
+        members: ["A", "B"],
+        memberCount: 2,
+        score: 16,
+        penalty: 3,
+        totalScore: 16,
+        timeSec: 12000,
+        status: "OK",
+      },
+    ];
+
+    const html = buildRogainingHtml(teams, new Date(2026, 3, 11), "Рогейн", "view");
+    const openSection = getClassSection(html, "Ч");
+
+    expect(openSection).toContain("<td>19</td>");
+    expect(openSection).toContain("<td><strong>3</strong></td>");
+    expect(openSection).toContain("<td><strong>16</strong></td>");
+  });
+
   it("disqualifies OK teams that enter restricted controls without 22 before and after", () => {
     const teams: RogainingTeam[] = [
       {
