@@ -35,6 +35,18 @@ function getClassSection(html: string, className: string): string {
   return html.slice(start, end);
 }
 
+function getScoreSection(html: string, title: string): string {
+  const header = `<h4>${title}</h4>`;
+  const start = html.indexOf(header);
+
+  expect(start, `Expected score section ${title} to exist`).toBeGreaterThan(-1);
+
+  const end = html.indexOf("</table>", start);
+  expect(end).toBeGreaterThan(start);
+
+  return html.slice(start, end);
+}
+
 describe("buildRogainingHtml", () => {
   it("shows only declared classes and dynamically promotes youth and masters", () => {
     const teams: RogainingTeam[] = [
@@ -438,8 +450,23 @@ describe("buildRogainingScoreHtml", () => {
     expectInOrder(html, [
       "<h3>Бали по регіонах</h3>",
       "<h3>Бали учасників</h3>",
+      "<h4>Дорослі</h4>",
+      "<h4>Молодь, юніори</h4>",
+      "<h4>Юнаки</h4>",
     ]);
     expect(html).toMatch(/<td>Київська<\/td>\s*<td><strong>75<\/strong><\/td>/);
+    const adultSection = getScoreSection(html, "Дорослі");
+    const youthUnder23Section = getScoreSection(html, "Молодь, юніори");
+    const youthUnder18Section = getScoreSection(html, "Юнаки");
+    expect(adultSection).toContain("Adult A");
+    expect(adultSection).not.toContain("Young A");
+    expect(adultSection).not.toContain("Youth A");
+    expect(youthUnder23Section).toContain("Young A");
+    expect(youthUnder23Section).not.toContain("Adult A");
+    expect(youthUnder23Section).not.toContain("Youth A");
+    expect(youthUnder18Section).toContain("Youth A");
+    expect(youthUnder18Section).not.toContain("Adult A");
+    expect(youthUnder18Section).not.toContain("Young A");
     expect(html).toMatch(/Youth A[\s\S]*<td>Ж18<\/td>[\s\S]*<td>1<\/td>[\s\S]*<td><strong>75<\/strong><\/td>/);
     expect(html).toMatch(/Youth B[\s\S]*<td>Ж18<\/td>[\s\S]*<td>2<\/td>[\s\S]*<td><strong>60<\/strong><\/td>/);
     expect(html).toMatch(/Young A[\s\S]*<td>МІКС23<\/td>[\s\S]*<td>1<\/td>[\s\S]*<td><strong>150<\/strong><\/td>/);
@@ -472,6 +499,43 @@ describe("buildRogainingScoreHtml", () => {
     expect(html).toMatch(/Мороз Олександр[\s\S]*<td>Донецька<\/td>[\s\S]*<td>Ч<\/td>[\s\S]*<td>1<\/td>[\s\S]*<td><strong>300<\/strong><\/td>/);
     expect(html).toMatch(/Кравченко Ігор[\s\S]*<td>Житомирська<\/td>[\s\S]*<td>Ч<\/td>[\s\S]*<td>1<\/td>[\s\S]*<td><strong>300<\/strong><\/td>/);
     expect(html).not.toMatch(/Мороз Олександр[\s\S]*<td>Донецька, Житомирська<\/td>/);
+  });
+
+  it("scores veteran teams only through open adult classes", () => {
+    const teams: RogainingTeam[] = [
+      {
+        className: "Ч",
+        teamName: "Відкритий",
+        organisation: "Київська",
+        members: ["Дорослий учасник"],
+        memberCount: 1,
+        score: 30,
+        penalty: 0,
+        totalScore: 30,
+        timeSec: 10000,
+        status: "OK",
+      },
+      {
+        className: "Ч45",
+        teamName: "Ветеран",
+        organisation: "Львівська",
+        members: ["Ветеран учасник"],
+        memberCount: 1,
+        score: 40,
+        penalty: 0,
+        totalScore: 40,
+        timeSec: 9000,
+        status: "OK",
+      },
+    ];
+
+    const html = buildRogainingScoreHtml(teams, new Date(2026, 3, 11), "Рогейн", "pdf");
+    const adultSection = getScoreSection(html, "Дорослі");
+
+    expect(html).toMatch(/<td><strong>Кількість учасників<\/strong><\/td>\s*<td><strong>2<\/strong><\/td>/);
+    expect(adultSection).toMatch(/Ветеран учасник[\s\S]*<td>Ч<\/td>[\s\S]*<td>1<\/td>[\s\S]*<td><strong>300<\/strong><\/td>/);
+    expect(adultSection).toMatch(/Дорослий учасник[\s\S]*<td>Ч<\/td>[\s\S]*<td>2<\/td>[\s\S]*<td><strong>150<\/strong><\/td>/);
+    expect(html).not.toContain("<td>Ч45</td>");
   });
 });
 

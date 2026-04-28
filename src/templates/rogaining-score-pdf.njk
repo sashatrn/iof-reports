@@ -32,6 +32,9 @@
 
 <h3>Бали учасників</h3>
 
+{% for section in scoreSections %}
+<h4>{{ section.title }}</h4>
+
 <table>
   <thead>
     <tr>
@@ -43,7 +46,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for entry in entries %}
+    {% for entry in section.entries %}
     <tr>
       <td>{{ entry.participantName }}</td>
       <td>{{ entry.region }}</td>
@@ -54,5 +57,6 @@
     {% endfor %}
   </tbody>
 </table>
+{% endfor %}
 
 {% endblock %}

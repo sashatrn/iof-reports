@@ -54,6 +54,13 @@ export type RogainingRegionScoreEntry = {
   points: number;
 };
 
+type RogainingScoreCategory = "adult" | "youthUnder23" | "youthUnder18";
+
+type RogainingScoreSection = {
+  title: string;
+  entries: RogainingScoreEntry[];
+};
+
 type RogainingDiplomasOptions = {
   includeBackground: boolean;
 };
@@ -513,19 +520,46 @@ function buildAwardsClasses(
 function getRogainingScorePointsMap(
   className: string,
   config: AppConfig,
-): Record<string, number> {
+): Record<string, number> | undefined {
+  const category = getRogainingScoreCategory(className, config);
+
+  switch (category) {
+    case "youthUnder18":
+      return config.rogaining.scorePoints.youthUnder18;
+    case "youthUnder23":
+      return config.rogaining.scorePoints.youthUnder23;
+    case "adult":
+      return config.rogaining.scorePoints.adult;
+    default:
+      return undefined;
+  }
+}
+
+function getRogainingScoreCategory(
+  className: string,
+  config: AppConfig,
+): RogainingScoreCategory | undefined {
   const parsedClass = parseRogainingClass(className, config);
+
+  if (!parsedClass) {
+    return undefined;
+  }
+
   const ageLimit = parsedClass?.ageLimit ?? OPEN_AGE;
 
   if (ageLimit <= 18) {
-    return config.rogaining.scorePoints.youthUnder18;
+    return "youthUnder18";
   }
 
   if (ageLimit <= 23) {
-    return config.rogaining.scorePoints.youthUnder23;
+    return "youthUnder23";
   }
 
-  return config.rogaining.scorePoints.adult;
+  if (ageLimit === OPEN_AGE && parsedClass.genderGroup !== "unknown") {
+    return "adult";
+  }
+
+  return undefined;
 }
 
 function getRogainingScorePoints(
@@ -558,6 +592,10 @@ function createRogainingScoreEntries(
     .filter((classGroup) => classGroup.name !== AGGREGATE_OPEN_CLASS)
     .flatMap((classGroup) => {
       const pointsMap = getRogainingScorePointsMap(classGroup.name, config);
+
+      if (!pointsMap) {
+        return [];
+      }
 
       return classGroup.teams
         .filter((team) => team.place !== "")
@@ -607,6 +645,40 @@ function buildRogainingRegionScoreEntries(
 
 function countUniqueRogainingScoreParticipants(entries: RogainingScoreEntry[]): number {
   return new Set(entries.map((entry) => entry.participantName)).size;
+}
+
+function buildRogainingScoreSections(
+  entries: RogainingScoreEntry[],
+  config: AppConfig,
+): RogainingScoreSection[] {
+  const entriesByCategory = new Map<RogainingScoreCategory, RogainingScoreEntry[]>();
+
+  for (const entry of entries) {
+    const category = getRogainingScoreCategory(entry.className, config);
+
+    if (!category) {
+      continue;
+    }
+
+    const categoryEntries = entriesByCategory.get(category) ?? [];
+    categoryEntries.push(entry);
+    entriesByCategory.set(category, categoryEntries);
+  }
+
+  return [
+    {
+      title: "Дорослі",
+      entries: entriesByCategory.get("adult") ?? [],
+    },
+    {
+      title: "Молодь, юніори",
+      entries: entriesByCategory.get("youthUnder23") ?? [],
+    },
+    {
+      title: "Юнаки",
+      entries: entriesByCategory.get("youthUnder18") ?? [],
+    },
+  ].filter((section) => section.entries.length > 0);
 }
 
 export function buildRogainingHtml(
@@ -660,6 +732,7 @@ export function buildRogainingScoreHtml(
   });
   const entries = allEntries.filter((entry) => entry.points !== 0);
   const regionScores = buildRogainingRegionScoreEntries(entries);
+  const scoreSections = buildRogainingScoreSections(entries, config);
   const participantCount = countUniqueRogainingScoreParticipants(allEntries);
   void variant;
 
@@ -679,6 +752,7 @@ export function buildRogainingScoreHtml(
     officials: config.officials,
     participantCount,
     regionScores,
+    scoreSections,
     entries,
   });
 }
