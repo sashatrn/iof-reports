@@ -72,14 +72,22 @@ function evaluateControlGateRule(
   let visitedRestrictedControl = false;
 
   for (const controls of memberControls) {
+    let passedGateControl = false;
+
     for (let index = 0; index < controls.length; index += 1) {
-      if (!restrictedControls.has(controls[index])) {
+      if (controls[index] === rule.gateControl) {
+        passedGateControl = true;
+      }
+
+      const isRestrictedControl = restrictedControls.has(controls[index]);
+
+      if (!isRestrictedControl) {
         continue;
       }
 
       visitedRestrictedControl = true;
 
-      if (controls[index - 1] !== rule.gateControl || controls[index + 1] !== rule.gateControl) {
+      if (!passedGateControl) {
         return {
           status: rule.disqualifiedStatus,
           controlGateStatus: "DSQ",

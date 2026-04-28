@@ -209,14 +209,14 @@ describe("buildRogainingHtml", () => {
     expect(openSection).toContain("<td><strong>16</strong></td>");
   });
 
-  it("disqualifies OK teams that enter restricted controls without 22 before and after", () => {
+  it("disqualifies OK teams that reach restricted controls before 22", () => {
     const teams: RogainingTeam[] = [
       {
         className: "Ч",
         teamName: "Валідний маршрут",
         organisation: "Київ",
         members: ["A", "B"],
-        memberControls: [["21", "22", "70", "22", "45"]],
+        memberControls: [["21", "22", "70", "45", "100", "70"]],
         memberCount: 2,
         score: 20,
         penalty: 0,
@@ -226,15 +226,28 @@ describe("buildRogainingHtml", () => {
       },
       {
         className: "Ч",
-        teamName: "Порушення зони",
+        teamName: "До 22",
         organisation: "Львів",
         members: ["C", "D"],
-        memberControls: [["21", "22", "70", "45"]],
+        memberControls: [["21", "70", "22", "100"]],
         memberCount: 2,
         score: 25,
         penalty: 0,
         totalScore: 25,
         timeSec: 11000,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "Без 22",
+        organisation: "Харків",
+        members: ["G", "H"],
+        memberControls: [["21", "70", "100", "45"]],
+        memberCount: 2,
+        score: 26,
+        penalty: 0,
+        totalScore: 26,
+        timeSec: 10500,
         status: "OK",
       },
       {
@@ -260,7 +273,8 @@ describe("buildRogainingHtml", () => {
     expect(openSection).toContain("<td>OK</td>");
     expect(openSection).toContain("Не були в зоні");
     expect(openSection).toContain("<td>-</td>");
-    expect(openSection).toContain("Порушення зони");
+    expect(openSection).toContain("До 22");
+    expect(openSection).toContain("Без 22");
     expect(openSection).toContain("<td>DSQ</td>");
     expect(openSection).toContain("<td>disqualified</td>");
   });
@@ -456,7 +470,7 @@ describe("buildRogainingAwardsHtml", () => {
         teamName: "Коректний вхід",
         organisation: "A",
         members: ["A1", "A2"],
-        memberControls: [["21", "22", "70", "22", "45"]],
+        memberControls: [["21", "22", "70", "45", "100"]],
         memberCount: 2,
         score: 30,
         penalty: 0,
@@ -469,7 +483,7 @@ describe("buildRogainingAwardsHtml", () => {
         teamName: "Порушник",
         organisation: "B",
         members: ["B1", "B2"],
-        memberControls: [["21", "22", "70", "45"]],
+        memberControls: [["21", "70", "45"]],
         memberCount: 2,
         score: 40,
         penalty: 0,
@@ -495,7 +509,7 @@ describe("buildRogainingDiplomasHtml", () => {
         teamName: "Фінішери",
         organisation: "A",
         members: ["A1", "A2"],
-        memberControls: [["21", "22", "70", "22", "45"]],
+        memberControls: [["21", "22", "70", "45", "100"]],
         memberCount: 2,
         score: 30,
         penalty: 0,
@@ -508,7 +522,7 @@ describe("buildRogainingDiplomasHtml", () => {
         teamName: "DSQ команда",
         organisation: "B",
         members: ["B1", "B2"],
-        memberControls: [["21", "22", "70", "45"]],
+        memberControls: [["21", "70", "45"]],
         memberCount: 2,
         score: 40,
         penalty: 0,
