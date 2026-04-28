@@ -101,6 +101,44 @@ function extractControls(
     .filter(Boolean);
 }
 
+function extractOrganisationName(value: unknown): string | undefined {
+  const name = String(value ?? "").trim();
+  return name === "" ? undefined : name;
+}
+
+function isKnownMemberOrganisation(organisation: string): boolean {
+  return organisation !== "Unknown" && organisation.toLowerCase() !== "no club";
+}
+
+function formatTeamOrganisation(
+  memberResults: RogainingMember[],
+  teamOrganisationName: unknown,
+  classOrganisationName: unknown,
+): string {
+  const seen = new Set<string>();
+  const memberOrganisations: string[] = [];
+
+  for (const member of memberResults) {
+    if (!isKnownMemberOrganisation(member.organisation) || seen.has(member.organisation)) {
+      continue;
+    }
+
+    seen.add(member.organisation);
+    memberOrganisations.push(member.organisation);
+  }
+
+  if (memberOrganisations.length > 0) {
+    return memberOrganisations.join(", ");
+  }
+
+  return (
+    extractOrganisationName(teamOrganisationName) ??
+    memberResults.find((member) => member.organisation !== "Unknown")?.organisation ??
+    extractOrganisationName(classOrganisationName) ??
+    "Unknown"
+  );
+}
+
 function normalizeTeam(memberResults: RogainingMember[]): {
   score: number;
   penalty: number;
@@ -168,7 +206,9 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
 
           return {
             name: extractMemberName(teamMemberResult),
-            organisation: teamMemberResult?.Organisation?.Name ?? "Unknown",
+            organisation:
+              extractOrganisationName(teamMemberResult?.Organisation?.Name) ??
+              "Unknown",
             controls: extractControls(result?.SplitTime),
             finishTimeSec: toNumber(result?.Time),
             score: findScoreByType(result?.Score, "Score"),
@@ -185,12 +225,11 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
       }
 
       const normalizedTeam = normalizeTeam(memberResults);
-      const organisation =
-        teamResult?.Organisation?.Name ??
-        memberResults.find((member) => member.organisation !== "Unknown")
-          ?.organisation ??
-        classResult?.Organisation?.Name ??
-        "Unknown";
+      const organisation = formatTeamOrganisation(
+        memberResults,
+        teamResult?.Organisation?.Name,
+        classResult?.Organisation?.Name,
+      );
 
       teams.push({
         className,
