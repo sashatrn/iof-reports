@@ -5,6 +5,7 @@ CLI-інструмент для перетворення результатів 
 - Індивідуальний протокол (по класах)
 - Командний протокол (окремо чоловіки та жінки)
 - Протокол результатів рогейну
+- Протокол балів рогейну
 
 Результати в протоколах розраховуються згідно правил національного проекту Пліч-о-пліч
 
@@ -30,11 +31,11 @@ CLI-інструмент для перетворення результатів 
 
 1. Відкрийте командний рядок Windows
 1. Виконайте `iof-reports <results.xml>`, де `<results.xml>` - IOF XML файл результатів.
-1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team`, `--report rogaining`, `--report rogaining-awards` або `--report rogaining-diplomas`.
+1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team`, `--report rogaining`, `--report rogaining-awards`, `--report rogaining-diplomas` або `--report rogaining-score`.
 1. За потреби згенеруйте HTML-файли: `--html view`, `--html pdf` або `--html both`.
 1. Для `rogaining-diplomas` за потреби увімкніть друк фону диплома через `--diploma-template on`. За замовчуванням `off`.
 
-Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`.
+Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`, `rogaining-score`.
 Доступні значення для `--html`: `none` (за замовчуванням), `view`, `pdf`, `both`.
 
 Приклади:
@@ -44,6 +45,7 @@ CLI-інструмент для перетворення результатів 
 - `iof-reports results.xml --report rogaining --html both` - створити обидва HTML-файли і PDF
 - `iof-reports results.xml --report rogaining-diplomas` - створити PDF для друку на готові дипломи
 - `iof-reports results.xml --report rogaining-diplomas --diploma-template on` - створити дипломи разом із фоновим бланком у PDF
+- `iof-reports results.xml --report rogaining-score` - створити протокол балів учасників рогейну
 
 Якщо є проблема з виводом кіриличних символів в консолі Windows, виконайте команду `chcp 65001` перед запуском додатку.
 
@@ -104,6 +106,12 @@ npm run dev:watch -- --input-dir ./incoming --output-dir ./out --report rogainin
 - `womenPrefixes`
 - `mixPrefixes`
 - `menPrefixes`
+
+Бали для `rogaining-score` налаштовуються в `rogaining.scorePoints`:
+
+- `youthUnder18` - юнаки/дівчата до 18 років включно
+- `youthUnder23` - молодь старше 18 і до 23 років включно
+- `adult` - дорослі класи
 
 ## Вимоги до проекту
 

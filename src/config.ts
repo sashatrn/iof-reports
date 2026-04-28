@@ -12,6 +12,11 @@ export type AppConfig = {
       restrictedControls: string[];
       disqualifiedStatus: string;
     };
+    scorePoints: {
+      youthUnder18: Record<string, number>;
+      youthUnder23: Record<string, number>;
+      adult: Record<string, number>;
+    };
   };
   genderMapping: {
     menPrefixes: string[];
@@ -44,6 +49,38 @@ const defaultConfig: AppConfig = {
       gateControl: "22",
       restrictedControls: ["70", "87", "100", "30", "96", "110"],
       disqualifiedStatus: "disqualified",
+    },
+    scorePoints: {
+      youthUnder18: {
+        "1": 75,
+        "2": 60,
+        "3": 50,
+        "4": 20,
+        "5": 18,
+        "6": 15,
+        "7": 13,
+        "8": 10,
+      },
+      youthUnder23: {
+        "1": 150,
+        "2": 125,
+        "3": 100,
+        "4": 40,
+        "5": 30,
+        "6": 25,
+        "7": 18,
+        "8": 13,
+      },
+      adult: {
+        "1": 300,
+        "2": 150,
+        "3": 200,
+        "4": 75,
+        "5": 60,
+        "6": 50,
+        "7": 40,
+        "8": 25,
+      },
     },
   },
   genderMapping: {
@@ -90,6 +127,22 @@ export function loadConfig(configPath?: string): AppConfig {
       controlGateRule: {
         ...defaultConfig.rogaining.controlGateRule,
         ...parsed.rogaining?.controlGateRule,
+      },
+      scorePoints: {
+        ...defaultConfig.rogaining.scorePoints,
+        ...parsed.rogaining?.scorePoints,
+        youthUnder18: {
+          ...defaultConfig.rogaining.scorePoints.youthUnder18,
+          ...parsed.rogaining?.scorePoints?.youthUnder18,
+        },
+        youthUnder23: {
+          ...defaultConfig.rogaining.scorePoints.youthUnder23,
+          ...parsed.rogaining?.scorePoints?.youthUnder23,
+        },
+        adult: {
+          ...defaultConfig.rogaining.scorePoints.adult,
+          ...parsed.rogaining?.scorePoints?.adult,
+        },
       },
     },
     genderMapping: {

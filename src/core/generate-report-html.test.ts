@@ -8,6 +8,7 @@ import {
   generateRogainingAwardsReportHtml,
   generateRogainingDiplomasReportHtml,
   generateRogainingReportHtml,
+  generateRogainingScoreReportHtml,
   generateTeamReportHtml,
 } from "./generate-report-html";
 
@@ -55,7 +56,7 @@ describe("generateRogainingReportHtml", () => {
     expect(report.reportType).toBe("rogaining");
     expect(report.itemCount).toBeGreaterThan(0);
     expect(report.viewHtml).toContain("Протокол результатів рогейну");
-    expect(report.viewHtml).toContain("Leader tour");
+    expect(report.viewHtml).toContain("<th>Команда</th>");
     expect(report.viewHtml).toContain(">ALL</h3>");
     expect(report.pdfHtml).toContain("Протокол результатів рогейну");
     expect(report.pdfHtml).not.toContain(">ALL</h3>");
@@ -99,6 +100,18 @@ describe("generateRogainingDiplomasReportHtml", () => {
   });
 });
 
+describe("generateRogainingScoreReportHtml", () => {
+  it("builds rogaining score html from TeamResult IOF XML", () => {
+    const report = generateRogainingScoreReportHtml(rogainingXml);
+
+    expect(report.reportType).toBe("rogaining-score");
+    expect(report.itemCount).toBeGreaterThan(0);
+    expect(report.viewHtml).toContain("Протокол балів рогейну");
+    expect(report.viewHtml).toContain("<th>Бали</th>");
+    expect(report.pdfHtml).toContain("Протокол балів рогейну");
+  });
+});
+
 describe("generateReportsHtml", () => {
   it("builds two reports for all mode", () => {
     const reports = generateReportsHtml(sampleXml, "all");
@@ -132,5 +145,12 @@ describe("generateReportHtml", () => {
 
     expect(report.reportType).toBe("rogaining-diplomas");
     expect(report.pdfHtml).toContain("participant-line");
+  });
+
+  it("dispatches to rogaining score report generator", () => {
+    const report = generateReportHtml(rogainingXml, "rogaining-score");
+
+    expect(report.reportType).toBe("rogaining-score");
+    expect(report.viewHtml).toContain("Протокол балів рогейну");
   });
 });

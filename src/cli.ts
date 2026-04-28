@@ -16,7 +16,7 @@ const DIPLOMA_TEMPLATE_VALUES = new Set<string>(["off", "on"]);
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--report all|individual|team|rogaining|rogaining-awards|rogaining-diplomas] [--html none|view|pdf|both] [--diploma-template off|on]",
+    "Usage: node dist/index.js <file.xml> [--report all|individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score] [--html none|view|pdf|both] [--diploma-template off|on]",
   );
 }
 
@@ -42,7 +42,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       if (!value || !REPORT_VALUES.has(value)) {
         logger.error(
           { report: value },
-          "Invalid report type. Expected one of: all, individual, team, rogaining, rogaining-awards, rogaining-diplomas.",
+          "Invalid report type. Expected one of: all, individual, team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score.",
         );
         printUsage(logger);
         process.exit(1);

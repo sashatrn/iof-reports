@@ -1,0 +1,58 @@
+{% extends "base-pdf.njk" %}
+
+{% block content %}
+
+<table>
+  <tbody>
+    <tr>
+      <td><strong>Кількість учасників</strong></td>
+      <td><strong>{{ participantCount }}</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Бали по регіонах</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Регіон</th>
+      <th>Бали</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for entry in regionScores %}
+    <tr>
+      <td>{{ entry.region }}</td>
+      <td><strong>{{ entry.points }}</strong></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h3>Бали учасників</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Учасник</th>
+      <th>Регіон</th>
+      <th>Клас</th>
+      <th>Місце</th>
+      <th>Бали</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for entry in entries %}
+    <tr>
+      <td>{{ entry.participantName }}</td>
+      <td>{{ entry.region }}</td>
+      <td>{{ entry.className }}</td>
+      <td>{{ entry.place }}</td>
+      <td><strong>{{ entry.points }}</strong></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

@@ -15,7 +15,7 @@ export type WatchOptions = {
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <individual|team|rogaining|rogaining-awards|rogaining-diplomas> [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
+    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score> [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
   );
 }
 
@@ -48,7 +48,7 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
       if (!value || !isSingleReportType(value)) {
         logger.error(
           { report: value },
-          "Invalid watch report type. Expected one of: individual, team, rogaining, rogaining-awards, rogaining-diplomas.",
+          "Invalid watch report type. Expected one of: individual, team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score.",
         );
         printUsage(logger);
         process.exit(1);

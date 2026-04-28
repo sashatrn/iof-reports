@@ -23,6 +23,7 @@ export type RogainingTeam = {
   teamName: string;
   organisation: string;
   members: string[];
+  memberOrganisations?: string[];
   memberControls?: string[][];
   controlGateStatus?: "OK" | "-" | "DSQ";
   memberCount: number;
@@ -236,6 +237,7 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
         teamName: teamResult?.Name ?? "Unknown",
         organisation,
         members: memberResults.map((member) => member.name),
+        memberOrganisations: memberResults.map((member) => member.organisation),
         memberControls: memberResults.map((member) => member.controls),
         memberCount: memberResults.length,
         score: normalizedTeam.score,

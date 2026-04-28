@@ -4,6 +4,7 @@ import {
   buildRogainingAwardsHtml,
   buildRogainingDiplomasHtml,
   buildRogainingHtml,
+  buildRogainingScoreHtml,
 } from "./rogaining-report";
 
 function expectInOrder(text: string, fragments: string[]): void {
@@ -277,6 +278,200 @@ describe("buildRogainingHtml", () => {
     expect(openSection).toContain("Без 22");
     expect(openSection).toContain("<td>DSQ</td>");
     expect(openSection).toContain("<td>disqualified</td>");
+  });
+});
+
+describe("buildRogainingScoreHtml", () => {
+  it("scores participants by class age group and place", () => {
+    const teams: RogainingTeam[] = [
+      {
+        className: "Ж18",
+        teamName: "Youth One",
+        organisation: "Київська",
+        members: ["Youth A"],
+        memberCount: 1,
+        score: 30,
+        penalty: 0,
+        totalScore: 30,
+        timeSec: 10000,
+        status: "OK",
+      },
+      {
+        className: "Ж18",
+        teamName: "Youth Two",
+        organisation: "Львівська",
+        members: ["Youth B"],
+        memberCount: 1,
+        score: 20,
+        penalty: 0,
+        totalScore: 20,
+        timeSec: 11000,
+        status: "OK",
+      },
+      {
+        className: "МІКС23",
+        teamName: "Young One",
+        organisation: "Одеська",
+        members: ["Young A"],
+        memberCount: 1,
+        score: 25,
+        penalty: 0,
+        totalScore: 25,
+        timeSec: 12000,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "Adult One",
+        organisation: "Дніпропетровська",
+        members: ["Adult A"],
+        memberCount: 1,
+        score: 50,
+        penalty: 0,
+        totalScore: 50,
+        timeSec: 9000,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "Adult Two",
+        organisation: "Харківська",
+        members: ["Adult B"],
+        memberCount: 1,
+        score: 40,
+        penalty: 0,
+        totalScore: 40,
+        timeSec: 9100,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "Adult Three",
+        organisation: "Полтавська",
+        members: ["Adult C"],
+        memberCount: 1,
+        score: 30,
+        penalty: 0,
+        totalScore: 30,
+        timeSec: 9200,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "Adult Four",
+        organisation: "Вінницька",
+        members: ["Adult D"],
+        memberCount: 1,
+        score: 25,
+        penalty: 0,
+        totalScore: 25,
+        timeSec: 9300,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "Adult Five",
+        organisation: "Сумська",
+        members: ["Adult E"],
+        memberCount: 1,
+        score: 20,
+        penalty: 0,
+        totalScore: 20,
+        timeSec: 9400,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "Adult Six",
+        organisation: "Волинська",
+        members: ["Adult F"],
+        memberCount: 1,
+        score: 18,
+        penalty: 0,
+        totalScore: 18,
+        timeSec: 9500,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "Adult Seven",
+        organisation: "Чернівецька",
+        members: ["Adult G"],
+        memberCount: 1,
+        score: 16,
+        penalty: 0,
+        totalScore: 16,
+        timeSec: 9600,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "Adult Eight",
+        organisation: "Івано-Франківська",
+        members: ["Adult H"],
+        memberCount: 1,
+        score: 14,
+        penalty: 0,
+        totalScore: 14,
+        timeSec: 9700,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "Adult Zero",
+        organisation: "Черкаська",
+        members: ["Adult Zero"],
+        memberCount: 1,
+        score: 10,
+        penalty: 0,
+        totalScore: 10,
+        timeSec: 9800,
+        status: "OK",
+      },
+    ];
+
+    const html = buildRogainingScoreHtml(teams, new Date(2026, 3, 11), "Рогейн", "view");
+
+    expect(html).toContain("Протокол балів рогейну");
+    expect(html).toMatch(/<td><strong>Кількість учасників<\/strong><\/td>\s*<td><strong>12<\/strong><\/td>/);
+    expect(html).toContain("<h3>Бали по регіонах</h3>");
+    expectInOrder(html, [
+      "<h3>Бали по регіонах</h3>",
+      "<h3>Бали учасників</h3>",
+    ]);
+    expect(html).toMatch(/<td>Київська<\/td>\s*<td><strong>75<\/strong><\/td>/);
+    expect(html).toMatch(/Youth A[\s\S]*<td>Ж18<\/td>[\s\S]*<td>1<\/td>[\s\S]*<td><strong>75<\/strong><\/td>/);
+    expect(html).toMatch(/Youth B[\s\S]*<td>Ж18<\/td>[\s\S]*<td>2<\/td>[\s\S]*<td><strong>60<\/strong><\/td>/);
+    expect(html).toMatch(/Young A[\s\S]*<td>МІКС23<\/td>[\s\S]*<td>1<\/td>[\s\S]*<td><strong>150<\/strong><\/td>/);
+    expect(html).toMatch(/Adult A[\s\S]*<td>Ч<\/td>[\s\S]*<td>1<\/td>[\s\S]*<td><strong>300<\/strong><\/td>/);
+    expect(html).toMatch(/Adult B[\s\S]*<td>Ч<\/td>[\s\S]*<td>2<\/td>[\s\S]*<td><strong>150<\/strong><\/td>/);
+    expect(html).toMatch(/Adult C[\s\S]*<td>Ч<\/td>[\s\S]*<td>3<\/td>[\s\S]*<td><strong>200<\/strong><\/td>/);
+    expect(html).not.toContain("Adult Zero");
+    expect(html).not.toContain("<td><strong>0</strong></td>");
+  });
+
+  it("uses each participant region instead of the combined team region", () => {
+    const teams: RogainingTeam[] = [
+      {
+        className: "Ч",
+        teamName: "Збірна",
+        organisation: "Донецька, Житомирська",
+        members: ["Мороз Олександр", "Кравченко Ігор"],
+        memberOrganisations: ["Донецька", "Житомирська"],
+        memberCount: 2,
+        score: 30,
+        penalty: 0,
+        totalScore: 30,
+        timeSec: 10000,
+        status: "OK",
+      },
+    ];
+
+    const html = buildRogainingScoreHtml(teams, new Date(2026, 3, 11), "Рогейн", "pdf");
+
+    expect(html).toMatch(/Мороз Олександр[\s\S]*<td>Донецька<\/td>[\s\S]*<td>Ч<\/td>[\s\S]*<td>1<\/td>[\s\S]*<td><strong>300<\/strong><\/td>/);
+    expect(html).toMatch(/Кравченко Ігор[\s\S]*<td>Житомирська<\/td>[\s\S]*<td>Ч<\/td>[\s\S]*<td>1<\/td>[\s\S]*<td><strong>300<\/strong><\/td>/);
+    expect(html).not.toMatch(/Мороз Олександр[\s\S]*<td>Донецька, Житомирська<\/td>/);
   });
 });
 

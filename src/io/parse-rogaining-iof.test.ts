@@ -119,5 +119,10 @@ describe("parseRogainingIof", () => {
 
     expect(parsed.teams).toHaveLength(1);
     expect(parsed.teams[0].organisation).toBe("Київська, Львівська");
+    expect(parsed.teams[0].memberOrganisations).toEqual([
+      "Київська",
+      "Львівська",
+      "Київська",
+    ]);
   });
 });

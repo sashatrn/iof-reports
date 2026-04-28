@@ -41,6 +41,19 @@ type RogainingDiplomaEntry = {
   place: string;
 };
 
+export type RogainingScoreEntry = {
+  participantName: string;
+  region: string;
+  className: string;
+  place: string;
+  points: number;
+};
+
+export type RogainingRegionScoreEntry = {
+  region: string;
+  points: number;
+};
+
 type RogainingDiplomasOptions = {
   includeBackground: boolean;
 };
@@ -497,6 +510,105 @@ function buildAwardsClasses(
     .sort((left, right) => sortAwardsClasses(left, right, config));
 }
 
+function getRogainingScorePointsMap(
+  className: string,
+  config: AppConfig,
+): Record<string, number> {
+  const parsedClass = parseRogainingClass(className, config);
+  const ageLimit = parsedClass?.ageLimit ?? OPEN_AGE;
+
+  if (ageLimit <= 18) {
+    return config.rogaining.scorePoints.youthUnder18;
+  }
+
+  if (ageLimit <= 23) {
+    return config.rogaining.scorePoints.youthUnder23;
+  }
+
+  return config.rogaining.scorePoints.adult;
+}
+
+function getRogainingScorePoints(
+  place: string,
+  pointsMap: Record<string, number>,
+): number {
+  return pointsMap[place] ?? 0;
+}
+
+function getRogainingScoreMemberRegion(team: RogainingTeam, memberIndex: number): string {
+  const memberOrganisation = team.memberOrganisations?.[memberIndex];
+
+  if (
+    memberOrganisation &&
+    memberOrganisation !== "Unknown" &&
+    memberOrganisation.toLowerCase() !== "no club"
+  ) {
+    return memberOrganisation;
+  }
+
+  return team.organisation;
+}
+
+function createRogainingScoreEntries(
+  teams: RogainingTeam[],
+  config: AppConfig,
+  options: { includeZeroPoints?: boolean } = {},
+): RogainingScoreEntry[] {
+  return buildRogainingClasses(teams, config)
+    .filter((classGroup) => classGroup.name !== AGGREGATE_OPEN_CLASS)
+    .flatMap((classGroup) => {
+      const pointsMap = getRogainingScorePointsMap(classGroup.name, config);
+
+      return classGroup.teams
+        .filter((team) => team.place !== "")
+        .flatMap((team) => {
+          const points = getRogainingScorePoints(team.place, pointsMap);
+
+          if (points === 0 && !options.includeZeroPoints) {
+            return [];
+          }
+
+          return team.members.map((participantName, memberIndex) => ({
+            participantName,
+            region: getRogainingScoreMemberRegion(team, memberIndex),
+            className: classGroup.name,
+            place: team.place,
+            points,
+          }));
+        });
+    });
+}
+
+export function buildRogainingScoreEntries(teams: RogainingTeam[]): RogainingScoreEntry[] {
+  const config = loadConfig();
+  const normalizedTeams = applyRogainingRules(teams, config);
+  return createRogainingScoreEntries(normalizedTeams, config);
+}
+
+function buildRogainingRegionScoreEntries(
+  entries: RogainingScoreEntry[],
+): RogainingRegionScoreEntry[] {
+  const pointsByRegion = new Map<string, number>();
+
+  for (const entry of entries) {
+    pointsByRegion.set(entry.region, (pointsByRegion.get(entry.region) ?? 0) + entry.points);
+  }
+
+  return [...pointsByRegion.entries()]
+    .map(([region, points]) => ({ region, points }))
+    .sort((left, right) => {
+      if (left.points !== right.points) {
+        return right.points - left.points;
+      }
+
+      return left.region.localeCompare(right.region, "uk");
+    });
+}
+
+function countUniqueRogainingScoreParticipants(entries: RogainingScoreEntry[]): number {
+  return new Set(entries.map((entry) => entry.participantName)).size;
+}
+
 export function buildRogainingHtml(
   teams: RogainingTeam[],
   eventDate: Date,
@@ -530,6 +642,44 @@ export function buildRogainingHtml(
     classes,
     showControlGateColumn: config.rogaining.controlGateRule.enabled,
     controlGateLabel: `КП ${config.rogaining.controlGateRule.gateControl}`,
+  });
+}
+
+export function buildRogainingScoreHtml(
+  teams: RogainingTeam[],
+  eventDate: Date,
+  eventName?: string,
+  variant: HtmlVariant = "pdf",
+): string {
+  const config = loadConfig();
+  const normalizedTeams = applyRogainingRules(teams, config);
+  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
+  const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
+  const allEntries = createRogainingScoreEntries(normalizedTeams, config, {
+    includeZeroPoints: true,
+  });
+  const entries = allEntries.filter((entry) => entry.points !== 0);
+  const regionScores = buildRogainingRegionScoreEntries(entries);
+  const participantCount = countUniqueRogainingScoreParticipants(allEntries);
+  void variant;
+
+  return renderTemplate("rogaining-score-pdf.njk", {
+    reportTitle: "Протокол балів рогейну",
+    event: {
+      title:
+        config.reportHeader.title ??
+        eventName ??
+        `Протокол балів рогейну, ${formatDate(eventDate)}`,
+      subtitle: "",
+      location: config.reportHeader.location,
+      date: formatDate(eventDate),
+      logo1: imageToBase64(logo1Path),
+      logo2: imageToBase64(logo2Path),
+    },
+    officials: config.officials,
+    participantCount,
+    regionScores,
+    entries,
   });
 }
 
