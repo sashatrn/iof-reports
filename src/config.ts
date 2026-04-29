@@ -185,14 +185,20 @@ const defaultConfig: AppConfig = {
   },
 };
 
+let activeConfigPath: string | undefined;
+
+export function setConfigPath(configPath?: string): void {
+  activeConfigPath = configPath;
+}
+
 export function loadConfig(configPath?: string): AppConfig {
-  if (configPath) {
-    console.log(`Loading config from ${configPath}`);
-  }
-  
-  const filePath = configPath ?? path.resolve(process.cwd(), "config.json");
+  const filePath = configPath ?? activeConfigPath ?? path.resolve(process.cwd(), "config.json");
 
   if (!fs.existsSync(filePath)) {
+    if (configPath || activeConfigPath) {
+      throw new Error(`Config not found at ${filePath}.`);
+    }
+
     console.warn(`Config not found at ${filePath}. Using default config.`);
     return defaultConfig;
   }

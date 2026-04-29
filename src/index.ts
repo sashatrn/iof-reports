@@ -3,9 +3,9 @@ import fs from "fs";
 
 import { htmlToPdf } from "./render/pdf";
 import { getAppVersion } from "./app-version";
-import { loadConfig } from "./config";
+import { loadConfig, setConfigPath } from "./config";
 import { createLogger } from "./logger";
-import { parseCliArgs } from "./cli";
+import { extractConfigPathArg, parseCliArgs } from "./cli";
 import { generateReportsHtml } from "./core/generate-report-html";
 import { runWatchMode } from "./watch/run-watch-mode";
 
@@ -30,13 +30,15 @@ async function main(): Promise<void> {
     return;
   }
 
+  const configPath = extractConfigPathArg(process.argv);
+  setConfigPath(configPath);
   const config = loadConfig();
   const logger = createLogger(config);
   logger.info({ version: getAppVersion() }, "iof-reports starting");
 
   const { inputPath, courseDataPath, report, html, diplomaTemplate } = parseCliArgs(process.argv, logger);
 
-  logger.info({ file: inputPath, courseDataPath, report, html, diplomaTemplate }, "Reading XML file");
+  logger.info({ file: inputPath, configPath, courseDataPath, report, html, diplomaTemplate }, "Reading XML file");
 
   const xml = fs.readFileSync(inputPath, "utf-8");
   const courseDataXml = courseDataPath ? fs.readFileSync(courseDataPath, "utf-8") : undefined;

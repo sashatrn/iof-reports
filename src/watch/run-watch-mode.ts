@@ -2,7 +2,8 @@ import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import { getAppVersion } from "../app-version";
-import { loadConfig } from "../config";
+import { extractConfigPathArg } from "../cli";
+import { loadConfig, setConfigPath } from "../config";
 import { generateReportHtml } from "../core/generate-report-html";
 import { createLogger } from "../logger";
 import { parseWatchArgs } from "./cli";
@@ -31,6 +32,8 @@ async function isFileStable(filePath: string, settleMs: number): Promise<boolean
 }
 
 export async function runWatchMode(argv: string[]): Promise<void> {
+  const configPath = extractConfigPathArg(argv);
+  setConfigPath(configPath);
   const config = loadConfig();
   const logger = createLogger(config);
   logger.info({ version: getAppVersion() }, "iof-reports watch starting");
@@ -52,6 +55,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
       settleMs: options.settleMs,
       port: options.port,
       diplomaTemplate: options.diplomaTemplate,
+      configPath: options.configPath,
       courseDataPath: options.courseDataPath,
     },
     "Watching directory for latest XML",

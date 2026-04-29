@@ -5,6 +5,7 @@ import { ReportType, REPORT_TYPES } from "./report-types";
 
 export type CliOptions = {
   inputPath: string;
+  configPath?: string;
   courseDataPath?: string;
   report: ReportType;
   html: "none" | "view" | "pdf" | "both";
@@ -17,26 +18,51 @@ const DIPLOMA_TEMPLATE_VALUES = new Set<string>(["off", "on"]);
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--report all|individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-splits] [--courses courses.xml] [--html none|view|pdf|both] [--diploma-template off|on]",
+    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-splits] [--courses courses.xml] [--html none|view|pdf|both] [--diploma-template off|on]",
   );
 }
 
-export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
-  const input = argv[2];
+export function extractConfigPathArg(argv: string[]): string | undefined {
+  for (let i = 2; i < argv.length; i += 1) {
+    const arg = argv[i];
 
-  if (!input) {
-    logger.error("No XML file provided.");
-    printUsage(logger);
-    process.exit(1);
+    if (arg !== "--config" && arg !== "-c") {
+      continue;
+    }
+
+    const value = argv[i + 1];
+
+    if (!value || value.startsWith("-")) {
+      throw new Error("No config file provided for --config.");
+    }
+
+    return path.resolve(process.cwd(), value);
   }
 
+  return undefined;
+}
+
+export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
+  let input: string | undefined;
   let report: CliOptions["report"] = "all";
+  let configPath: string | undefined;
   let courseDataPath: string | undefined;
   let html: CliOptions["html"] = "none";
   let diplomaTemplate: CliOptions["diplomaTemplate"] = "off";
 
-  for (let i = 3; i < argv.length; i += 1) {
+  for (let i = 2; i < argv.length; i += 1) {
     const arg = argv[i];
+
+    if (!arg.startsWith("-")) {
+      if (!input) {
+        input = arg;
+        continue;
+      }
+
+      logger.error({ arg }, "Unexpected positional argument.");
+      printUsage(logger);
+      process.exit(1);
+    }
 
     if (arg === "--report" || arg === "-r") {
       const value = argv[i + 1];
@@ -51,6 +77,20 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       }
 
       report = value as CliOptions["report"];
+      i += 1;
+      continue;
+    }
+
+    if (arg === "--config" || arg === "-c") {
+      const value = argv[i + 1];
+
+      if (!value || value.startsWith("-")) {
+        logger.error("No config file provided for --config.");
+        printUsage(logger);
+        process.exit(1);
+      }
+
+      configPath = path.resolve(process.cwd(), value);
       i += 1;
       continue;
     }
@@ -108,10 +148,21 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
     process.exit(1);
   }
 
+  if (!input) {
+    logger.error("No XML file provided.");
+    printUsage(logger);
+    process.exit(1);
+  }
+
   const absolutePath = path.resolve(process.cwd(), input);
 
   if (!fs.existsSync(absolutePath)) {
     logger.error({ path: absolutePath }, "XML file not found.");
+    process.exit(1);
+  }
+
+  if (configPath && !fs.existsSync(configPath)) {
+    logger.error({ path: configPath }, "Config file not found.");
     process.exit(1);
   }
 
@@ -128,6 +179,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
 
   return {
     inputPath: absolutePath,
+    configPath,
     courseDataPath,
     report,
     html,
