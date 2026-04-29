@@ -12,6 +12,7 @@
     "dev:watch": "tsx src/index.ts watch",
     "dev:sample": "tsx src/index.ts src/__fixtures__/sample.xml",
     "dev:rogaining": "tsx src/index.ts src/__fixtures__/rogaining-test.xml --report rogaining",
+    "dev:rogaining-splits": "tsx src/index.ts src/__fixtures__/rogaining-test.xml --report rogaining-splits --courses src/__fixtures__/courses.xml",
     "clean": "rimraf dist",
     "build": "npm run clean && tsc && npm run copy-assets && npm run copy-templates",
     "copy-assets": "cpy \"src/assets/**/*\" dist/assets",

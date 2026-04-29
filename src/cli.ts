@@ -5,6 +5,7 @@ import { ReportType, REPORT_TYPES } from "./report-types";
 
 export type CliOptions = {
   inputPath: string;
+  courseDataPath?: string;
   report: ReportType;
   html: "none" | "view" | "pdf" | "both";
   diplomaTemplate: "off" | "on";
@@ -16,7 +17,7 @@ const DIPLOMA_TEMPLATE_VALUES = new Set<string>(["off", "on"]);
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--report all|individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score] [--html none|view|pdf|both] [--diploma-template off|on]",
+    "Usage: node dist/index.js <file.xml> [--report all|individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-splits] [--courses courses.xml] [--html none|view|pdf|both] [--diploma-template off|on]",
   );
 }
 
@@ -30,6 +31,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
   }
 
   let report: CliOptions["report"] = "all";
+  let courseDataPath: string | undefined;
   let html: CliOptions["html"] = "none";
   let diplomaTemplate: CliOptions["diplomaTemplate"] = "off";
 
@@ -42,13 +44,27 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       if (!value || !REPORT_VALUES.has(value)) {
         logger.error(
           { report: value },
-          "Invalid report type. Expected one of: all, individual, team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score.",
+          "Invalid report type. Expected one of: all, individual, team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-splits.",
         );
         printUsage(logger);
         process.exit(1);
       }
 
       report = value as CliOptions["report"];
+      i += 1;
+      continue;
+    }
+
+    if (arg === "--courses" || arg === "--course") {
+      const value = argv[i + 1];
+
+      if (!value) {
+        logger.error("No CourseData XML file provided for --courses.");
+        printUsage(logger);
+        process.exit(1);
+      }
+
+      courseDataPath = path.resolve(process.cwd(), value);
       i += 1;
       continue;
     }
@@ -99,8 +115,20 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
     process.exit(1);
   }
 
+  if (courseDataPath && !fs.existsSync(courseDataPath)) {
+    logger.error({ path: courseDataPath }, "CourseData XML file not found.");
+    process.exit(1);
+  }
+
+  if (report === "rogaining-splits" && !courseDataPath) {
+    logger.error("rogaining-splits report requires --courses <courses.xml>.");
+    printUsage(logger);
+    process.exit(1);
+  }
+
   return {
     inputPath: absolutePath,
+    courseDataPath,
     report,
     html,
     diplomaTemplate,

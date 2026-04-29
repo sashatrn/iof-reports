@@ -34,14 +34,16 @@ async function main(): Promise<void> {
   const logger = createLogger(config);
   logger.info({ version: getAppVersion() }, "iof-reports starting");
 
-  const { inputPath, report, html, diplomaTemplate } = parseCliArgs(process.argv, logger);
+  const { inputPath, courseDataPath, report, html, diplomaTemplate } = parseCliArgs(process.argv, logger);
 
-  logger.info({ file: inputPath, report, html, diplomaTemplate }, "Reading XML file");
+  logger.info({ file: inputPath, courseDataPath, report, html, diplomaTemplate }, "Reading XML file");
 
   const xml = fs.readFileSync(inputPath, "utf-8");
+  const courseDataXml = courseDataPath ? fs.readFileSync(courseDataPath, "utf-8") : undefined;
   const generatedReports = generateReportsHtml(xml, report, {
     logger,
     includeDiplomaBackground: diplomaTemplate === "on",
+    courseDataXml,
   });
 
   for (const generatedReport of generatedReports) {

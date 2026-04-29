@@ -1,0 +1,365 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<CourseData xmlns="http://www.orienteering.org/datastandard/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" iofVersion="3.0" createTime="2026-04-22T08:24:43.830+03:00" creator="OCAD 12.3.0.1595">
+  <Event>
+    <Name>25.04.2026</Name>
+  </Event>
+  <RaceCourseData>
+    <Map>
+      <Scale>10000</Scale>
+      <!-- extent of ocad map-->
+      <MapPositionTopLeft x="-2054.1" y="262.6" unit="mm"/>
+      <MapPositionBottomRight x="399.2" y="-1518.0" unit="mm"/>
+    </Map>
+    <Control>
+      <Id>S1</Id>
+      <Position lng="29.168400" lat="50.373541" />
+      <MapPosition x="-383.3" y="-5.6" unit="mm" />
+    </Control>
+    <Control>
+      <Id>20</Id>
+      <Position lng="29.171925" lat="50.379077" />
+      <MapPosition x="-367.8" y="59.1" unit="mm" />
+    </Control>
+    <Control>
+      <Id>21</Id>
+      <Position lng="29.150775" lat="50.374723" />
+      <MapPosition x="-509.2" y="-11.5" unit="mm" />
+    </Control>
+    <Control>
+      <Id>22</Id>
+      <Position lng="29.071565" lat="50.342780" />
+      <MapPosition x="-1013.2" y="-447.3" unit="mm" />
+    </Control>
+    <Control>
+      <Id>23</Id>
+      <Position lng="29.178030" lat="50.367901" />
+      <MapPosition x="-306.1" y="-57.3" unit="mm" />
+    </Control>
+    <Control>
+      <Id>24</Id>
+      <Position lng="29.166284" lat="50.364233" />
+      <MapPosition x="-382.6" y="-110.2" unit="mm" />
+    </Control>
+    <Control>
+      <Id>25</Id>
+      <Position lng="29.160999" lat="50.380203" />
+      <MapPosition x="-446.5" y="59.7" unit="mm" />
+    </Control>
+    <Control>
+      <Id>26</Id>
+      <Position lng="29.158479" lat="50.366447" />
+      <MapPosition x="-441.2" y="-94.2" unit="mm" />
+    </Control>
+    <Control>
+      <Id>30</Id>
+      <Position lng="29.084757" lat="50.330760" />
+      <MapPosition x="-900.3" y="-565.4" unit="mm" />
+    </Control>
+    <Control>
+      <Id>31</Id>
+      <Position lng="29.189530" lat="50.361801" />
+      <MapPosition x="-215.0" y="-112.0" unit="mm" />
+    </Control>
+    <Control>
+      <Id>32</Id>
+      <Position lng="29.157245" lat="50.358058" />
+      <MapPosition x="-435.8" y="-187.8" unit="mm" />
+    </Control>
+    <Control>
+      <Id>33</Id>
+      <Position lng="29.172939" lat="50.360463" />
+      <MapPosition x="-329.5" y="-144.5" unit="mm" />
+    </Control>
+    <Control>
+      <Id>34</Id>
+      <Position lng="29.182811" lat="50.372222" />
+      <MapPosition x="-279.8" y="-4.6" unit="mm" />
+    </Control>
+    <Control>
+      <Id>35</Id>
+      <Position lng="29.190772" lat="50.373915" />
+      <MapPosition x="-226.6" y="22.6" unit="mm" />
+    </Control>
+    <Control>
+      <Id>40</Id>
+      <Position lng="29.085538" lat="50.367885" />
+      <MapPosition x="-956.6" y="-156.3" unit="mm" />
+    </Control>
+    <Control>
+      <Id>41</Id>
+      <Position lng="29.152538" lat="50.369618" />
+      <MapPosition x="-488.3" y="-65.7" unit="mm" />
+    </Control>
+    <Control>
+      <Id>42</Id>
+      <Position lng="29.196655" lat="50.378019" />
+      <MapPosition x="-192.2" y="74.0" unit="mm" />
+    </Control>
+    <Control>
+      <Id>43</Id>
+      <Position lng="29.176929" lat="50.350657" />
+      <MapPosition x="-284.9" y="-248.0" unit="mm" />
+    </Control>
+    <Control>
+      <Id>44</Id>
+      <Position lng="29.156045" lat="50.352207" />
+      <MapPosition x="-434.5" y="-253.4" unit="mm" />
+    </Control>
+    <Control>
+      <Id>45</Id>
+      <Position lng="29.226757" lat="50.352751" />
+      <MapPosition x="62.1" y="-171.4" unit="mm" />
+    </Control>
+    <Control>
+      <Id>46</Id>
+      <Position lng="29.138872" lat="50.362057" />
+      <MapPosition x="-571.8" y="-163.5" unit="mm" />
+    </Control>
+    <Control>
+      <Id>47</Id>
+      <Position lng="29.112827" lat="50.332495" />
+      <MapPosition x="-705.6" y="-516.4" unit="mm" />
+    </Control>
+    <Control>
+      <Id>48</Id>
+      <Position lng="29.205609" lat="50.380096" />
+      <MapPosition x="-132.7" y="106.5" unit="mm" />
+    </Control>
+    <Control>
+      <Id>49</Id>
+      <Position lng="29.152237" lat="50.378976" />
+      <MapPosition x="-506.1" y="36.9" unit="mm" />
+    </Control>
+    <Control>
+      <Id>50</Id>
+      <Position lng="29.144116" lat="50.382180" />
+      <MapPosition x="-568.5" y="63.4" unit="mm" />
+    </Control>
+    <Control>
+      <Id>51</Id>
+      <Position lng="29.118091" lat="50.379849" />
+      <MapPosition x="-747.6" y="10.0" unit="mm" />
+    </Control>
+    <Control>
+      <Id>52</Id>
+      <Position lng="29.195929" lat="50.381272" />
+      <MapPosition x="-202.7" y="109.0" unit="mm" />
+    </Control>
+    <Control>
+      <Id>53</Id>
+      <Position lng="29.202664" lat="50.368498" />
+      <MapPosition x="-133.9" y="-24.2" unit="mm" />
+    </Control>
+    <Control>
+      <Id>54</Id>
+      <Position lng="29.200415" lat="50.348154" />
+      <MapPosition x="-115.5" y="-250.3" unit="mm" />
+    </Control>
+    <Control>
+      <Id>55</Id>
+      <Position lng="29.175843" lat="50.342197" />
+      <MapPosition x="-278.4" y="-342.2" unit="mm" />
+    </Control>
+    <Control>
+      <Id>56</Id>
+      <Position lng="29.165064" lat="50.346495" />
+      <MapPosition x="-361.4" y="-306.5" unit="mm" />
+    </Control>
+    <Control>
+      <Id>57</Id>
+      <Position lng="29.147634" lat="50.342586" />
+      <MapPosition x="-477.5" y="-368.2" unit="mm" />
+    </Control>
+    <Control>
+      <Id>58</Id>
+      <Position lng="29.136893" lat="50.349269" />
+      <MapPosition x="-564.3" y="-306.2" unit="mm" />
+    </Control>
+    <Control>
+      <Id>59</Id>
+      <Position lng="29.098734" lat="50.364562" />
+      <MapPosition x="-858.3" y="-178.8" unit="mm" />
+    </Control>
+    <Control>
+      <Id>60</Id>
+      <Position lng="29.193712" lat="50.339963" />
+      <MapPosition x="-148.9" y="-347.6" unit="mm" />
+    </Control>
+    <Control>
+      <Id>61</Id>
+      <Position lng="29.228691" lat="50.365092" />
+      <MapPosition x="54.9" y="-33.6" unit="mm" />
+    </Control>
+    <Control>
+      <Id>62</Id>
+      <Position lng="29.213616" lat="50.363926" />
+      <MapPosition x="-49.2" y="-62.7" unit="mm" />
+    </Control>
+    <Control>
+      <Id>63</Id>
+      <Position lng="29.205200" lat="50.356996" />
+      <MapPosition x="-96.7" y="-148.0" unit="mm" />
+    </Control>
+    <Control>
+      <Id>64</Id>
+      <Position lng="29.125075" lat="50.370533" />
+      <MapPosition x="-683.0" y="-85.0" unit="mm" />
+    </Control>
+    <Control>
+      <Id>65</Id>
+      <Position lng="29.213966" lat="50.374703" />
+      <MapPosition x="-64.9" y="56.2" unit="mm" />
+    </Control>
+    <Control>
+      <Id>66</Id>
+      <Position lng="29.137760" lat="50.338296" />
+      <MapPosition x="-539.8" y="-425.9" unit="mm" />
+    </Control>
+    <Control>
+      <Id>67</Id>
+      <Position lng="29.097330" lat="50.342975" />
+      <MapPosition x="-832.2" y="-417.7" unit="mm" />
+    </Control>
+    <Control>
+      <Id>68</Id>
+      <Position lng="29.133445" lat="50.356314" />
+      <MapPosition x="-600.3" y="-232.4" unit="mm" />
+    </Control>
+    <Control>
+      <Id>69</Id>
+      <Position lng="29.107883" lat="50.354600" />
+      <MapPosition x="-777.3" y="-278.6" unit="mm" />
+    </Control>
+    <Control>
+      <Id>70</Id>
+      <Position lng="29.074604" lat="50.335486" />
+      <MapPosition x="-979.6" y="-524.2" unit="mm" />
+    </Control>
+    <Control>
+      <Id>71</Id>
+      <Position lng="29.119360" lat="50.351050" />
+      <MapPosition x="-690.6" y="-305.4" unit="mm" />
+    </Control>
+    <Control>
+      <Id>72</Id>
+      <Position lng="29.139719" lat="50.330383" />
+      <MapPosition x="-512.8" y="-510.9" unit="mm" />
+    </Control>
+    <Control>
+      <Id>73</Id>
+      <Position lng="29.096464" lat="50.358969" />
+      <MapPosition x="-864.9" y="-242.7" unit="mm" />
+    </Control>
+    <Control>
+      <Id>74</Id>
+      <Position lng="29.106499" lat="50.371982" />
+      <MapPosition x="-816.0" y="-88.9" unit="mm" />
+    </Control>
+    <Control>
+      <Id>75</Id>
+      <Position lng="29.201025" lat="50.384282" />
+      <MapPosition x="-172.0" y="147.6" unit="mm" />
+    </Control>
+    <Control>
+      <Id>76</Id>
+      <Position lng="29.218778" lat="50.371043" />
+      <MapPosition x="-24.9" y="21.1" unit="mm" />
+    </Control>
+    <Control>
+      <Id>80</Id>
+      <Position lng="29.120796" lat="50.338652" />
+      <MapPosition x="-659.8" y="-440.2" unit="mm" />
+    </Control>
+    <Control>
+      <Id>81</Id>
+      <Position lng="29.160668" lat="50.334224" />
+      <MapPosition x="-371.8" y="-446.2" unit="mm" />
+    </Control>
+    <Control>
+      <Id>82</Id>
+      <Position lng="29.122655" lat="50.330774" />
+      <MapPosition x="-633.6" y="-524.8" unit="mm" />
+    </Control>
+    <Control>
+      <Id>83</Id>
+      <Position lng="29.077545" lat="50.373363" />
+      <MapPosition x="-1021.9" y="-104.6" unit="mm" />
+    </Control>
+    <Control>
+      <Id>84</Id>
+      <Position lng="29.101106" lat="50.334429" />
+      <MapPosition x="-791.4" y="-507.6" unit="mm" />
+    </Control>
+    <Control>
+      <Id>85</Id>
+      <Position lng="29.088276" lat="50.374617" />
+      <MapPosition x="-948.6" y="-79.4" unit="mm" />
+    </Control>
+    <Control>
+      <Id>86</Id>
+      <Position lng="29.088177" lat="50.353849" />
+      <MapPosition x="-914.7" y="-307.8" unit="mm" />
+    </Control>
+    <Control>
+      <Id>87</Id>
+      <Position lng="29.084398" lat="50.337270" />
+      <MapPosition x="-913.7" y="-494.2" unit="mm" />
+    </Control>
+    <Control>
+      <Id>90</Id>
+      <Position lng="29.146273" lat="50.386833" />
+      <MapPosition x="-561.1" y="116.9" unit="mm" />
+    </Control>
+    <Control>
+      <Id>91</Id>
+      <Position lng="29.100916" lat="50.328404" />
+      <MapPosition x="-782.6" y="-574.1" unit="mm" />
+    </Control>
+    <Control>
+      <Id>92</Id>
+      <Position lng="29.076114" lat="50.355714" />
+      <MapPosition x="-1002.7" y="-300.2" unit="mm" />
+    </Control>
+    <Control>
+      <Id>93</Id>
+      <Position lng="29.084257" lat="50.363503" />
+      <MapPosition x="-958.3" y="-205.9" unit="mm" />
+    </Control>
+    <Control>
+      <Id>94</Id>
+      <Position lng="29.216809" lat="50.343605" />
+      <MapPosition x="7.5" y="-282.7" unit="mm" />
+    </Control>
+    <Control>
+      <Id>95</Id>
+      <Position lng="29.207697" lat="50.383160" />
+      <MapPosition x="-123.2" y="142.4" unit="mm" />
+    </Control>
+    <Control>
+      <Id>96</Id>
+      <Position lng="29.092590" lat="50.327498" />
+      <MapPosition x="-839.8" y="-592.9" unit="mm" />
+    </Control>
+    <Control>
+      <Id>100</Id>
+      <Position lng="29.074882" lat="50.330927" />
+      <MapPosition x="-970.1" y="-574.1" unit="mm" />
+    </Control>
+    <Control>
+      <Id>101</Id>
+      <Position lng="29.073060" lat="50.368740" />
+      <MapPosition x="-1045.8" y="-160.2" unit="mm" />
+    </Control>
+    <Control>
+      <Id>102</Id>
+      <Position lng="29.236660" lat="50.361375" />
+      <MapPosition x="117.2" y="-65.9" unit="mm" />
+    </Control>
+    <Control>
+      <Id>110</Id>
+      <Position lng="29.088153" lat="50.321175" />
+      <MapPosition x="-860.5" y="-667.2" unit="mm" />
+    </Control>
+
+  </RaceCourseData>
+</CourseData>

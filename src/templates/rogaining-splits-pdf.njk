@@ -1,0 +1,63 @@
+{% extends "base-pdf.njk" %}
+
+{% block content %}
+
+{% for team in teams %}
+<section class="split-team">
+  <h3>{{ team.teamName }}</h3>
+
+  <table class="split-summary">
+    <tbody>
+      <tr>
+        <td><strong>Клас</strong></td>
+        <td>{{ team.className }}</td>
+        <td><strong>Загальна відстань</strong></td>
+        <td>{{ team.totalDistance }}</td>
+      </tr>
+      <tr>
+        <td><strong>Учасники</strong></td>
+        <td>{{ team.membersLine }}</td>
+        <td><strong>Загальний час</strong></td>
+        <td>{{ team.totalTime }}</td>
+      </tr>
+      <tr>
+        <td><strong>Бали</strong></td>
+        <td>{{ team.score }}</td>
+        <td><strong>Штрафи</strong></td>
+        <td>{{ team.penalty }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table>
+    <thead>
+      <tr>
+        <th>КП</th>
+        <th>Час</th>
+        <th>Відстань</th>
+        <th>Темп хв/км</th>
+        <th>Час від початку</th>
+        <th>Відстань від початку</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for leg in team.legs %}
+      <tr>
+        <td>{{ leg.controlCode }}</td>
+        <td>{{ leg.legTime }}</td>
+        <td>{{ leg.legDistance }}</td>
+        <td>{{ leg.pace }}</td>
+        <td>{{ leg.totalTime }}</td>
+        <td>{{ leg.totalDistance }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="6">Немає сплітів</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endfor %}
+
+{% endblock %}

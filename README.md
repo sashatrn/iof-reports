@@ -6,6 +6,7 @@ CLI-інструмент для перетворення результатів 
 - Командний протокол (окремо чоловіки та жінки)
 - Протокол результатів рогейну
 - Протокол балів рогейну
+- Протокол сплітів рогейну
 
 Результати в протоколах розраховуються згідно правил національного проекту Пліч-о-пліч
 
@@ -31,11 +32,11 @@ CLI-інструмент для перетворення результатів 
 
 1. Відкрийте командний рядок Windows
 1. Виконайте `iof-reports <results.xml>`, де `<results.xml>` - IOF XML файл результатів.
-1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team`, `--report rogaining`, `--report rogaining-awards`, `--report rogaining-diplomas` або `--report rogaining-score`.
+1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team`, `--report rogaining`, `--report rogaining-awards`, `--report rogaining-diplomas`, `--report rogaining-score` або `--report rogaining-splits`.
 1. За потреби згенеруйте HTML-файли: `--html view`, `--html pdf` або `--html both`.
 1. Для `rogaining-diplomas` за потреби увімкніть друк фону диплома через `--diploma-template on`. За замовчуванням `off`.
 
-Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`, `rogaining-score`.
+Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`, `rogaining-score`, `rogaining-splits`.
 Доступні значення для `--html`: `none` (за замовчуванням), `view`, `pdf`, `both`.
 
 Приклади:
@@ -46,6 +47,7 @@ CLI-інструмент для перетворення результатів 
 - `iof-reports results.xml --report rogaining-diplomas` - створити PDF для друку на готові дипломи
 - `iof-reports results.xml --report rogaining-diplomas --diploma-template on` - створити дипломи разом із фоновим бланком у PDF
 - `iof-reports results.xml --report rogaining-score` - створити протокол балів учасників рогейну
+- `iof-reports results.xml --report rogaining-splits --courses courses.xml` - створити протокол сплітів рогейну з відстанями між КП
 
 Якщо є проблема з виводом кіриличних символів в консолі Windows, виконайте команду `chcp 65001` перед запуском додатку.
 
@@ -82,6 +84,7 @@ iof-reports watch \
 - `--settle-ms 1000` - пауза для перевірки, що latest XML уже не дописується
 - `--port 4173` - порт локального HTTP-сервера
 - `--diploma-template off|on` - чи вкладати фон диплома в `rogaining-diplomas`
+- `--courses courses.xml` - файл `CourseData` для `rogaining-splits`
 
 Після запуску відкривайте viewer через браузер:
 

@@ -10,12 +10,18 @@ type RogainingMember = {
   name: string;
   organisation: string;
   controls: string[];
+  splits: RogainingSplit[];
   finishTimeSec?: number;
   score?: number;
   penalty?: number;
   status: string;
   overallTimeSec?: number;
   overallStatus?: string;
+};
+
+export type RogainingSplit = {
+  controlCode: string;
+  timeSec?: number;
 };
 
 export type RogainingTeam = {
@@ -25,6 +31,7 @@ export type RogainingTeam = {
   members: string[];
   memberOrganisations?: string[];
   memberControls?: string[][];
+  memberSplits?: RogainingSplit[][];
   controlGateStatus?: "OK" | "-" | "DSQ";
   memberCount: number;
   score: number;
@@ -88,18 +95,29 @@ function extractMemberName(memberResult: {
 }
 
 function extractControls(
+  splits: RogainingSplit[],
+): string[] {
+  return splits.map((split) => split.controlCode);
+}
+
+function extractSplits(
   splitTime:
     | {
         ControlCode?: string | number;
+        Time?: string | number;
       }
     | {
         ControlCode?: string | number;
+        Time?: string | number;
       }[]
     | undefined,
-): string[] {
+): RogainingSplit[] {
   return asArray(splitTime)
-    .map((entry) => String(entry?.ControlCode ?? "").trim())
-    .filter(Boolean);
+    .map((entry) => ({
+      controlCode: String(entry?.ControlCode ?? "").trim(),
+      timeSec: toNumber(entry?.Time),
+    }))
+    .filter((entry) => entry.controlCode !== "");
 }
 
 function extractOrganisationName(value: unknown): string | undefined {
@@ -204,13 +222,15 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
       const memberResults = asArray(teamResult?.TeamMemberResult)
         .map((teamMemberResult) => {
           const result = teamMemberResult?.Result;
+          const splits = extractSplits(result?.SplitTime);
 
           return {
             name: extractMemberName(teamMemberResult),
             organisation:
               extractOrganisationName(teamMemberResult?.Organisation?.Name) ??
               "Unknown",
-            controls: extractControls(result?.SplitTime),
+            controls: extractControls(splits),
+            splits,
             finishTimeSec: toNumber(result?.Time),
             score: findScoreByType(result?.Score, "Score"),
             penalty: findScoreByType(result?.Score, "Penalty"),
@@ -239,6 +259,7 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
         members: memberResults.map((member) => member.name),
         memberOrganisations: memberResults.map((member) => member.organisation),
         memberControls: memberResults.map((member) => member.controls),
+        memberSplits: memberResults.map((member) => member.splits),
         memberCount: memberResults.length,
         score: normalizedTeam.score,
         penalty: normalizedTeam.penalty,

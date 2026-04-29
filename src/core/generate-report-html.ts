@@ -1,5 +1,6 @@
 import { Logger } from "pino";
 import { loadConfig } from "../config";
+import { parseCourseData } from "../io/parse-course-data";
 import { parseIof } from "../io/parse-iof";
 import { parseRogainingIof } from "../io/parse-rogaining-iof";
 import { buildIndividualHtml } from "../reports/individual-report";
@@ -9,6 +10,8 @@ import {
   buildRogainingScoreEntries,
   buildRogainingHtml,
   buildRogainingScoreHtml,
+  buildRogainingSplitTeamEntries,
+  buildRogainingSplitsHtml,
 } from "../reports/rogaining-report";
 import { buildTeamHtml } from "../reports/team-report";
 import { pointsFromPosition } from "../scoring/points";
@@ -27,6 +30,7 @@ export type GeneratedReport = {
 type GenerateReportOptions = {
   logger?: Logger;
   includeDiplomaBackground?: boolean;
+  courseDataXml?: string;
 };
 
 function normalizeEventDate(eventDate: Date | undefined, logger?: Logger): Date {
@@ -197,6 +201,35 @@ export function generateRogainingScoreReportHtml(
   };
 }
 
+export function generateRogainingSplitsReportHtml(
+  xml: string,
+  options: GenerateReportOptions = {},
+): GeneratedReport {
+  const { logger, courseDataXml } = options;
+
+  if (!courseDataXml) {
+    throw new Error("rogaining-splits report requires a CourseData XML file.");
+  }
+
+  const parsed = parseRogainingIof(xml);
+  const courseData = parseCourseData(courseDataXml);
+  const eventDate = normalizeEventDate(parsed.eventDate, logger);
+
+  logger?.info(
+    { count: parsed.teams.length, controls: courseData.controls.length },
+    "Rogaining teams and course data parsed successfully for splits report",
+  );
+
+  return {
+    reportType: "rogaining-splits",
+    viewHtml: buildRogainingSplitsHtml(parsed.teams, courseData, eventDate, parsed.eventName, "view"),
+    pdfHtml: buildRogainingSplitsHtml(parsed.teams, courseData, eventDate, parsed.eventName, "pdf"),
+    eventName: parsed.eventName,
+    eventDate: toIsoDate(eventDate),
+    itemCount: buildRogainingSplitTeamEntries(parsed.teams, courseData).length,
+  };
+}
+
 export function generateReportHtml(
   xml: string,
   reportType: SingleReportType,
@@ -215,6 +248,8 @@ export function generateReportHtml(
       return generateRogainingDiplomasReportHtml(xml, options);
     case "rogaining-score":
       return generateRogainingScoreReportHtml(xml, options);
+    case "rogaining-splits":
+      return generateRogainingSplitsReportHtml(xml, options);
   }
 }
 

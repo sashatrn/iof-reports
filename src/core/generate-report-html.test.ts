@@ -9,6 +9,7 @@ import {
   generateRogainingDiplomasReportHtml,
   generateRogainingReportHtml,
   generateRogainingScoreReportHtml,
+  generateRogainingSplitsReportHtml,
   generateTeamReportHtml,
 } from "./generate-report-html";
 
@@ -18,6 +19,10 @@ const sampleXml = fs.readFileSync(
 );
 const rogainingXml = fs.readFileSync(
   path.resolve(__dirname, "../__fixtures__/rogaining-test.xml"),
+  "utf-8",
+);
+const coursesXml = fs.readFileSync(
+  path.resolve(__dirname, "../__fixtures__/courses.xml"),
   "utf-8",
 );
 
@@ -112,6 +117,27 @@ describe("generateRogainingScoreReportHtml", () => {
   });
 });
 
+describe("generateRogainingSplitsReportHtml", () => {
+  it("builds rogaining splits html from TeamResult and CourseData XML", () => {
+    const report = generateRogainingSplitsReportHtml(rogainingXml, {
+      courseDataXml: coursesXml,
+    });
+
+    expect(report.reportType).toBe("rogaining-splits");
+    expect(report.itemCount).toBeGreaterThan(0);
+    expect(report.viewHtml).toContain("Спліти рогейну");
+    expect(report.viewHtml).toContain("<th>Темп хв/км</th>");
+    expect(report.viewHtml).toContain("<th>Відстань від початку</th>");
+    expect(report.pdfHtml).toContain("Загальна відстань");
+  });
+
+  it("requires CourseData XML", () => {
+    expect(() => generateRogainingSplitsReportHtml(rogainingXml)).toThrow(
+      "CourseData XML",
+    );
+  });
+});
+
 describe("generateReportsHtml", () => {
   it("builds two reports for all mode", () => {
     const reports = generateReportsHtml(sampleXml, "all");
@@ -152,5 +178,14 @@ describe("generateReportHtml", () => {
 
     expect(report.reportType).toBe("rogaining-score");
     expect(report.viewHtml).toContain("Протокол балів рогейну");
+  });
+
+  it("dispatches to rogaining splits report generator", () => {
+    const report = generateReportHtml(rogainingXml, "rogaining-splits", {
+      courseDataXml: coursesXml,
+    });
+
+    expect(report.reportType).toBe("rogaining-splits");
+    expect(report.viewHtml).toContain("Спліти рогейну");
   });
 });

@@ -5,6 +5,8 @@ import {
   buildRogainingDiplomasHtml,
   buildRogainingHtml,
   buildRogainingScoreHtml,
+  buildRogainingSplitTeamEntries,
+  buildRogainingSplitsHtml,
 } from "./rogaining-report";
 
 function expectInOrder(text: string, fragments: string[]): void {
@@ -534,8 +536,155 @@ describe("buildRogainingScoreHtml", () => {
 
     expect(html).toMatch(/<td><strong>Кількість учасників<\/strong><\/td>\s*<td><strong>2<\/strong><\/td>/);
     expect(adultSection).toMatch(/Ветеран учасник[\s\S]*<td>Ч<\/td>[\s\S]*<td>1<\/td>[\s\S]*<td><strong>300<\/strong><\/td>/);
-    expect(adultSection).toMatch(/Дорослий учасник[\s\S]*<td>Ч<\/td>[\s\S]*<td>2<\/td>[\s\S]*<td><strong>150<\/strong><\/td>/);
+    expect(adultSection).toMatch(/Дорослий учасник[\s\S]*<td>Ч<\/td>[\s\S]*<td>2<\/td>[\s\S]*<td><strong>250<\/strong><\/td>/);
     expect(html).not.toContain("<td>Ч45</td>");
+  });
+});
+
+describe("buildRogainingSplitsHtml", () => {
+  const courseData = {
+    scale: 10000,
+    controls: [
+      { id: "S1", mapX: 0, mapY: 0, mapUnit: "mm" },
+      { id: "31", mapX: 100, mapY: 0, mapUnit: "mm" },
+      { id: "32", mapX: 100, mapY: 100, mapUnit: "mm" },
+    ],
+  };
+
+  const teams: RogainingTeam[] = [
+    {
+      className: "Ч",
+      teamName: "Швидкі",
+      organisation: "Київська",
+      members: ["Учасник A", "Учасник B"],
+      memberCount: 2,
+      memberSplits: [
+        [
+          { controlCode: "32", timeSec: 1500 },
+          { controlCode: "32", timeSec: 1520 },
+          { controlCode: "31", timeSec: 600 },
+        ],
+        [
+          { controlCode: "31", timeSec: 610 },
+          { controlCode: "32", timeSec: 1510 },
+          { controlCode: "32", timeSec: 1530 },
+        ],
+      ],
+      score: 42,
+      penalty: 3,
+      totalScore: 42,
+      timeSec: 1800,
+      status: "OK",
+    },
+  ];
+
+  it("builds team split rows with distances, paces, and cumulative values", () => {
+    const entries = buildRogainingSplitTeamEntries(teams, courseData);
+
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({
+      teamName: "Швидкі",
+      className: "Ч",
+      membersLine: "Учасник A, Учасник B",
+      totalDistance: "3.41 км",
+      totalTime: "0:30:00",
+      score: 45,
+      penalty: 3,
+    });
+    expect(entries[0].legs).toEqual([
+      {
+        controlCode: "31",
+        legTime: "0:10:10",
+        legDistance: "1.00 км",
+        pace: "10:10",
+        totalTime: "0:10:10",
+        totalDistance: "1.00 км",
+      },
+      {
+        controlCode: "32",
+        legTime: "0:15:20",
+        legDistance: "1.00 км",
+        pace: "15:20",
+        totalTime: "0:25:30",
+        totalDistance: "2.00 км",
+      },
+      {
+        controlCode: "Фініш",
+        legTime: "0:04:30",
+        legDistance: "1.41 км",
+        pace: "3:11",
+        totalTime: "0:30:00",
+        totalDistance: "3.41 км",
+      },
+    ]);
+  });
+
+  it("renders the splits protocol template", () => {
+    const html = buildRogainingSplitsHtml(
+      teams,
+      courseData,
+      new Date(2026, 3, 25),
+      "Рогейн",
+      "pdf",
+    );
+
+    expect(html).toContain("Спліти рогейну");
+    expect(html).toContain("<h3>Швидкі</h3>");
+    expect(html).toContain("<strong>Загальна відстань</strong>");
+    expect(html).toContain("<th>Час</th>");
+    expect(html).toMatch(/<td>31<\/td>\s*<td>0:10:10<\/td>\s*<td>1.00 км<\/td>\s*<td>10:10<\/td>/);
+    expect(html).not.toMatch(/<td>32<\/td>[\s\S]*<td>32<\/td>/);
+    expect(html).toMatch(/<td>Фініш<\/td>\s*<td>0:04:30<\/td>\s*<td>1.41 км<\/td>\s*<td>3:11<\/td>/);
+  });
+
+  it("keeps repeated controls when another control is between them", () => {
+    const entries = buildRogainingSplitTeamEntries(
+      [
+        {
+          className: "Ч",
+          teamName: "Зона",
+          organisation: "Київська",
+          members: ["Учасник A", "Учасник B"],
+          memberCount: 2,
+          memberSplits: [
+            [
+              { controlCode: "31", timeSec: 100 },
+              { controlCode: "31", timeSec: 110 },
+              { controlCode: "32", timeSec: 200 },
+              { controlCode: "32", timeSec: 210 },
+            ],
+            [
+              { controlCode: "31", timeSec: 105 },
+              { controlCode: "22", timeSec: 150 },
+              { controlCode: "32", timeSec: 205 },
+              { controlCode: "22", timeSec: 260 },
+            ],
+          ],
+          score: 10,
+          penalty: 0,
+          totalScore: 10,
+          timeSec: 300,
+          status: "OK",
+        },
+      ],
+      {
+        scale: 10000,
+        controls: [
+          { id: "S1", mapX: 0, mapY: 0, mapUnit: "mm" },
+          { id: "22", mapX: 50, mapY: 0, mapUnit: "mm" },
+          { id: "31", mapX: 100, mapY: 0, mapUnit: "mm" },
+          { id: "32", mapX: 100, mapY: 100, mapUnit: "mm" },
+        ],
+      },
+    );
+
+    expect(entries[0].legs.map((leg) => leg.controlCode)).toEqual([
+      "31",
+      "22",
+      "32",
+      "22",
+      "Фініш",
+    ]);
   });
 });
 

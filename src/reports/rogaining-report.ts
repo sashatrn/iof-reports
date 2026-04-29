@@ -1,6 +1,7 @@
 import path from "path";
 import { AppConfig, loadConfig } from "../config";
-import { RogainingTeam } from "../io/parse-rogaining-iof";
+import { CourseControlPoint, ParsedCourseData } from "../io/parse-course-data";
+import { RogainingSplit, RogainingTeam } from "../io/parse-rogaining-iof";
 import { renderTemplate } from "../render/template-engine";
 import { formatDate } from "../utils/date";
 import { imageToBase64 } from "../utils/image";
@@ -59,6 +60,26 @@ type RogainingScoreCategory = "adult" | "youthUnder23" | "youthUnder18";
 type RogainingScoreSection = {
   title: string;
   entries: RogainingScoreEntry[];
+};
+
+type RogainingSplitLegEntry = {
+  controlCode: string;
+  legTime: string;
+  legDistance: string;
+  pace: string;
+  totalTime: string;
+  totalDistance: string;
+};
+
+type RogainingSplitTeamEntry = {
+  teamName: string;
+  className: string;
+  membersLine: string;
+  totalDistance: string;
+  totalTime: string;
+  score: number;
+  penalty: number;
+  legs: RogainingSplitLegEntry[];
 };
 
 type RogainingDiplomasOptions = {
@@ -681,6 +702,234 @@ function buildRogainingScoreSections(
   ].filter((section) => section.entries.length > 0);
 }
 
+function buildCourseControlMap(courseData: ParsedCourseData): Map<string, CourseControlPoint> {
+  return new Map(courseData.controls.map((control) => [control.id, control]));
+}
+
+function getStartControl(controlMap: Map<string, CourseControlPoint>): CourseControlPoint | undefined {
+  return controlMap.get("S1") ?? [...controlMap.values()].find((control) => control.id.startsWith("S"));
+}
+
+function getFinishControl(
+  controlMap: Map<string, CourseControlPoint>,
+  startControl: CourseControlPoint | undefined,
+): CourseControlPoint | undefined {
+  return (
+    controlMap.get("F1") ??
+    [...controlMap.values()].find((control) => control.id.toUpperCase().startsWith("F")) ??
+    startControl
+  );
+}
+
+function toRadians(value: number): number {
+  return (value * Math.PI) / 180;
+}
+
+function haversineDistanceMeters(left: CourseControlPoint, right: CourseControlPoint): number | undefined {
+  if (
+    left.lat === undefined ||
+    left.lng === undefined ||
+    right.lat === undefined ||
+    right.lng === undefined
+  ) {
+    return undefined;
+  }
+
+  const earthRadiusMeters = 6371000;
+  const latDelta = toRadians(right.lat - left.lat);
+  const lngDelta = toRadians(right.lng - left.lng);
+  const leftLat = toRadians(left.lat);
+  const rightLat = toRadians(right.lat);
+  const halfChord =
+    Math.sin(latDelta / 2) ** 2 +
+    Math.cos(leftLat) * Math.cos(rightLat) * Math.sin(lngDelta / 2) ** 2;
+
+  return 2 * earthRadiusMeters * Math.asin(Math.sqrt(halfChord));
+}
+
+function courseDistanceMeters(
+  left: CourseControlPoint,
+  right: CourseControlPoint,
+  scale?: number,
+): number | undefined {
+  if (
+    scale !== undefined &&
+    left.mapX !== undefined &&
+    left.mapY !== undefined &&
+    right.mapX !== undefined &&
+    right.mapY !== undefined &&
+    left.mapUnit === "mm" &&
+    right.mapUnit === "mm"
+  ) {
+    return Math.hypot(right.mapX - left.mapX, right.mapY - left.mapY) * scale / 1000;
+  }
+
+  return haversineDistanceMeters(left, right);
+}
+
+function formatDistance(distanceMeters?: number): string {
+  if (distanceMeters === undefined) {
+    return "";
+  }
+
+  return `${(distanceMeters / 1000).toFixed(2)} км`;
+}
+
+function formatPace(timeSec: number | undefined, distanceMeters: number | undefined): string {
+  if (timeSec === undefined || distanceMeters === undefined || distanceMeters <= 0) {
+    return "";
+  }
+
+  const paceSec = Math.round(timeSec / (distanceMeters / 1000));
+  const minutes = Math.floor(paceSec / 60);
+  const seconds = paceSec % 60;
+
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+function deduplicateAdjacentSplits(
+  splits: Required<RogainingSplit>[],
+): Required<RogainingSplit>[] {
+  return splits.reduce<Required<RogainingSplit>[]>((deduplicated, split) => {
+    const previousSplit = deduplicated[deduplicated.length - 1];
+
+    if (previousSplit?.controlCode === split.controlCode) {
+      previousSplit.timeSec = Math.max(previousSplit.timeSec, split.timeSec);
+      return deduplicated;
+    }
+
+    deduplicated.push({ ...split });
+    return deduplicated;
+  }, []);
+}
+
+function normalizeSplitSequence(splits: RogainingSplit[] | undefined): Required<RogainingSplit>[] {
+  const chronologicalSplits = (splits ?? [])
+    .filter((split): split is Required<RogainingSplit> => {
+      return split.controlCode !== "" && split.timeSec !== undefined;
+    })
+    .sort((left, right) => left.timeSec - right.timeSec);
+
+  return deduplicateAdjacentSplits(chronologicalSplits);
+}
+
+function selectTeamSplitSequence(team: RogainingTeam): Required<RogainingSplit>[] {
+  const sequences = (team.memberSplits ?? [])
+    .map((splits) => normalizeSplitSequence(splits))
+    .filter((splits) => splits.length > 0);
+
+  if (sequences.length === 0) {
+    return [];
+  }
+
+  const baseSequence = sequences.reduce((longest, current) => {
+    return current.length > longest.length ? current : longest;
+  }, sequences[0]);
+
+  return baseSequence.map((baseSplit, index) => {
+    const matchingTimes = sequences
+      .map((sequence) => sequence[index])
+      .filter((split): split is Required<RogainingSplit> => {
+        return split !== undefined && split.controlCode === baseSplit.controlCode;
+      })
+      .map((split) => split.timeSec);
+
+    return {
+      controlCode: baseSplit.controlCode,
+      timeSec: matchingTimes.length > 0 ? Math.max(...matchingTimes) : baseSplit.timeSec,
+    };
+  });
+}
+
+function sortRogainingSplitsTeams(teams: RogainingTeam[]): RankedRogainingTeam[] {
+  const byClass = new Map<string, RogainingTeam[]>();
+
+  for (const team of teams) {
+    const classTeams = byClass.get(team.className) ?? [];
+    classTeams.push(team);
+    byClass.set(team.className, classTeams);
+  }
+
+  return [...byClass.keys()]
+    .sort((left, right) => left.localeCompare(right, "uk"))
+    .flatMap((className) => rankTeams(byClass.get(className) ?? []));
+}
+
+export function buildRogainingSplitTeamEntries(
+  teams: RogainingTeam[],
+  courseData: ParsedCourseData,
+): RogainingSplitTeamEntry[] {
+  const controlMap = buildCourseControlMap(courseData);
+  const startControl = getStartControl(controlMap);
+  const finishControl = getFinishControl(controlMap, startControl);
+
+  return sortRogainingSplitsTeams(teams).map((team) => {
+    const splitSequence = selectTeamSplitSequence(team);
+    let previousControl = startControl;
+    let previousTimeSec = 0;
+    let totalDistanceMeters = 0;
+    const legs = splitSequence.map((split) => {
+      const currentControl = controlMap.get(split.controlCode);
+      const legTimeSec = Math.max(0, split.timeSec - previousTimeSec);
+      const legDistanceMeters =
+        previousControl && currentControl
+          ? courseDistanceMeters(previousControl, currentControl, courseData.scale)
+          : undefined;
+
+      if (legDistanceMeters !== undefined) {
+        totalDistanceMeters += legDistanceMeters;
+      }
+
+      previousTimeSec = Math.max(previousTimeSec, split.timeSec);
+
+      if (currentControl) {
+        previousControl = currentControl;
+      }
+
+      return {
+        controlCode: split.controlCode,
+        legTime: formatDuration(legTimeSec),
+        legDistance: formatDistance(legDistanceMeters),
+        pace: formatPace(legTimeSec, legDistanceMeters),
+        totalTime: formatDuration(split.timeSec),
+        totalDistance: formatDistance(totalDistanceMeters),
+      };
+    });
+
+    if (team.timeSec !== undefined) {
+      const legTimeSec = Math.max(0, team.timeSec - previousTimeSec);
+      const legDistanceMeters =
+        previousControl && finishControl
+          ? courseDistanceMeters(previousControl, finishControl, courseData.scale)
+          : undefined;
+
+      if (legDistanceMeters !== undefined) {
+        totalDistanceMeters += legDistanceMeters;
+      }
+
+      legs.push({
+        controlCode: "Фініш",
+        legTime: formatDuration(legTimeSec),
+        legDistance: formatDistance(legDistanceMeters),
+        pace: formatPace(legTimeSec, legDistanceMeters),
+        totalTime: formatDuration(team.timeSec),
+        totalDistance: formatDistance(totalDistanceMeters),
+      });
+    }
+
+    return {
+      teamName: team.teamName,
+      className: team.className,
+      membersLine: team.membersLine,
+      totalDistance: formatDistance(totalDistanceMeters),
+      totalTime: formatDuration(team.timeSec),
+      score: team.grossScore,
+      penalty: team.penalty,
+      legs,
+    };
+  });
+}
+
 export function buildRogainingHtml(
   teams: RogainingTeam[],
   eventDate: Date,
@@ -754,6 +1003,38 @@ export function buildRogainingScoreHtml(
     regionScores,
     scoreSections,
     entries,
+  });
+}
+
+export function buildRogainingSplitsHtml(
+  teams: RogainingTeam[],
+  courseData: ParsedCourseData,
+  eventDate: Date,
+  eventName?: string,
+  variant: HtmlVariant = "pdf",
+): string {
+  const config = loadConfig();
+  const normalizedTeams = applyRogainingRules(teams, config);
+  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
+  const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
+  const splitTeams = buildRogainingSplitTeamEntries(normalizedTeams, courseData);
+  void variant;
+
+  return renderTemplate("rogaining-splits-pdf.njk", {
+    reportTitle: "Спліти рогейну",
+    event: {
+      title:
+        config.reportHeader.title ??
+        eventName ??
+        `Спліти рогейну, ${formatDate(eventDate)}`,
+      subtitle: "",
+      location: config.reportHeader.location,
+      date: formatDate(eventDate),
+      logo1: imageToBase64(logo1Path),
+      logo2: imageToBase64(logo2Path),
+    },
+    officials: config.officials,
+    teams: splitTeams,
   });
 }
 

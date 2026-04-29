@@ -34,6 +34,10 @@ describe("parseRogainingIof", () => {
                 <Status>OK</Status>
                 <Score type="Score">84</Score>
                 <Score type="Penalty">2</Score>
+                <SplitTime status="Additional">
+                  <ControlCode>31</ControlCode>
+                  <Time>120</Time>
+                </SplitTime>
                 <OverallResult>
                   <Time>14464</Time>
                   <Status>OK</Status>
@@ -50,6 +54,7 @@ describe("parseRogainingIof", () => {
     expect(team?.score).toBe(84);
     expect(team?.penalty).toBe(2);
     expect(team?.totalScore).toBe(84);
+    expect(team?.memberSplits).toEqual([[{ controlCode: "31", timeSec: 120 }]]);
   });
 
   it("joins unique member regions in participant order", () => {

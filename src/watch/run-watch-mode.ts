@@ -52,6 +52,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
       settleMs: options.settleMs,
       port: options.port,
       diplomaTemplate: options.diplomaTemplate,
+      courseDataPath: options.courseDataPath,
     },
     "Watching directory for latest XML",
   );
@@ -82,7 +83,10 @@ export async function runWatchMode(argv: string[]): Promise<void> {
       }
 
       const xml = fs.readFileSync(latestFile.path, "utf-8");
-      const hash = sha256(xml);
+      const courseDataXml = options.courseDataPath
+        ? fs.readFileSync(options.courseDataPath, "utf-8")
+        : undefined;
+      const hash = sha256(`${xml}\n${courseDataXml ?? ""}`);
 
       if (state.lastFilePath === latestFile.path && state.lastFileHash === hash) {
         logger.debug({ file: latestFile.path }, "No XML changes detected");
@@ -92,6 +96,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
       const generatedReport = generateReportHtml(xml, options.reportType, {
         logger,
         includeDiplomaBackground: options.diplomaTemplate === "on",
+        courseDataXml,
       });
       const updatedAt = new Date().toISOString();
 
