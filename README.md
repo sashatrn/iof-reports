@@ -116,6 +116,8 @@ npm run dev:watch -- --input-dir ./incoming --output-dir ./out --report rogainin
 - `youthUnder23` - молодь старше 18 і до 23 років включно
 - `adult` - дорослі класи
 
+Службові поля звіту `rogaining-score` налаштовуються в `rogaining.scoreReport`: вид спорту, назва змагань, наказ, дата, місце, текст командного місця, назви програми, групи регіонів та підписи.
+
 ## Вимоги до проекту
 
 - Node.js 18+

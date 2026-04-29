@@ -2,61 +2,153 @@
 
 {% block content %}
 
-<table>
-  <tbody>
-    <tr>
-      <td><strong>Кількість учасників</strong></td>
-      <td><strong>{{ participantCount }}</strong></td>
-    </tr>
-  </tbody>
-</table>
+<h1 class="score-doc-title">Звіт</h1>
+<div class="score-doc-subtitle">про проведення змагань</div>
 
-<h3>Бали по регіонах</h3>
+<div class="score-doc-meta">
+  <div class="score-doc-meta-row">
+    <div class="score-doc-meta-number">1.</div>
+    <div><strong>Вид спорту:</strong> {{ scoreReport.sport }}</div>
+  </div>
+  <div class="score-doc-meta-row">
+    <div class="score-doc-meta-number">2.</div>
+    <div>
+      <strong>Повна назва змагань:</strong> {{ scoreReport.competitionName }}
+      {% if scoreReport.orderText %}
+      <div class="score-doc-meta-extra">{{ scoreReport.orderText }}</div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="score-doc-meta-row">
+    <div class="score-doc-meta-number">3.</div>
+    <div><strong>Дата проведення:</strong> {{ scoreReport.dateText }}</div>
+  </div>
+  <div class="score-doc-meta-row">
+    <div class="score-doc-meta-number">4.</div>
+    <div><strong>Повна назва місця проведення:</strong> {{ scoreReport.placeName }}</div>
+  </div>
+  <div class="score-doc-meta-row">
+    <div class="score-doc-meta-number">5.</div>
+    <div><strong>Загальна кількість учасників змагань:</strong> {{ scoreReport.participantCount }}</div>
+  </div>
+  <div class="score-doc-meta-row">
+    <div class="score-doc-meta-number">6.</div>
+    <div><strong>Кількість країн/регіонів:</strong> {{ scoreReport.regionCount }}</div>
+  </div>
+  <div class="score-doc-meta-row">
+    <div class="score-doc-meta-number">7.</div>
+    <div>
+      <strong>Кількість (команд):</strong> {{ scoreReport.teamCount }}
+      <div class="score-doc-meta-extra"><strong>Зайняте командне місце:</strong> {{ scoreReport.teamPlaceText }}</div>
+    </div>
+  </div>
+  <div class="score-doc-meta-row">
+    <div class="score-doc-meta-number">8.</div>
+    <div><strong>Інформація про захід:</strong> {{ scoreReport.eventInfo }}</div>
+  </div>
+  <div class="score-doc-meta-row">
+    <div class="score-doc-meta-number">9.</div>
+    <div><strong>Результати змагань:</strong></div>
+  </div>
+</div>
 
-<table>
+<div class="score-doc-results-title">{{ scoreReport.resultsTitle }}</div>
+
+<table class="score-doc-results">
   <thead>
     <tr>
+      <th>Прізвище, ім'я, по батькові спортсмена</th>
       <th>Регіон</th>
-      <th>Бали</th>
+      <th>ФСТ, відомство</th>
+      <th>Вид програми, дистанції, вагові категорії, рекорди</th>
+      <th>місце</th>
+      <th>очки рейтин-гу</th>
     </tr>
   </thead>
   <tbody>
-    {% for entry in regionScores %}
-    <tr>
-      <td>{{ entry.region }}</td>
-      <td><strong>{{ entry.points }}</strong></td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-<h3>Бали учасників</h3>
-
-{% for section in scoreSections %}
-<h4>{{ section.title }}</h4>
-
-<table>
-  <thead>
-    <tr>
-      <th>Учасник</th>
-      <th>Регіон</th>
-      <th>Клас</th>
-      <th>Місце</th>
-      <th>Бали</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for entry in section.entries %}
+    {% for entry in entries %}
     <tr>
       <td>{{ entry.participantName }}</td>
       <td>{{ entry.region }}</td>
-      <td>{{ entry.className }}</td>
-      <td>{{ entry.place }}</td>
-      <td><strong>{{ entry.points }}</strong></td>
+      <td>{{ scoreReport.departmentName }}</td>
+      <td>{{ entry.className }}{% if scoreReport.programName %} ({{ scoreReport.programName }}){% endif %}</td>
+      <td class="score-doc-place-cell">{{ entry.place }}</td>
+      <td class="score-doc-points-cell">{{ entry.points }}</td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
-{% endfor %}
+
+<div class="score-doc-section-title">Групи регіонів</div>
+
+<table class="score-doc-region-groups">
+  <thead>
+    <tr>
+      <th>№ з/п</th>
+      <th>I група</th>
+      <th>Кількість очок</th>
+      <th>місце</th>
+      <th>II група</th>
+      <th>Кількість очок</th>
+      <th>місце</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in regionGroups.group1And2 %}
+    <tr>
+      <td class="score-doc-number-cell">{{ row.number }}</td>
+      <td>{% if row.left %}{{ row.left.name }}{% endif %}</td>
+      <td class="score-doc-points-cell">{% if row.left and row.left.points > 0 %}{{ row.left.points }}{% endif %}</td>
+      <td class="score-doc-place-cell">{% if row.left %}{{ row.left.place }}{% endif %}</td>
+      <td>{% if row.right %}{{ row.right.name }}{% endif %}</td>
+      <td class="score-doc-points-cell">{% if row.right and row.right.points > 0 %}{{ row.right.points }}{% endif %}</td>
+      <td class="score-doc-place-cell">{% if row.right %}{{ row.right.place }}{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table class="score-doc-region-groups">
+  <thead>
+    <tr>
+      <th>№ з/п</th>
+      <th>III група</th>
+      <th>Кількість очок</th>
+      <th>місце</th>
+      <th>ФСТ та відомства</th>
+      <th>Кількість очок</th>
+      <th>місце</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in regionGroups.group3AndOrganizations %}
+    <tr>
+      <td class="score-doc-number-cell">{{ row.number }}</td>
+      <td>{% if row.left %}{{ row.left.name }}{% endif %}</td>
+      <td class="score-doc-points-cell">{% if row.left and row.left.points > 0 %}{{ row.left.points }}{% endif %}</td>
+      <td class="score-doc-place-cell">{% if row.left %}{{ row.left.place }}{% endif %}</td>
+      <td>{% if row.right %}{{ row.right.name }}{% endif %}</td>
+      <td class="score-doc-points-cell">{% if row.right and row.right.points > 0 %}{{ row.right.points }}{% endif %}</td>
+      <td class="score-doc-place-cell">{% if row.right %}{{ row.right.place }}{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="score-doc-signatures">
+  <div class="score-doc-signature-row">
+    <div>{{ scoreReport.signatures.chiefJudgeTitle }}</div>
+    <div>_________________ {{ officials.chiefJudge }}</div>
+  </div>
+  <div class="score-doc-signature-row">
+    <div>{{ scoreReport.signatures.departmentHeadTitle }}</div>
+    <div>_________________</div>
+  </div>
+  <div class="score-doc-signature-row">
+    <div>{{ scoreReport.signatures.sportResponsibleTitle }}</div>
+    <div>_________________</div>
+  </div>
+  <div class="score-doc-footer-date">{{ scoreReport.signatures.footerDateText }}</div>
+</div>
 
 {% endblock %}

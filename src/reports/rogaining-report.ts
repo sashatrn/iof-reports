@@ -57,9 +57,38 @@ export type RogainingRegionScoreEntry = {
 
 type RogainingScoreCategory = "adult" | "youthUnder23" | "youthUnder18";
 
-type RogainingScoreSection = {
-  title: string;
-  entries: RogainingScoreEntry[];
+type RogainingRegionGroupScoreEntry = {
+  name: string;
+  points: number;
+  place: string;
+};
+
+type RogainingRegionGroupScoreRow = {
+  number: number;
+  left?: RogainingRegionGroupScoreEntry;
+  right?: RogainingRegionGroupScoreEntry;
+};
+
+type RogainingScoreRegionGroups = {
+  group1And2: RogainingRegionGroupScoreRow[];
+  group3AndOrganizations: RogainingRegionGroupScoreRow[];
+};
+
+type RogainingScoreReportInfo = {
+  sport: string;
+  competitionName: string;
+  orderText: string;
+  dateText: string;
+  placeName: string;
+  participantCount: number;
+  regionCount: number;
+  teamCount: number;
+  teamPlaceText: string;
+  eventInfo: string;
+  resultsTitle: string;
+  programName: string;
+  departmentName: string;
+  signatures: AppConfig["rogaining"]["scoreReport"]["signatures"];
 };
 
 type RogainingSplitLegEntry = {
@@ -168,6 +197,32 @@ function formatDuration(sec?: number): string {
     2,
     "0",
   )}`;
+}
+
+function getUkrainianMonthName(monthIndex: number): string {
+  const monthNames = [
+    "січня",
+    "лютого",
+    "березня",
+    "квітня",
+    "травня",
+    "червня",
+    "липня",
+    "серпня",
+    "вересня",
+    "жовтня",
+    "листопада",
+    "грудня",
+  ];
+
+  return monthNames[monthIndex] ?? "";
+}
+
+function formatRogainingScoreDateText(date: Date): string {
+  const day = String(date.getDate()).padStart(2, "0");
+  const monthName = getUkrainianMonthName(date.getMonth());
+
+  return `з "${day}" по "${day}" ${monthName} ${date.getFullYear()} року`;
 }
 
 function rankTeams(teams: RogainingTeam[]): RankedRogainingTeam[] {
@@ -590,6 +645,20 @@ function getRogainingScorePoints(
   return pointsMap[place] ?? 0;
 }
 
+function normalizeRogainingRegion(region: string): string {
+  const normalized = region.trim().replace(/\s+/g, " ");
+
+  if (/^м\.\s*київ$/i.test(normalized)) {
+    return "м. Київ";
+  }
+
+  if (/^м\.\s*севастополь$/i.test(normalized)) {
+    return "м. Севастополь";
+  }
+
+  return normalized;
+}
+
 function getRogainingScoreMemberRegion(team: RogainingTeam, memberIndex: number): string {
   const memberOrganisation = team.memberOrganisations?.[memberIndex];
 
@@ -598,10 +667,10 @@ function getRogainingScoreMemberRegion(team: RogainingTeam, memberIndex: number)
     memberOrganisation !== "Unknown" &&
     memberOrganisation.toLowerCase() !== "no club"
   ) {
-    return memberOrganisation;
+    return normalizeRogainingRegion(memberOrganisation);
   }
 
-  return team.organisation;
+  return normalizeRogainingRegion(team.organisation);
 }
 
 function createRogainingScoreEntries(
@@ -650,7 +719,8 @@ function buildRogainingRegionScoreEntries(
   const pointsByRegion = new Map<string, number>();
 
   for (const entry of entries) {
-    pointsByRegion.set(entry.region, (pointsByRegion.get(entry.region) ?? 0) + entry.points);
+    const region = normalizeRogainingRegion(entry.region);
+    pointsByRegion.set(region, (pointsByRegion.get(region) ?? 0) + entry.points);
   }
 
   return [...pointsByRegion.entries()]
@@ -664,42 +734,140 @@ function buildRogainingRegionScoreEntries(
     });
 }
 
-function countUniqueRogainingScoreParticipants(entries: RogainingScoreEntry[]): number {
-  return new Set(entries.map((entry) => entry.participantName)).size;
+function countRogainingTeamParticipants(teams: RogainingTeam[]): number {
+  return teams.reduce((count, team) => count + team.members.length, 0);
 }
 
-function buildRogainingScoreSections(
-  entries: RogainingScoreEntry[],
-  config: AppConfig,
-): RogainingScoreSection[] {
-  const entriesByCategory = new Map<RogainingScoreCategory, RogainingScoreEntry[]>();
+function getRogainingTeamParticipantRegions(teams: RogainingTeam[]): string[] {
+  return teams.flatMap((team) =>
+    team.members.map((_, memberIndex) => getRogainingScoreMemberRegion(team, memberIndex)),
+  );
+}
 
-  for (const entry of entries) {
-    const category = getRogainingScoreCategory(entry.className, config);
+function countUniqueRogainingTeamParticipantRegions(teams: RogainingTeam[]): number {
+  return new Set(getRogainingTeamParticipantRegions(teams)).size;
+}
 
-    if (!category) {
-      continue;
+function buildRegionScoreMap(
+  regionScores: RogainingRegionScoreEntry[],
+): Map<string, number> {
+  return new Map(
+    regionScores.map((entry) => [
+      normalizeRogainingRegion(entry.region),
+      entry.points,
+    ]),
+  );
+}
+
+function assignRegionGroupPlaces(
+  entries: RogainingRegionGroupScoreEntry[],
+): RogainingRegionGroupScoreEntry[] {
+  const sortedWithPoints = entries
+    .filter((entry) => entry.points > 0)
+    .sort((left, right) => {
+      if (left.points !== right.points) {
+        return right.points - left.points;
+      }
+
+      return left.name.localeCompare(right.name, "uk");
+    });
+  const placesByName = new Map<string, string>();
+  let previousPoints: number | undefined;
+  let currentPlace = 0;
+
+  sortedWithPoints.forEach((entry, index) => {
+    if (entry.points !== previousPoints) {
+      currentPlace = index + 1;
+      previousPoints = entry.points;
     }
 
-    const categoryEntries = entriesByCategory.get(category) ?? [];
-    categoryEntries.push(entry);
-    entriesByCategory.set(category, categoryEntries);
-  }
+    placesByName.set(entry.name, String(currentPlace));
+  });
 
-  return [
-    {
-      title: "Дорослі",
-      entries: entriesByCategory.get("adult") ?? [],
-    },
-    {
-      title: "Молодь, юніори",
-      entries: entriesByCategory.get("youthUnder23") ?? [],
-    },
-    {
-      title: "Юнаки",
-      entries: entriesByCategory.get("youthUnder18") ?? [],
-    },
-  ].filter((section) => section.entries.length > 0);
+  return entries.map((entry) => ({
+    ...entry,
+    place: placesByName.get(entry.name) ?? "",
+  }));
+}
+
+function buildRegionGroupScoreEntries(
+  regions: string[],
+  pointsByRegion: Map<string, number>,
+): RogainingRegionGroupScoreEntry[] {
+  const entries = regions.map((region) => {
+    const name = normalizeRogainingRegion(region);
+
+    return {
+      name,
+      points: pointsByRegion.get(name) ?? 0,
+      place: "",
+    };
+  });
+
+  return assignRegionGroupPlaces(entries);
+}
+
+function buildRegionGroupRows(
+  left: RogainingRegionGroupScoreEntry[],
+  right: RogainingRegionGroupScoreEntry[],
+): RogainingRegionGroupScoreRow[] {
+  const rowCount = Math.max(left.length, right.length);
+
+  return Array.from({ length: rowCount }, (_, index) => ({
+    number: index + 1,
+    left: left[index],
+    right: right[index],
+  }));
+}
+
+function buildRogainingScoreRegionGroups(
+  config: AppConfig,
+  regionScores: RogainingRegionScoreEntry[],
+): RogainingScoreRegionGroups {
+  const pointsByRegion = buildRegionScoreMap(regionScores);
+  const regionGroups = config.rogaining.scoreReport.regionGroups;
+
+  return {
+    group1And2: buildRegionGroupRows(
+      buildRegionGroupScoreEntries(regionGroups.group1, pointsByRegion),
+      buildRegionGroupScoreEntries(regionGroups.group2, pointsByRegion),
+    ),
+    group3AndOrganizations: buildRegionGroupRows(
+      buildRegionGroupScoreEntries(regionGroups.group3, pointsByRegion),
+      buildRegionGroupScoreEntries(regionGroups.organizations, pointsByRegion),
+    ),
+  };
+}
+
+function buildRogainingScoreReportInfo(
+  config: AppConfig,
+  eventDate: Date,
+  eventName: string | undefined,
+  teams: RogainingTeam[],
+): RogainingScoreReportInfo {
+  const scoreReport = config.rogaining.scoreReport;
+  const competitionName =
+    scoreReport.competitionName ??
+    eventName ??
+    `Протокол балів рогейну, ${formatDate(eventDate)}`;
+  const regionCount = countUniqueRogainingTeamParticipantRegions(teams);
+
+  return {
+    sport: scoreReport.sport,
+    competitionName,
+    orderText: scoreReport.orderText,
+    dateText: scoreReport.dateText ?? formatRogainingScoreDateText(eventDate),
+    placeName: scoreReport.placeName ?? config.reportHeader.location,
+    participantCount: countRogainingTeamParticipants(teams),
+    regionCount,
+    teamCount: regionCount,
+    teamPlaceText: scoreReport.teamPlaceText,
+    eventInfo: scoreReport.eventInfo,
+    resultsTitle: scoreReport.resultsTitle ?? `Результати ${competitionName}`,
+    programName: scoreReport.programName,
+    departmentName: scoreReport.departmentName,
+    signatures: scoreReport.signatures,
+  };
 }
 
 function buildCourseControlMap(courseData: ParsedCourseData): Map<string, CourseControlPoint> {
@@ -974,34 +1142,27 @@ export function buildRogainingScoreHtml(
 ): string {
   const config = loadConfig();
   const normalizedTeams = applyRogainingRules(teams, config);
-  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
-  const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
   const allEntries = createRogainingScoreEntries(normalizedTeams, config, {
     includeZeroPoints: true,
   });
   const entries = allEntries.filter((entry) => entry.points !== 0);
   const regionScores = buildRogainingRegionScoreEntries(entries);
-  const scoreSections = buildRogainingScoreSections(entries, config);
-  const participantCount = countUniqueRogainingScoreParticipants(allEntries);
+  const scoreReport = buildRogainingScoreReportInfo(
+    config,
+    eventDate,
+    eventName,
+    normalizedTeams,
+  );
+  const regionGroups = buildRogainingScoreRegionGroups(config, regionScores);
   void variant;
 
   return renderTemplate("rogaining-score-pdf.njk", {
     reportTitle: "Протокол балів рогейну",
-    event: {
-      title:
-        config.reportHeader.title ??
-        eventName ??
-        `Протокол балів рогейну, ${formatDate(eventDate)}`,
-      subtitle: "",
-      location: config.reportHeader.location,
-      date: formatDate(eventDate),
-      logo1: imageToBase64(logo1Path),
-      logo2: imageToBase64(logo2Path),
-    },
+    showDefaultHeader: false,
+    showDefaultFooter: false,
     officials: config.officials,
-    participantCount,
-    regionScores,
-    scoreSections,
+    scoreReport,
+    regionGroups,
     entries,
   });
 }

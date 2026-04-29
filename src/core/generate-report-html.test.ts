@@ -111,9 +111,9 @@ describe("generateRogainingScoreReportHtml", () => {
 
     expect(report.reportType).toBe("rogaining-score");
     expect(report.itemCount).toBeGreaterThan(0);
-    expect(report.viewHtml).toContain("Протокол балів рогейну");
-    expect(report.viewHtml).toContain("<th>Бали</th>");
-    expect(report.pdfHtml).toContain("Протокол балів рогейну");
+    expect(report.viewHtml).toContain("<h1 class=\"score-doc-title\">Звіт</h1>");
+    expect(report.viewHtml).toContain("<th>очки рейтин-гу</th>");
+    expect(report.pdfHtml).toContain("<h1 class=\"score-doc-title\">Звіт</h1>");
   });
 });
 
@@ -177,7 +177,7 @@ describe("generateReportHtml", () => {
     const report = generateReportHtml(rogainingXml, "rogaining-score");
 
     expect(report.reportType).toBe("rogaining-score");
-    expect(report.viewHtml).toContain("Протокол балів рогейну");
+    expect(report.viewHtml).toContain("<h1 class=\"score-doc-title\">Звіт</h1>");
   });
 
   it("dispatches to rogaining splits report generator", () => {

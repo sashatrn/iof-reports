@@ -17,6 +17,30 @@ export type AppConfig = {
       youthUnder23: Record<string, number>;
       adult: Record<string, number>;
     };
+    scoreReport: {
+      sport: string;
+      competitionName?: string;
+      orderText: string;
+      dateText?: string;
+      placeName?: string;
+      teamPlaceText: string;
+      eventInfo: string;
+      resultsTitle?: string;
+      programName: string;
+      departmentName: string;
+      regionGroups: {
+        group1: string[];
+        group2: string[];
+        group3: string[];
+        organizations: string[];
+      };
+      signatures: {
+        chiefJudgeTitle: string;
+        departmentHeadTitle: string;
+        sportResponsibleTitle: string;
+        footerDateText: string;
+      };
+    };
   };
   genderMapping: {
     menPrefixes: string[];
@@ -82,6 +106,64 @@ const defaultConfig: AppConfig = {
         "8": 25,
       },
     },
+    scoreReport: {
+      sport: "спортивне орієнтування",
+      orderText: "Наказ Мінмолодьспорту від __________________ № ______________",
+      teamPlaceText: "_командного заліку не було__",
+      eventInfo: "",
+      programName: "рогейн",
+      departmentName: "",
+      regionGroups: {
+        group1: [
+          "м. Київ",
+          "Харківська",
+          "Дніпропетровська",
+          "Донецька",
+          "Запорізька",
+          "Одеська",
+          "Київська",
+          "Луганська",
+          "Львівська",
+          "АР Крим",
+        ],
+        group2: [
+          "Вінницька",
+          "Полтавська",
+          "Миколаївська",
+          "Черкаська",
+          "Чернігівська",
+          "Івано-Франківська",
+          "Херсонська",
+        ],
+        group3: [
+          "Хмельницька",
+          "Сумська",
+          "м. Севастополь",
+          "Чернівецька",
+          "Рівненська",
+          "Житомирська",
+          "Кіровоградська",
+          "Волинська",
+          "Закарпатська",
+          "Тернопільська",
+        ],
+        organizations: [
+          "ФСТ \"Україна\"",
+          "КФВС МОН України",
+          "ФСТ \"Спартак\"",
+          "ФСТ \"Динамо\"",
+          "ФСТ \"Колос\"",
+          "ТСО України",
+          "ЗС України",
+        ],
+      },
+      signatures: {
+        chiefJudgeTitle: "Головний суддя",
+        departmentHeadTitle: "Начальник відділу",
+        sportResponsibleTitle: "Відповідальний з виду спорту Мінмолодьспорту",
+        footerDateText: "\"_________\" ____________________ 2026 рік",
+      },
+    },
   },
   genderMapping: {
     menPrefixes: ["M", "Ч", "Х"],
@@ -142,6 +224,30 @@ export function loadConfig(configPath?: string): AppConfig {
         adult: {
           ...defaultConfig.rogaining.scorePoints.adult,
           ...parsed.rogaining?.scorePoints?.adult,
+        },
+      },
+      scoreReport: {
+        ...defaultConfig.rogaining.scoreReport,
+        ...parsed.rogaining?.scoreReport,
+        regionGroups: {
+          ...defaultConfig.rogaining.scoreReport.regionGroups,
+          ...parsed.rogaining?.scoreReport?.regionGroups,
+          group1:
+            parsed.rogaining?.scoreReport?.regionGroups?.group1 ??
+            defaultConfig.rogaining.scoreReport.regionGroups.group1,
+          group2:
+            parsed.rogaining?.scoreReport?.regionGroups?.group2 ??
+            defaultConfig.rogaining.scoreReport.regionGroups.group2,
+          group3:
+            parsed.rogaining?.scoreReport?.regionGroups?.group3 ??
+            defaultConfig.rogaining.scoreReport.regionGroups.group3,
+          organizations:
+            parsed.rogaining?.scoreReport?.regionGroups?.organizations ??
+            defaultConfig.rogaining.scoreReport.regionGroups.organizations,
+        },
+        signatures: {
+          ...defaultConfig.rogaining.scoreReport.signatures,
+          ...parsed.rogaining?.scoreReport?.signatures,
         },
       },
     },
