@@ -1326,31 +1326,20 @@ function formatCourseRank(courseRank: number): string {
 
 function resolveClassificationRank(
   row: RogainingPointsClassificationRow | undefined,
-  resultPercent: number,
+  score: number,
+  winnerScore: number,
 ): string {
-  if (!row) {
+  if (!row || winnerScore === 0) {
     return "";
   }
 
-  if (row.kmsu !== undefined && resultPercent >= row.kmsu) {
-    return "КМСУ";
-  }
+  const threshold = (pct: number) => Math.floor((winnerScore * pct) / 100);
 
-  if (row.first !== undefined && resultPercent >= row.first) {
-    return "I";
-  }
-
-  if (row.secondYouth1 !== undefined && resultPercent >= row.secondYouth1) {
-    return "II";
-  }
-
-  if (row.thirdYouth2 !== undefined && resultPercent >= row.thirdYouth2) {
-    return "III";
-  }
-
-  if (row.youth3 !== undefined && resultPercent >= row.youth3) {
-    return "III";
-  }
+  if (row.kmsu !== undefined && score >= threshold(row.kmsu)) return "КМСУ";
+  if (row.first !== undefined && score >= threshold(row.first)) return "I";
+  if (row.secondYouth1 !== undefined && score >= threshold(row.secondYouth1)) return "II";
+  if (row.thirdYouth2 !== undefined && score >= threshold(row.thirdYouth2)) return "III";
+  if (row.youth3 !== undefined && score >= threshold(row.youth3)) return "III";
 
   return "";
 }
@@ -1419,8 +1408,7 @@ function buildRogainingResultsClasses(
         isOpenRogainingClass(classGroup.name, config) &&
         classRegions.size >= resultsReport.minRegionsForMsu;
       const isDisqualified = team.place === "";
-      const resultPercent =
-        !isDisqualified && winnerScore > 0 ? (team.totalScore / winnerScore) * 100 : 0;
+      const effectiveScore = isDisqualified ? 0 : team.totalScore;
 
       return {
         place: team.place,
@@ -1431,7 +1419,7 @@ function buildRogainingResultsClasses(
             ...memberData.member,
             awardedRank: earnsMsu
               ? "МСУ"
-              : resolveClassificationRank(classificationRow, resultPercent),
+              : resolveClassificationRank(classificationRow, effectiveScore, winnerScore),
           };
         }),
         score: team.grossScore,
@@ -1761,12 +1749,16 @@ export function buildRogainingResultsHtml(
   const config = loadConfig();
   const normalizedTeams = applyRogainingRules(teams, config);
   const resultsReport = config.rogaining.resultsReport;
+  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
+  const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
   void variant;
 
   return renderTemplate("rogaining-results-pdf.njk", {
     reportTitle: "Протокол результатів змагань з орієнтування",
     showDefaultHeader: false,
     showDefaultFooter: false,
+    logo1: imageToBase64(logo1Path),
+    logo2: imageToBase64(logo2Path),
     header: {
       lines: resultsReport.headerLines,
       competitionName:

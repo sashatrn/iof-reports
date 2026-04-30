@@ -143,13 +143,21 @@
   }
 </style>
 
-<div class="results-header">
-  {% for line in header.lines %}
-  <div class="results-header-line">{{ line }}</div>
-  {% endfor %}
-  <div class="results-competition">{{ header.competitionName }}</div>
-  <div class="results-title">{{ header.title }}</div>
-  <div class="results-program">{{ header.programName }}</div>
+<div class="header-brand">
+  <div class="logo-slot">
+    {% if logo1 %}<img src="{{ logo1 }}" alt="Logo1" />{% endif %}
+  </div>
+  <div class="results-header">
+    {% for line in header.lines %}
+    <div class="results-header-line">{{ line }}</div>
+    {% endfor %}
+    <div class="results-competition">{{ header.competitionName }}</div>
+    <div class="results-title">{{ header.title }}</div>
+    <div class="results-program">{{ header.programName }}</div>
+  </div>
+  <div class="logo-slot right">
+    {% if logo2 %}<img src="{{ logo2 }}" alt="Logo2" />{% endif %}
+  </div>
 </div>
 
 <div class="results-date-location">
