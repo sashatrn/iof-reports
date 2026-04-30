@@ -3,6 +3,7 @@ import { loadConfig } from "../config";
 import { parseCourseData } from "../io/parse-course-data";
 import { parseIof } from "../io/parse-iof";
 import { parseRogainingIof } from "../io/parse-rogaining-iof";
+import { parseUofBaza } from "../io/parse-uof-baza";
 import { buildIndividualHtml } from "../reports/individual-report";
 import {
   buildRogainingAwardsHtml,
@@ -10,6 +11,7 @@ import {
   buildRogainingDiplomasHtml,
   buildRogainingScoreEntries,
   buildRogainingHtml,
+  buildRogainingResultsHtml,
   buildRogainingScoreHtml,
   buildRogainingSplitTeamEntries,
   buildRogainingSplitsHtml,
@@ -33,6 +35,7 @@ type GenerateReportOptions = {
   logger?: Logger;
   includeDiplomaBackground?: boolean;
   courseDataXml?: string;
+  bazaXml?: string | Buffer;
 };
 
 function normalizeEventDate(eventDate: Date | undefined, logger?: Logger): Date {
@@ -204,6 +207,35 @@ export function generateRogainingScoreReportHtml(
   };
 }
 
+export function generateRogainingResultsReportHtml(
+  xml: string,
+  options: GenerateReportOptions = {},
+): GeneratedReport {
+  const { logger, bazaXml } = options;
+
+  if (!bazaXml) {
+    throw new Error("rogaining-results report requires a UOF baza XML file.");
+  }
+
+  const parsed = parseRogainingIof(xml);
+  const baza = parseUofBaza(bazaXml);
+  const eventDate = normalizeEventDate(parsed.eventDate, logger);
+
+  logger?.info(
+    { count: parsed.teams.length, bazaSportsmen: baza.sportsmen.length },
+    "Rogaining teams and UOF baza parsed successfully for results report",
+  );
+
+  return {
+    reportType: "rogaining-results",
+    viewHtml: buildRogainingResultsHtml(parsed.teams, baza, eventDate, parsed.eventName, "view"),
+    pdfHtml: buildRogainingResultsHtml(parsed.teams, baza, eventDate, parsed.eventName, "pdf"),
+    eventName: parsed.eventName,
+    eventDate: toIsoDate(eventDate),
+    itemCount: parsed.teams.length,
+  };
+}
+
 export function generateRogainingSplitsReportHtml(
   xml: string,
   options: GenerateReportOptions = {},
@@ -251,6 +283,8 @@ export function generateReportHtml(
       return generateRogainingDiplomasReportHtml(xml, options);
     case "rogaining-score":
       return generateRogainingScoreReportHtml(xml, options);
+    case "rogaining-results":
+      return generateRogainingResultsReportHtml(xml, options);
     case "rogaining-splits":
       return generateRogainingSplitsReportHtml(xml, options);
   }

@@ -36,16 +36,18 @@ async function main(): Promise<void> {
   const logger = createLogger(config);
   logger.info({ version: getAppVersion() }, "iof-reports starting");
 
-  const { inputPath, courseDataPath, report, format, html, diplomaTemplate } = parseCliArgs(process.argv, logger);
+  const { inputPath, courseDataPath, bazaPath, report, format, html, diplomaTemplate } = parseCliArgs(process.argv, logger);
 
-  logger.info({ file: inputPath, configPath, courseDataPath, report, format, html, diplomaTemplate }, "Reading XML file");
+  logger.info({ file: inputPath, configPath, courseDataPath, bazaPath, report, format, html, diplomaTemplate }, "Reading XML file");
 
   const xml = fs.readFileSync(inputPath, "utf-8");
   const courseDataXml = courseDataPath ? fs.readFileSync(courseDataPath, "utf-8") : undefined;
+  const bazaXml = bazaPath ? fs.readFileSync(bazaPath) : undefined;
   const generatedReports = generateReportsHtml(xml, report, {
     logger,
     includeDiplomaBackground: diplomaTemplate === "on",
     courseDataXml,
+    bazaXml,
   });
 
   for (const generatedReport of generatedReports) {

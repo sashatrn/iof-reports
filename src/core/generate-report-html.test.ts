@@ -8,6 +8,7 @@ import {
   generateRogainingAwardsReportHtml,
   generateRogainingDiplomasReportHtml,
   generateRogainingReportHtml,
+  generateRogainingResultsReportHtml,
   generateRogainingScoreReportHtml,
   generateRogainingSplitsReportHtml,
   generateTeamReportHtml,
@@ -25,6 +26,25 @@ const coursesXml = fs.readFileSync(
   path.resolve(__dirname, "../__fixtures__/courses.xml"),
   "utf-8",
 );
+const bazaXml = `<?xml version="1.0" encoding="utf-8"?>
+<UOFData>
+  <Names>Тестовий рогейн</Names>
+  <Sportsman>
+    <FIO>Зуєва Владислава</FIO>
+    <Birthday>07.12.2008</Birthday>
+    <Qualification>б/р</Qualification>
+    <Region>Донецька</Region>
+    <Trener>Тестовий Т.Т.</Trener>
+    <Prim>Вибри</Prim>
+  </Sportsman>
+  <Sportsman>
+    <FIO>Зуєва Ярослава</FIO>
+    <Birthday>21.04.2012</Birthday>
+    <Qualification>б/р</Qualification>
+    <Region>Донецька</Region>
+    <Prim>Вибри</Prim>
+  </Sportsman>
+</UOFData>`;
 
 describe("generateIndividualReportHtml", () => {
   it("builds individual report html from IOF XML", () => {
@@ -118,6 +138,27 @@ describe("generateRogainingScoreReportHtml", () => {
   });
 });
 
+describe("generateRogainingResultsReportHtml", () => {
+  it("builds rogaining results html with UOF baza data", () => {
+    const report = generateRogainingResultsReportHtml(rogainingXml, {
+      bazaXml,
+    });
+
+    expect(report.reportType).toBe("rogaining-results");
+    expect(report.itemCount).toBeGreaterThan(0);
+    expect(report.viewHtml).toContain("ПРОТОКОЛ РЕЗУЛЬТАТІВ ЗМАГАНЬ З ОРІЄНТУВАННЯ");
+    expect(report.viewHtml).toContain("Зуєва Владислава");
+    expect(report.viewHtml).toContain("Ранг дистанції");
+    expect(report.viewHtml).toContain("Викон.<br>розряд");
+  });
+
+  it("requires UOF baza XML", () => {
+    expect(() => generateRogainingResultsReportHtml(rogainingXml)).toThrow(
+      "UOF baza XML",
+    );
+  });
+});
+
 describe("generateRogainingSplitsReportHtml", () => {
   it("builds rogaining splits html from TeamResult and CourseData XML", () => {
     const report = generateRogainingSplitsReportHtml(rogainingXml, {
@@ -179,6 +220,15 @@ describe("generateReportHtml", () => {
 
     expect(report.reportType).toBe("rogaining-score");
     expect(report.viewHtml).toContain("<h1 class=\"score-doc-title\">Звіт</h1>");
+  });
+
+  it("dispatches to rogaining results report generator", () => {
+    const report = generateReportHtml(rogainingXml, "rogaining-results", {
+      bazaXml,
+    });
+
+    expect(report.reportType).toBe("rogaining-results");
+    expect(report.viewHtml).toContain("Зуєва Владислава");
   });
 
   it("dispatches to rogaining splits report generator", () => {

@@ -6,6 +6,7 @@ export const REPORT_TYPES = [
   "rogaining-awards",
   "rogaining-diplomas",
   "rogaining-score",
+  "rogaining-results",
   "rogaining-splits",
 ] as const;
 
@@ -24,6 +25,7 @@ export function isSingleReportType(value: string): value is SingleReportType {
     value === "rogaining-awards" ||
     value === "rogaining-diplomas" ||
     value === "rogaining-score" ||
+    value === "rogaining-results" ||
     value === "rogaining-splits"
   );
 }

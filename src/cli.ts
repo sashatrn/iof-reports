@@ -7,6 +7,7 @@ export type CliOptions = {
   inputPath: string;
   configPath?: string;
   courseDataPath?: string;
+  bazaPath?: string;
   report: ReportType;
   format: "pdf" | "docx";
   html: "none" | "view" | "pdf";
@@ -20,7 +21,7 @@ const DIPLOMA_TEMPLATE_VALUES = new Set<string>(["off", "on"]);
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-splits] [--format pdf|docx] [--courses courses.xml] [--html none|view|pdf] [--diploma-template off|on]",
+    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-results|rogaining-splits] [--format pdf|docx] [--courses courses.xml] [--baza baza.xml] [--html none|view|pdf] [--diploma-template off|on]",
   );
 }
 
@@ -49,6 +50,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
   let report: CliOptions["report"] = "all";
   let configPath: string | undefined;
   let courseDataPath: string | undefined;
+  let bazaPath: string | undefined;
   let format: CliOptions["format"] = "pdf";
   let html: CliOptions["html"] = "none";
   let diplomaTemplate: CliOptions["diplomaTemplate"] = "off";
@@ -73,7 +75,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       if (!value || !REPORT_VALUES.has(value)) {
         logger.error(
           { report: value },
-          "Invalid report type. Expected one of: all, individual, team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-splits.",
+          "Invalid report type. Expected one of: all, individual, team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-results, rogaining-splits.",
         );
         printUsage(logger);
         process.exit(1);
@@ -108,6 +110,20 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       }
 
       courseDataPath = path.resolve(process.cwd(), value);
+      i += 1;
+      continue;
+    }
+
+    if (arg === "--baza" || arg === "--base") {
+      const value = argv[i + 1];
+
+      if (!value) {
+        logger.error("No UOF baza XML file provided for --baza.");
+        printUsage(logger);
+        process.exit(1);
+      }
+
+      bazaPath = path.resolve(process.cwd(), value);
       i += 1;
       continue;
     }
@@ -191,8 +207,19 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
     process.exit(1);
   }
 
+  if (bazaPath && !fs.existsSync(bazaPath)) {
+    logger.error({ path: bazaPath }, "UOF baza XML file not found.");
+    process.exit(1);
+  }
+
   if (report === "rogaining-splits" && !courseDataPath) {
     logger.error("rogaining-splits report requires --courses <courses.xml>.");
+    printUsage(logger);
+    process.exit(1);
+  }
+
+  if (report === "rogaining-results" && !bazaPath) {
+    logger.error("rogaining-results report requires --baza <baza.xml>.");
     printUsage(logger);
     process.exit(1);
   }
@@ -201,6 +228,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
     inputPath: absolutePath,
     configPath,
     courseDataPath,
+    bazaPath,
     report,
     format,
     html,

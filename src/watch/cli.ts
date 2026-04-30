@@ -70,6 +70,12 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
         process.exit(1);
       }
 
+      if (value === "rogaining-results") {
+        logger.error("rogaining-results is not supported in watch mode yet. Use the regular CLI with --baza <baza.xml>.");
+        printUsage(logger);
+        process.exit(1);
+      }
+
       reportType = value;
       i += 1;
       continue;

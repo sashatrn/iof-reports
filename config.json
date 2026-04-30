@@ -51,6 +51,19 @@
       "programName": "рогейн",
       "departmentName": "",
       "regionTableLayout": "flat"
+    },
+    "resultsReport": {
+      "headerLines": [
+        "Міністерство молоді та спорту",
+        "України Федерація спортивного",
+        "орієнтування України"
+      ],
+      "title": "ПРОТОКОЛ РЕЗУЛЬТАТІВ ЗМАГАНЬ З ОРІЄНТУВАННЯ",
+      "programName": "РОГЕЙН",
+      "courseChief": "",
+      "controlTime": "12:00:00",
+      "msuPlaces": [1, 2],
+      "minRegionsForMsu": 6
     }
   },
   "genderMapping": {

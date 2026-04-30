@@ -46,6 +46,16 @@ export type AppConfig = {
         footerDateText: string;
       };
     };
+    resultsReport: {
+      headerLines: string[];
+      title: string;
+      programName: string;
+      courseChief: string;
+      controlCount?: number;
+      controlTime: string;
+      msuPlaces: number[];
+      minRegionsForMsu: number;
+    };
   };
   genderMapping: {
     menPrefixes: string[];
@@ -199,6 +209,19 @@ const defaultConfig: AppConfig = {
         footerDateText: "\"_________\" ____________________ 2026 рік",
       },
     },
+    resultsReport: {
+      headerLines: [
+        "Міністерство молоді та спорту",
+        "України Федерація спортивного",
+        "орієнтування України",
+      ],
+      title: "ПРОТОКОЛ РЕЗУЛЬТАТІВ ЗМАГАНЬ З ОРІЄНТУВАННЯ",
+      programName: "РОГЕЙН",
+      courseChief: "",
+      controlTime: "24:00:00",
+      msuPlaces: [1, 2],
+      minRegionsForMsu: 6,
+    },
   },
   genderMapping: {
     menPrefixes: ["M", "Ч", "Х"],
@@ -309,6 +332,16 @@ export function loadConfig(configPath?: string): AppConfig {
         flatRegions:
           parsed.rogaining?.scoreReport?.flatRegions ??
           defaultConfig.rogaining.scoreReport.flatRegions,
+      },
+      resultsReport: {
+        ...defaultConfig.rogaining.resultsReport,
+        ...parsed.rogaining?.resultsReport,
+        headerLines:
+          parsed.rogaining?.resultsReport?.headerLines ??
+          defaultConfig.rogaining.resultsReport.headerLines,
+        msuPlaces:
+          parsed.rogaining?.resultsReport?.msuPlaces ??
+          defaultConfig.rogaining.resultsReport.msuPlaces,
       },
     },
     genderMapping: {

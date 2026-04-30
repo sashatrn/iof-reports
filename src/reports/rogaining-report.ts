@@ -2,6 +2,7 @@ import path from "path";
 import { AppConfig, loadConfig } from "../config";
 import { CourseControlPoint, ParsedCourseData } from "../io/parse-course-data";
 import { RogainingSplit, RogainingTeam } from "../io/parse-rogaining-iof";
+import { ParsedUofBaza, UofBazaSportsman } from "../io/parse-uof-baza";
 import { DocxBlock, renderDocx } from "../render/docx";
 import { renderTemplate } from "../render/template-engine";
 import { formatDate } from "../utils/date";
@@ -108,6 +109,34 @@ type RogainingScoreReportInfo = {
   programName: string;
   departmentName: string;
   signatures: AppConfig["rogaining"]["scoreReport"]["signatures"];
+};
+
+type RogainingResultsMemberEntry = {
+  name: string;
+  birthday: string;
+  region: string;
+  trainers: string;
+  qualification: string;
+  awardedRank: string;
+};
+
+type RogainingResultsTeamEntry = {
+  place: string;
+  teamName: string;
+  members: RogainingResultsMemberEntry[];
+  score: number;
+  penalty: number;
+  totalScore: number;
+  formattedTime: string;
+};
+
+type RogainingResultsClassGroup = {
+  name: string;
+  courseRank: number;
+  controlCount: number;
+  controlTime: string;
+  courseChief: string;
+  teams: RogainingResultsTeamEntry[];
 };
 
 type RogainingSplitLegEntry = {
@@ -506,6 +535,80 @@ function buildRogainingClasses(
     .map((className) => ({
       name: className,
       teams: rankTeams(byClass.get(className)!),
+    }))
+    .filter((classGroup) => classGroup.teams.length > 0);
+}
+
+function buildDeclaredRogainingClasses(
+  teams: RogainingTeam[],
+  config: AppConfig,
+): RogainingClassGroup[] {
+  const byClass = new Map<string, RogainingTeam[]>();
+
+  for (const team of teams) {
+    if (!byClass.has(team.className)) {
+      byClass.set(team.className, []);
+    }
+
+    byClass.get(team.className)!.push(team);
+  }
+
+  return [...byClass.keys()]
+    .sort((left, right) => {
+      const leftParsed = parseRogainingClass(left, config);
+      const rightParsed = parseRogainingClass(right, config);
+
+      if (!leftParsed || !rightParsed) {
+        return left.localeCompare(right, "uk");
+      }
+
+      const genderComparison =
+        getGenderOrder(leftParsed.genderGroup) - getGenderOrder(rightParsed.genderGroup);
+
+      if (genderComparison !== 0) {
+        return genderComparison;
+      }
+
+      return compareClassAgeLimits(leftParsed.ageLimit, rightParsed.ageLimit);
+    })
+    .map((className) => ({
+      name: className,
+      teams: rankTeams(byClass.get(className)!),
+    }))
+    .filter((classGroup) => classGroup.teams.length > 0);
+}
+
+function buildOpenRogainingResultsClasses(
+  teams: RogainingTeam[],
+  config: AppConfig,
+): RogainingClassGroup[] {
+  const groups: Array<{
+    name: string;
+    genderGroup: ParsedRogainingClass["genderGroup"];
+  }> = [
+    { name: "Ч-О", genderGroup: "men" },
+    { name: "Ж-О", genderGroup: "women" },
+    { name: "МІКС-О", genderGroup: "mix" },
+  ];
+  const teamsByGroup = new Map<string, RogainingTeam[]>(
+    groups.map((group) => [group.name, []]),
+  );
+
+  for (const team of teams) {
+    const parsedClass = parseRogainingClass(team.className, config);
+    const group = groups.find((entry) => entry.genderGroup === parsedClass?.genderGroup);
+
+    if (!group) {
+      continue;
+    }
+
+    teamsByGroup.get(group.name)!.push(team);
+  }
+
+  return groups
+    .map((group) => ({
+      name: group.name,
+      teams: rankTeams(teamsByGroup.get(group.name)!),
     }))
     .filter((classGroup) => classGroup.teams.length > 0);
 }
@@ -953,6 +1056,340 @@ function buildRogainingScoreReportInfo(
   };
 }
 
+function normalizePersonNameKey(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[’']/g, "")
+    .replace(/[^a-zа-яіїєґ0-9]+/giu, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .sort((left, right) => left.localeCompare(right, "uk"))
+    .join(" ");
+}
+
+function buildBazaIndex(baza: ParsedUofBaza): Map<string, UofBazaSportsman> {
+  const index = new Map<string, UofBazaSportsman>();
+
+  for (const sportsman of baza.sportsmen) {
+    const key = normalizePersonNameKey(sportsman.fio);
+
+    if (key && !index.has(key)) {
+      index.set(key, sportsman);
+    }
+  }
+
+  return index;
+}
+
+function findBazaSportsman(
+  index: Map<string, UofBazaSportsman>,
+  memberName: string,
+): UofBazaSportsman | undefined {
+  return index.get(normalizePersonNameKey(memberName));
+}
+
+function parseUkrainianDate(value: string): Date | undefined {
+  const match = value.trim().match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+
+  if (!match) {
+    return undefined;
+  }
+
+  const date = new Date(Number(match[3]), Number(match[2]) - 1, Number(match[1]));
+
+  return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
+function calculateAgeOnDate(birthday: string, eventDate: Date): number | undefined {
+  const birthDate = parseUkrainianDate(birthday);
+
+  if (!birthDate) {
+    return undefined;
+  }
+
+  let age = eventDate.getFullYear() - birthDate.getFullYear();
+  const hadBirthday =
+    eventDate.getMonth() > birthDate.getMonth() ||
+    (eventDate.getMonth() === birthDate.getMonth() &&
+      eventDate.getDate() >= birthDate.getDate());
+
+  if (!hadBirthday) {
+    age -= 1;
+  }
+
+  return age;
+}
+
+function normalizeQualification(qualification: string): string {
+  return qualification
+    .trim()
+    .toUpperCase()
+    .replace(/[ІЇ]/g, "I")
+    .replace(/КМСУ?/g, "КМСУ")
+    .replace(/МСМК/g, "МСУМК")
+    .replace(/\s+/g, "");
+}
+
+function qualificationPoints(
+  qualification: string,
+  age: number | undefined,
+): number {
+  const normalized = normalizeQualification(qualification);
+
+  if (normalized.includes("МСУМК")) {
+    return 150;
+  }
+
+  if (normalized.includes("КМС")) {
+    return 30;
+  }
+
+  if (normalized.includes("МСУ")) {
+    return 100;
+  }
+
+  if (normalized === "I" || normalized === "1") {
+    return 10;
+  }
+
+  if (normalized === "II" || normalized === "2" || normalized.includes("IЮН")) {
+    return 3;
+  }
+
+  if (normalized === "III" || normalized === "3" || normalized.includes("IIЮН")) {
+    return 1;
+  }
+
+  return age !== undefined && age <= 18 ? 0.1 : 0.3;
+}
+
+const ROGAINING_POINTS_CLASSIFICATION_TABLE = [
+  { rank: 1200, kmsu: 74, first: 66, secondYouth1: 54, thirdYouth2: 49, youth3: undefined },
+  { rank: 1100, kmsu: 76, first: 68, secondYouth1: 56, thirdYouth2: 50, youth3: undefined },
+  { rank: 1000, kmsu: 78, first: 70, secondYouth1: 58, thirdYouth2: 51, youth3: undefined },
+  { rank: 800, kmsu: 82, first: 72, secondYouth1: 60, thirdYouth2: 52, youth3: undefined },
+  { rank: 630, kmsu: 84, first: 74, secondYouth1: 62, thirdYouth2: 53, youth3: undefined },
+  { rank: 500, kmsu: 86, first: 76, secondYouth1: 64, thirdYouth2: 54, youth3: 46 },
+  { rank: 400, kmsu: 88, first: 78, secondYouth1: 66, thirdYouth2: 55, youth3: 47 },
+  { rank: 320, kmsu: 90, first: 80, secondYouth1: 68, thirdYouth2: 56, youth3: 48 },
+  { rank: 250, kmsu: 92, first: 82, secondYouth1: 70, thirdYouth2: 57, youth3: 49 },
+  { rank: 200, kmsu: 94, first: 84, secondYouth1: 72, thirdYouth2: 58, youth3: 50 },
+  { rank: 160, kmsu: 97, first: 86, secondYouth1: 74, thirdYouth2: 60, youth3: 51 },
+  { rank: 120, kmsu: 100, first: 88, secondYouth1: 76, thirdYouth2: 62, youth3: 52 },
+  { rank: 100, kmsu: undefined, first: 90, secondYouth1: 78, thirdYouth2: 64, youth3: 53 },
+  { rank: 80, kmsu: undefined, first: 92, secondYouth1: 80, thirdYouth2: 66, youth3: 54 },
+  { rank: 63, kmsu: undefined, first: 94, secondYouth1: 82, thirdYouth2: 68, youth3: 55 },
+  { rank: 50, kmsu: undefined, first: 97, secondYouth1: 84, thirdYouth2: 70, youth3: 56 },
+  { rank: 36, kmsu: undefined, first: 100, secondYouth1: 86, thirdYouth2: 72, youth3: 57 },
+  { rank: 32, kmsu: undefined, first: undefined, secondYouth1: 88, thirdYouth2: 74, youth3: 58 },
+  { rank: 25, kmsu: undefined, first: undefined, secondYouth1: 90, thirdYouth2: 76, youth3: 60 },
+  { rank: 20, kmsu: undefined, first: undefined, secondYouth1: 92, thirdYouth2: 78, youth3: 62 },
+  { rank: 16, kmsu: undefined, first: undefined, secondYouth1: 95, thirdYouth2: 80, youth3: 64 },
+  { rank: 13, kmsu: undefined, first: undefined, secondYouth1: 97, thirdYouth2: 82, youth3: 66 },
+  { rank: 10, kmsu: undefined, first: undefined, secondYouth1: undefined, thirdYouth2: 84, youth3: 68 },
+  { rank: 8, kmsu: undefined, first: undefined, secondYouth1: undefined, thirdYouth2: 86, youth3: 70 },
+  { rank: 6, kmsu: undefined, first: undefined, secondYouth1: undefined, thirdYouth2: 88, youth3: 72 },
+  { rank: 5, kmsu: undefined, first: undefined, secondYouth1: undefined, thirdYouth2: 90, youth3: 74 },
+  { rank: 4, kmsu: undefined, first: undefined, secondYouth1: undefined, thirdYouth2: 94, youth3: 78 },
+  { rank: 3, kmsu: undefined, first: undefined, secondYouth1: undefined, thirdYouth2: undefined, youth3: 80 },
+  { rank: 2, kmsu: undefined, first: undefined, secondYouth1: undefined, thirdYouth2: undefined, youth3: 82 },
+  { rank: 1, kmsu: undefined, first: undefined, secondYouth1: undefined, thirdYouth2: undefined, youth3: 88 },
+] as const;
+
+type RogainingPointsClassificationRow = (typeof ROGAINING_POINTS_CLASSIFICATION_TABLE)[number];
+
+function getClassificationRow(courseRank: number): RogainingPointsClassificationRow | undefined {
+  return ROGAINING_POINTS_CLASSIFICATION_TABLE.find((row) => courseRank >= row.rank);
+}
+
+function isOpenRogainingClass(className: string, config: AppConfig): boolean {
+  const parsed = parseRogainingClass(className, config);
+
+  return Boolean(parsed && parsed.ageLimit === OPEN_AGE && parsed.genderGroup !== "unknown");
+}
+
+function buildMemberData(
+  team: RankedRogainingTeam,
+  memberIndex: number,
+  bazaIndex: Map<string, UofBazaSportsman>,
+  eventDate: Date,
+): { member: RogainingResultsMemberEntry; qualificationScore: number; age?: number } {
+  const name = team.members[memberIndex];
+  const sportsman = findBazaSportsman(bazaIndex, name);
+  const birthday = sportsman?.birthday ?? "";
+  const age = calculateAgeOnDate(birthday, eventDate);
+  const qualification = sportsman?.qualification || "";
+  const region =
+    sportsman?.region ||
+    team.memberOrganisations?.[memberIndex] ||
+    team.organisation;
+
+  return {
+    member: {
+      name: sportsman?.fio || name,
+      birthday,
+      region: normalizeRogainingRegion(region),
+      trainers: sportsman?.trainers.join(", ") || "",
+      qualification,
+      awardedRank: "",
+    },
+    qualificationScore: qualificationPoints(qualification, age),
+    age,
+  };
+}
+
+function calculateCourseRank(
+  rankedTeams: RankedRogainingTeam[],
+  bazaIndex: Map<string, UofBazaSportsman>,
+  eventDate: Date,
+): number {
+  const qualificationScores: number[] = [];
+
+  for (const team of rankedTeams.filter((rankedTeam) => rankedTeam.place !== "")) {
+    for (let memberIndex = 0; memberIndex < team.members.length; memberIndex += 1) {
+      qualificationScores.push(
+        buildMemberData(team, memberIndex, bazaIndex, eventDate).qualificationScore,
+      );
+
+      if (qualificationScores.length >= 12) {
+        break;
+      }
+    }
+
+    if (qualificationScores.length >= 12) {
+      break;
+    }
+  }
+
+  if (qualificationScores.length < 3) {
+    return 0;
+  }
+
+  const sum = qualificationScores.reduce((total, score) => total + score, 0);
+
+  return Math.round(sum * 10) / 10;
+}
+
+function formatCourseRank(courseRank: number): string {
+  return Number.isInteger(courseRank) ? String(courseRank) : courseRank.toFixed(1);
+}
+
+function resolveClassificationRank(
+  row: RogainingPointsClassificationRow | undefined,
+  resultPercent: number,
+  isYouth: boolean,
+): string {
+  if (!row) {
+    return "";
+  }
+
+  if (row.kmsu !== undefined && resultPercent >= row.kmsu) {
+    return "КМСУ";
+  }
+
+  if (row.first !== undefined && resultPercent >= row.first) {
+    return "I";
+  }
+
+  if (row.secondYouth1 !== undefined && resultPercent >= row.secondYouth1) {
+    return isYouth ? "I юн." : "II";
+  }
+
+  if (row.thirdYouth2 !== undefined && resultPercent >= row.thirdYouth2) {
+    return isYouth ? "II юн." : "III";
+  }
+
+  if (row.youth3 !== undefined && resultPercent >= row.youth3) {
+    return "III юн.";
+  }
+
+  return "";
+}
+
+function estimateClassControlCount(teams: RankedRogainingTeam[]): number {
+  return teams.reduce((maxControls, team) => {
+    const teamControls = new Set<string>();
+
+    for (const memberSplits of team.memberSplits ?? []) {
+      for (const split of memberSplits) {
+        if (split.controlCode) {
+          teamControls.add(split.controlCode);
+        }
+      }
+    }
+
+    return Math.max(maxControls, teamControls.size);
+  }, 0);
+}
+
+function buildRogainingResultsClasses(
+  teams: RogainingTeam[],
+  baza: ParsedUofBaza,
+  eventDate: Date,
+  config: AppConfig,
+): RogainingResultsClassGroup[] {
+  const bazaIndex = buildBazaIndex(baza);
+  const rankedClasses = buildOpenRogainingResultsClasses(teams, config);
+  const resultsReport = config.rogaining.resultsReport;
+
+  return rankedClasses.map((classGroup) => {
+    const placeableTeams = classGroup.teams.filter((team) => team.place !== "");
+    const winnerScore = placeableTeams[0]?.totalScore ?? 0;
+    const courseRank = calculateCourseRank(classGroup.teams, bazaIndex, eventDate);
+    const classificationRow = getClassificationRow(courseRank);
+    const classRegions = new Set<string>();
+
+    for (const team of placeableTeams) {
+      for (let memberIndex = 0; memberIndex < team.members.length; memberIndex += 1) {
+        const region = buildMemberData(team, memberIndex, bazaIndex, eventDate).member.region;
+        if (region) {
+          classRegions.add(region);
+        }
+      }
+    }
+
+    const resultTeams = classGroup.teams.map((team) => {
+      const place = Number(team.place);
+      const earnsMsu =
+        Number.isFinite(place) &&
+        resultsReport.msuPlaces.includes(place) &&
+        isOpenRogainingClass(classGroup.name, config) &&
+        classRegions.size >= resultsReport.minRegionsForMsu;
+      const resultPercent = winnerScore > 0 ? (team.totalScore / winnerScore) * 100 : 0;
+
+      return {
+        place: team.place,
+        teamName: team.teamName,
+        members: team.members.map((_, memberIndex) => {
+          const memberData = buildMemberData(team, memberIndex, bazaIndex, eventDate);
+          const isYouth = memberData.age !== undefined && memberData.age <= 18;
+
+          return {
+            ...memberData.member,
+            awardedRank: earnsMsu
+              ? "МСУ"
+              : resolveClassificationRank(classificationRow, resultPercent, isYouth),
+          };
+        }),
+        score: team.grossScore,
+        penalty: team.penalty,
+        totalScore: team.totalScore,
+        formattedTime: team.formattedTime,
+      };
+    });
+
+    return {
+      name: classGroup.name,
+      courseRank,
+      controlCount: resultsReport.controlCount ?? estimateClassControlCount(classGroup.teams),
+      controlTime: resultsReport.controlTime,
+      courseChief: resultsReport.courseChief,
+      teams: resultTeams,
+    };
+  });
+}
+
 function buildCourseControlMap(courseData: ParsedCourseData): Map<string, CourseControlPoint> {
   return new Map(courseData.controls.map((control) => [control.id, control]));
 }
@@ -1247,6 +1684,44 @@ export function buildRogainingScoreHtml(
     scoreReport,
     regionTables,
     entries,
+  });
+}
+
+export function buildRogainingResultsHtml(
+  teams: RogainingTeam[],
+  baza: ParsedUofBaza,
+  eventDate: Date,
+  eventName?: string,
+  variant: HtmlVariant = "pdf",
+): string {
+  const config = loadConfig();
+  const normalizedTeams = applyRogainingRules(teams, config);
+  const resultsReport = config.rogaining.resultsReport;
+  void variant;
+
+  return renderTemplate("rogaining-results-pdf.njk", {
+    reportTitle: "Протокол результатів змагань з орієнтування",
+    showDefaultHeader: false,
+    showDefaultFooter: false,
+    header: {
+      lines: resultsReport.headerLines,
+      competitionName:
+        config.reportHeader.title ??
+        eventName ??
+        baza.eventName ??
+        `Протокол результатів рогейну, ${formatDate(eventDate)}`,
+      title: resultsReport.title,
+      programName: resultsReport.programName,
+      date: formatDate(eventDate),
+      location: config.reportHeader.location,
+    },
+    officials: config.officials,
+    classes: buildRogainingResultsClasses(normalizedTeams, baza, eventDate, config).map(
+      (classGroup) => ({
+        ...classGroup,
+        formattedCourseRank: formatCourseRank(classGroup.courseRank),
+      }),
+    ),
   });
 }
 
