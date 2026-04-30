@@ -31,12 +31,14 @@ export type AppConfig = {
       resultsTitle?: string;
       programName: string;
       departmentName: string;
+      regionTableLayout: "groups" | "flat";
       regionGroups: {
         group1: string[];
         group2: string[];
         group3: string[];
         organizations: string[];
       };
+      flatRegions: string[];
       signatures: {
         chiefJudgeTitle: string;
         departmentHeadTitle: string;
@@ -116,6 +118,7 @@ const defaultConfig: AppConfig = {
       eventInfo: "",
       programName: "рогейн",
       departmentName: "",
+      regionTableLayout: "groups",
       regionGroups: {
         group1: [
           "м. Київ",
@@ -160,6 +163,35 @@ const defaultConfig: AppConfig = {
           "ЗС України",
         ],
       },
+      flatRegions: [
+        "м. Київ",
+        "Харківська",
+        "Дніпропетровська",
+        "Донецька",
+        "Запорізька",
+        "Одеська",
+        "Київська",
+        "Луганська",
+        "Львівська",
+        "Вінницька",
+        "Хмельницька",
+        "Сумська",
+        "Черкаська",
+        "Рівненська",
+        "Чернівецька",
+        "Житомирська",
+        "Кіровоградська",
+        "Волинська",
+        "Закарпатська",
+        "Тернопільська",
+        "Полтавська",
+        "Миколаївська",
+        "Чернігівська",
+        "Івано-Франківська",
+        "Херсонська",
+        "АР Крим",
+        "м. Севастополь",
+      ],
       signatures: {
         chiefJudgeTitle: "Головний суддя",
         departmentHeadTitle: "Начальник відділу",
@@ -274,6 +306,9 @@ export function loadConfig(configPath?: string): AppConfig {
           ...defaultConfig.rogaining.scoreReport.signatures,
           ...parsed.rogaining?.scoreReport?.signatures,
         },
+        flatRegions:
+          parsed.rogaining?.scoreReport?.flatRegions ??
+          defaultConfig.rogaining.scoreReport.flatRegions,
       },
     },
     genderMapping: {

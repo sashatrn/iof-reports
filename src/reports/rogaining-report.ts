@@ -75,6 +75,24 @@ type RogainingScoreRegionGroups = {
   group3AndOrganizations: RogainingRegionGroupScoreRow[];
 };
 
+type RogainingFlatRegionScoreEntry = {
+  number: number;
+  name: string;
+  points: number;
+};
+
+type RogainingFlatRegionScoreRow = {
+  left?: RogainingFlatRegionScoreEntry;
+  middle?: RogainingFlatRegionScoreEntry;
+  organization?: RogainingFlatRegionScoreEntry;
+};
+
+type RogainingScoreRegionTables = {
+  layout: AppConfig["rogaining"]["scoreReport"]["regionTableLayout"];
+  groups: RogainingScoreRegionGroups;
+  flatRows: RogainingFlatRegionScoreRow[];
+};
+
 type RogainingScoreReportInfo = {
   sport: string;
   competitionName: string;
@@ -846,6 +864,64 @@ function buildRogainingScoreRegionGroups(
   };
 }
 
+function buildFlatRegionScoreEntries(
+  names: string[],
+  pointsByRegion: Map<string, number>,
+  startNumber = 1,
+): RogainingFlatRegionScoreEntry[] {
+  return names.map((region, index) => {
+    const name = normalizeRogainingRegion(region);
+
+    return {
+      number: startNumber + index,
+      name,
+      points: pointsByRegion.get(name) ?? 0,
+    };
+  });
+}
+
+function buildFlatRegionScoreRows(
+  config: AppConfig,
+  regionScores: RogainingRegionScoreEntry[],
+): RogainingFlatRegionScoreRow[] {
+  const pointsByRegion = buildRegionScoreMap(regionScores);
+  const flatRegions = config.rogaining.scoreReport.flatRegions.map(normalizeRogainingRegion);
+  const firstColumnSize = Math.ceil(flatRegions.length / 2);
+  const left = buildFlatRegionScoreEntries(
+    flatRegions.slice(0, firstColumnSize),
+    pointsByRegion,
+    1,
+  );
+  const middle = buildFlatRegionScoreEntries(
+    flatRegions.slice(firstColumnSize),
+    pointsByRegion,
+    firstColumnSize + 1,
+  );
+  const organizations = buildFlatRegionScoreEntries(
+    config.rogaining.scoreReport.regionGroups.organizations,
+    pointsByRegion,
+    1,
+  );
+  const rowCount = Math.max(left.length, middle.length, organizations.length);
+
+  return Array.from({ length: rowCount }, (_, index) => ({
+    left: left[index],
+    middle: middle[index],
+    organization: organizations[index],
+  }));
+}
+
+function buildRogainingScoreRegionTables(
+  config: AppConfig,
+  regionScores: RogainingRegionScoreEntry[],
+): RogainingScoreRegionTables {
+  return {
+    layout: config.rogaining.scoreReport.regionTableLayout,
+    groups: buildRogainingScoreRegionGroups(config, regionScores),
+    flatRows: buildFlatRegionScoreRows(config, regionScores),
+  };
+}
+
 function buildRogainingScoreReportInfo(
   config: AppConfig,
   eventDate: Date,
@@ -1160,7 +1236,7 @@ export function buildRogainingScoreHtml(
     eventName,
     allEntries,
   );
-  const regionGroups = buildRogainingScoreRegionGroups(config, regionScores);
+  const regionTables = buildRogainingScoreRegionTables(config, regionScores);
   void variant;
 
   return renderTemplate("rogaining-score-pdf.njk", {
@@ -1169,7 +1245,7 @@ export function buildRogainingScoreHtml(
     showDefaultFooter: false,
     officials: config.officials,
     scoreReport,
-    regionGroups,
+    regionTables,
     entries,
   });
 }

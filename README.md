@@ -125,6 +125,13 @@ npm run dev:watch -- --input-dir ./incoming --output-dir ./out --report rogainin
 
 Службові поля звіту `rogaining-score` налаштовуються в `rogaining.scoreReport`: вид спорту, назва змагань, наказ, дата, місце, текст командного місця, назви програми, групи регіонів та підписи.
 
+Формат таблиці регіонів у `rogaining-score` задається через `rogaining.scoreReport.regionTableLayout`:
+
+- `groups` - поточний формат з I, II, III групами
+- `flat` - одна таблиця регіонів у дві колонки та окрема колонка ФСТ/відомств
+
+Для `flat` порядок регіонів можна перевизначити через `rogaining.scoreReport.flatRegions`.
+
 ## Вимоги до проекту
 
 - Node.js 18+

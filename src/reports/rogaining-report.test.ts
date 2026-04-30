@@ -488,6 +488,45 @@ describe("buildRogainingScoreHtml", () => {
     expect(html).not.toMatch(/Мороз Олександр[\s\S]*<td>Донецька, Житомирська<\/td>/);
   });
 
+  it("can render score region table in flat layout", () => {
+    setConfigPath(path.resolve(__dirname, "../__fixtures__/rogaining-score-flat-regions-config.json"));
+    const teams: RogainingTeam[] = [
+      {
+        className: "Ч",
+        teamName: "Київ",
+        organisation: "м.Київ",
+        members: ["Київський учасник"],
+        memberCount: 1,
+        score: 30,
+        penalty: 0,
+        totalScore: 30,
+        timeSec: 10000,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "Харків",
+        organisation: "Харківська",
+        members: ["Харківський учасник"],
+        memberCount: 1,
+        score: 20,
+        penalty: 0,
+        totalScore: 20,
+        timeSec: 11000,
+        status: "OK",
+      },
+    ];
+
+    const html = buildRogainingScoreHtml(teams, new Date(2026, 3, 11), "Рогейн", "pdf");
+
+    expect(html).toContain("<th>Регіони</th>");
+    expect(html).toContain("<th>ФСТ/відомства</th>");
+    expect(html).not.toContain("<th>I група</th>");
+    expect(html).toMatch(/<td class="score-doc-number-cell">1<\/td>\s*<td>м\. Київ<\/td>\s*<td class="score-doc-points-cell">300<\/td>/);
+    expect(html).toMatch(/<td class="score-doc-number-cell">2<\/td>\s*<td>Харківська<\/td>\s*<td class="score-doc-points-cell">250<\/td>/);
+    expect(html).toContain("<td>ФСТ \"Україна\"</td>");
+  });
+
   it("ignores score categories that are not configured", () => {
     const teams: RogainingTeam[] = [
       {

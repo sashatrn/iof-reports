@@ -81,6 +81,38 @@
 
 <div class="score-doc-section-title">Групи регіонів</div>
 
+{% if regionTables.layout == "flat" %}
+<table class="score-doc-region-groups score-doc-flat-regions">
+  <thead>
+    <tr>
+      <th>№ з/п</th>
+      <th>Регіони</th>
+      <th>Очки</th>
+      <th>№ з/п</th>
+      <th>Регіони</th>
+      <th>Очки</th>
+      <th>№ з/п</th>
+      <th>ФСТ/відомства</th>
+      <th>Очки</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in regionTables.flatRows %}
+    <tr>
+      <td class="score-doc-number-cell">{% if row.left %}{{ row.left.number }}{% endif %}</td>
+      <td>{% if row.left %}{{ row.left.name }}{% endif %}</td>
+      <td class="score-doc-points-cell">{% if row.left and row.left.points > 0 %}{{ row.left.points }}{% endif %}</td>
+      <td class="score-doc-number-cell">{% if row.middle %}{{ row.middle.number }}{% endif %}</td>
+      <td>{% if row.middle %}{{ row.middle.name }}{% endif %}</td>
+      <td class="score-doc-points-cell">{% if row.middle and row.middle.points > 0 %}{{ row.middle.points }}{% endif %}</td>
+      <td class="score-doc-number-cell">{% if row.organization %}{{ row.organization.number }}{% endif %}</td>
+      <td>{% if row.organization %}{{ row.organization.name }}{% endif %}</td>
+      <td class="score-doc-points-cell">{% if row.organization and row.organization.points > 0 %}{{ row.organization.points }}{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
 <table class="score-doc-region-groups">
   <thead>
     <tr>
@@ -94,7 +126,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for row in regionGroups.group1And2 %}
+    {% for row in regionTables.groups.group1And2 %}
     <tr>
       <td class="score-doc-number-cell">{{ row.number }}</td>
       <td>{% if row.left %}{{ row.left.name }}{% endif %}</td>
@@ -121,7 +153,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for row in regionGroups.group3AndOrganizations %}
+    {% for row in regionTables.groups.group3AndOrganizations %}
     <tr>
       <td class="score-doc-number-cell">{{ row.number }}</td>
       <td>{% if row.left %}{{ row.left.name }}{% endif %}</td>
@@ -134,6 +166,7 @@
     {% endfor %}
   </tbody>
 </table>
+{% endif %}
 
 <div class="score-doc-signatures">
   <div class="score-doc-signature-row">
