@@ -1,4 +1,6 @@
-import { describe, expect, it } from "vitest";
+import path from "path";
+import { afterEach, describe, expect, it } from "vitest";
+import { setConfigPath } from "../config";
 import { RogainingTeam } from "../io/parse-rogaining-iof";
 import {
   buildRogainingAwardsHtml,
@@ -8,6 +10,10 @@ import {
   buildRogainingSplitTeamEntries,
   buildRogainingSplitsHtml,
 } from "./rogaining-report";
+
+afterEach(() => {
+  setConfigPath(undefined);
+});
 
 function expectInOrder(text: string, fragments: string[]): void {
   let previousIndex = -1;
@@ -482,7 +488,7 @@ describe("buildRogainingScoreHtml", () => {
     expect(html).not.toMatch(/Мороз Олександр[\s\S]*<td>Донецька, Житомирська<\/td>/);
   });
 
-  it("scores veteran teams only through open adult classes", () => {
+  it("ignores score categories that are not configured", () => {
     const teams: RogainingTeam[] = [
       {
         className: "Ч",
@@ -513,9 +519,50 @@ describe("buildRogainingScoreHtml", () => {
     const html = buildRogainingScoreHtml(teams, new Date(2026, 3, 11), "Рогейн", "pdf");
 
     expect(html).toMatch(/<strong>Загальна кількість учасників змагань:<\/strong>\s*2/);
+    expect(html).toMatch(/<strong>Кількість країн\/регіонів:<\/strong>\s*2/);
+    expect(html).toMatch(/<strong>Кількість \(команд\):<\/strong>\s*2/);
     expect(html).toMatch(/Ветеран учасник[\s\S]*<td>Ч \(рогейн\)<\/td>[\s\S]*<td class="score-doc-place-cell">1<\/td>[\s\S]*<td class="score-doc-points-cell">300<\/td>/);
     expect(html).toMatch(/Дорослий учасник[\s\S]*<td>Ч \(рогейн\)<\/td>[\s\S]*<td class="score-doc-place-cell">2<\/td>[\s\S]*<td class="score-doc-points-cell">250<\/td>/);
     expect(html).not.toContain("<td>Ч45 (рогейн)</td>");
+  });
+
+  it("scores only masters when only masters score category is configured", () => {
+    setConfigPath(path.resolve(__dirname, "../__fixtures__/rogaining-score-masters-config.json"));
+    const teams: RogainingTeam[] = [
+      {
+        className: "Ч",
+        teamName: "Відкритий",
+        organisation: "Київська",
+        members: ["Дорослий учасник"],
+        memberCount: 1,
+        score: 30,
+        penalty: 0,
+        totalScore: 30,
+        timeSec: 10000,
+        status: "OK",
+      },
+      {
+        className: "Ч45",
+        teamName: "Ветеран",
+        organisation: "Львівська",
+        members: ["Ветеран учасник"],
+        memberCount: 1,
+        score: 40,
+        penalty: 0,
+        totalScore: 40,
+        timeSec: 9000,
+        status: "OK",
+      },
+    ];
+
+    const html = buildRogainingScoreHtml(teams, new Date(2026, 3, 11), "Рогейн", "pdf");
+
+    expect(html).toMatch(/<strong>Загальна кількість учасників змагань:<\/strong>\s*1/);
+    expect(html).toMatch(/<strong>Кількість країн\/регіонів:<\/strong>\s*1/);
+    expect(html).toMatch(/<strong>Кількість \(команд\):<\/strong>\s*1/);
+    expect(html).toMatch(/Ветеран учасник[\s\S]*<td>Ч45 \(рогейн\)<\/td>[\s\S]*<td class="score-doc-place-cell">1<\/td>[\s\S]*<td class="score-doc-points-cell">90<\/td>/);
+    expect(html).not.toContain("<td>Ч (рогейн)</td>");
+    expect(html).not.toContain("Дорослий учасник");
   });
 });
 

@@ -1,6 +1,13 @@
 import fs from "fs";
 import path from "path";
 
+type RogainingScorePoints = {
+  youthUnder18?: Record<string, number>;
+  youthUnder23?: Record<string, number>;
+  adult?: Record<string, number>;
+  masters?: Record<string, number>;
+};
+
 export type AppConfig = {
   logging: {
     level: string;
@@ -12,11 +19,7 @@ export type AppConfig = {
       restrictedControls: string[];
       disqualifiedStatus: string;
     };
-    scorePoints: {
-      youthUnder18: Record<string, number>;
-      youthUnder23: Record<string, number>;
-      adult: Record<string, number>;
-    };
+    scorePoints: RogainingScorePoints;
     scoreReport: {
       sport: string;
       competitionName?: string;
@@ -191,6 +194,37 @@ export function setConfigPath(configPath?: string): void {
   activeConfigPath = configPath;
 }
 
+function mergeScorePoints(
+  parsedScorePoints: RogainingScorePoints | undefined,
+): RogainingScorePoints {
+  if (!parsedScorePoints) {
+    return defaultConfig.rogaining.scorePoints;
+  }
+
+  const categories: Array<keyof RogainingScorePoints> = [
+    "youthUnder18",
+    "youthUnder23",
+    "adult",
+    "masters",
+  ];
+  const scorePoints: RogainingScorePoints = {};
+
+  for (const category of categories) {
+    const parsedCategoryPoints = parsedScorePoints[category];
+
+    if (!parsedCategoryPoints) {
+      continue;
+    }
+
+    scorePoints[category] = {
+      ...(defaultConfig.rogaining.scorePoints[category] ?? {}),
+      ...parsedCategoryPoints,
+    };
+  }
+
+  return scorePoints;
+}
+
 export function loadConfig(configPath?: string): AppConfig {
   const filePath = configPath ?? activeConfigPath ?? path.resolve(process.cwd(), "config.json");
 
@@ -216,22 +250,7 @@ export function loadConfig(configPath?: string): AppConfig {
         ...defaultConfig.rogaining.controlGateRule,
         ...parsed.rogaining?.controlGateRule,
       },
-      scorePoints: {
-        ...defaultConfig.rogaining.scorePoints,
-        ...parsed.rogaining?.scorePoints,
-        youthUnder18: {
-          ...defaultConfig.rogaining.scorePoints.youthUnder18,
-          ...parsed.rogaining?.scorePoints?.youthUnder18,
-        },
-        youthUnder23: {
-          ...defaultConfig.rogaining.scorePoints.youthUnder23,
-          ...parsed.rogaining?.scorePoints?.youthUnder23,
-        },
-        adult: {
-          ...defaultConfig.rogaining.scorePoints.adult,
-          ...parsed.rogaining?.scorePoints?.adult,
-        },
-      },
+      scorePoints: mergeScorePoints(parsed.rogaining?.scorePoints),
       scoreReport: {
         ...defaultConfig.rogaining.scoreReport,
         ...parsed.rogaining?.scoreReport,

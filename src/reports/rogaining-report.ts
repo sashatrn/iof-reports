@@ -55,7 +55,7 @@ export type RogainingRegionScoreEntry = {
   points: number;
 };
 
-type RogainingScoreCategory = "adult" | "youthUnder23" | "youthUnder18";
+type RogainingScoreCategory = "adult" | "masters" | "youthUnder23" | "youthUnder18";
 
 type RogainingRegionGroupScoreEntry = {
   name: string;
@@ -606,6 +606,8 @@ function getRogainingScorePointsMap(
       return config.rogaining.scorePoints.youthUnder23;
     case "adult":
       return config.rogaining.scorePoints.adult;
+    case "masters":
+      return config.rogaining.scorePoints.masters;
     default:
       return undefined;
   }
@@ -629,6 +631,10 @@ function getRogainingScoreCategory(
 
   if (ageLimit <= 23) {
     return "youthUnder23";
+  }
+
+  if (ageLimit !== OPEN_AGE && ageLimit >= MASTER_MIN_AGE) {
+    return "masters";
   }
 
   if (ageLimit === OPEN_AGE && parsedClass.genderGroup !== "unknown") {
@@ -734,18 +740,14 @@ function buildRogainingRegionScoreEntries(
     });
 }
 
-function countRogainingTeamParticipants(teams: RogainingTeam[]): number {
-  return teams.reduce((count, team) => count + team.members.length, 0);
+function countUniqueRogainingScoreEntryRegions(entries: RogainingScoreEntry[]): number {
+  return new Set(entries.map((entry) => normalizeRogainingRegion(entry.region))).size;
 }
 
-function getRogainingTeamParticipantRegions(teams: RogainingTeam[]): string[] {
-  return teams.flatMap((team) =>
-    team.members.map((_, memberIndex) => getRogainingScoreMemberRegion(team, memberIndex)),
-  );
-}
-
-function countUniqueRogainingTeamParticipantRegions(teams: RogainingTeam[]): number {
-  return new Set(getRogainingTeamParticipantRegions(teams)).size;
+function countUniqueRogainingScoreEntryParticipants(entries: RogainingScoreEntry[]): number {
+  return new Set(
+    entries.map((entry) => `${entry.participantName}\u0000${normalizeRogainingRegion(entry.region)}`),
+  ).size;
 }
 
 function buildRegionScoreMap(
@@ -843,14 +845,14 @@ function buildRogainingScoreReportInfo(
   config: AppConfig,
   eventDate: Date,
   eventName: string | undefined,
-  teams: RogainingTeam[],
+  scoringEntries: RogainingScoreEntry[],
 ): RogainingScoreReportInfo {
   const scoreReport = config.rogaining.scoreReport;
   const competitionName =
     scoreReport.competitionName ??
     eventName ??
     `Протокол балів рогейну, ${formatDate(eventDate)}`;
-  const regionCount = countUniqueRogainingTeamParticipantRegions(teams);
+  const regionCount = countUniqueRogainingScoreEntryRegions(scoringEntries);
 
   return {
     sport: scoreReport.sport,
@@ -858,7 +860,7 @@ function buildRogainingScoreReportInfo(
     orderText: scoreReport.orderText,
     dateText: scoreReport.dateText ?? formatRogainingScoreDateText(eventDate),
     placeName: scoreReport.placeName ?? config.reportHeader.location,
-    participantCount: countRogainingTeamParticipants(teams),
+    participantCount: countUniqueRogainingScoreEntryParticipants(scoringEntries),
     regionCount,
     teamCount: regionCount,
     teamPlaceText: scoreReport.teamPlaceText,
@@ -1151,7 +1153,7 @@ export function buildRogainingScoreHtml(
     config,
     eventDate,
     eventName,
-    normalizedTeams,
+    allEntries,
   );
   const regionGroups = buildRogainingScoreRegionGroups(config, regionScores);
   void variant;
