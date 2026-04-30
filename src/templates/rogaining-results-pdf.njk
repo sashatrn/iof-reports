@@ -51,7 +51,6 @@
   }
 
   .results-class {
-    break-inside: avoid;
     margin-bottom: 5mm;
   }
 
@@ -125,6 +124,11 @@
     font-weight: 700;
   }
 
+  .results-rank-info {
+    margin-top: 1mm;
+    font-size: 8.2pt;
+  }
+
   .results-signatures {
     width: 120mm;
     margin-top: 8mm;
@@ -158,7 +162,6 @@
   <div class="results-class-meta">
     Вікова група&nbsp;&nbsp;{{ class.name }}
     {% if class.courseChief %}&nbsp;&nbsp;&nbsp;&nbsp;Начальник дистанції: {{ class.courseChief }}{% endif %}
-    &nbsp;&nbsp;&nbsp;&nbsp;Ранг дистанції: {{ class.formattedCourseRank }}
   </div>
   <div class="results-course-meta">
     {% if class.controlCount > 0 %}{{ class.controlCount }} КП&nbsp;&nbsp;{% endif %}Контрольний час:{{ class.controlTime }}
@@ -191,8 +194,8 @@
           <td class="results-region">{{ member.region }}</td>
           <td class="results-trainer">{{ member.trainers }}</td>
           <td class="results-score">{% if loop.first %}{{ team.score }}{% endif %}</td>
-          <td class="results-penalty">{% if loop.first and team.penalty > 0 %}{{ team.penalty }}{% endif %}</td>
-          <td class="results-total">{% if loop.first %}{{ team.totalScore }}{% endif %}</td>
+          <td class="results-penalty">{% if loop.first %}{% if team.isDisqualified %}DSQ{% elif team.penalty > 0 %}{{ team.penalty }}{% endif %}{% endif %}</td>
+          <td class="results-total">{% if loop.first %}{% if team.isDisqualified %}0{% else %}{{ team.totalScore }}{% endif %}{% endif %}</td>
           <td class="results-time">{% if loop.first %}{{ team.formattedTime }}{% endif %}</td>
           <td class="results-place">{% if loop.first %}{{ team.place }}{% endif %}</td>
           <td class="results-rank">{{ member.qualification }}</td>
@@ -202,6 +205,13 @@
       {% endfor %}
     </tbody>
   </table>
+  {% if class.rankInfoLines.length > 0 %}
+  <div class="results-rank-info">
+    {% for line in class.rankInfoLines %}
+    <div>{{ line }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
 </div>
 {% endfor %}
 

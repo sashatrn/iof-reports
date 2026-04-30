@@ -20,6 +20,7 @@ type RankedRogainingTeam = RogainingTeam & {
 };
 
 const PLACEABLE_STATUSES = new Set(["OK"]);
+const RESULTS_EXCLUDED_STATUSES = new Set(["DidNotStart", "DidNotFinish"]);
 const OPEN_AGE = Number.POSITIVE_INFINITY;
 const YOUTH_MAX_AGE = 23;
 const MASTER_MIN_AGE = 45;
@@ -128,6 +129,7 @@ type RogainingResultsTeamEntry = {
   penalty: number;
   totalScore: number;
   formattedTime: string;
+  isDisqualified: boolean;
 };
 
 type RogainingResultsClassGroup = {
@@ -137,6 +139,7 @@ type RogainingResultsClassGroup = {
   controlTime: string;
   courseChief: string;
   teams: RogainingResultsTeamEntry[];
+  rankInfoLines: string[];
 };
 
 type RogainingSplitLegEntry = {
@@ -1203,6 +1206,52 @@ function getClassificationRow(courseRank: number): RogainingPointsClassification
   return ROGAINING_POINTS_CLASSIFICATION_TABLE.find((row) => courseRank >= row.rank);
 }
 
+function buildClassRankInfoLines(
+  courseRank: number,
+  winnerScore: number,
+  classificationRow: RogainingPointsClassificationRow | undefined,
+  msuPlaces: number[],
+  msuEarned: boolean,
+  isOpenClass: boolean,
+): string[] {
+  if (!classificationRow || winnerScore === 0) return [];
+
+  const distanceClass =
+    isOpenClass && msuPlaces.length > 0
+      ? "МСУ"
+      : classificationRow.kmsu !== undefined
+        ? "КМСУ"
+        : classificationRow.first !== undefined
+          ? "І р-д"
+          : "ІІ р-д";
+
+  const lines: string[] = [];
+  lines.push(`Клас дистанції: ${distanceClass}; Ранг дистанції: ${formatCourseRank(courseRank)}`);
+
+  const thresholds: string[] = [];
+  if (msuEarned && msuPlaces.length > 0) {
+    thresholds.push(`${msuPlaces.join("-")} місце - МСУ`);
+  }
+  if (classificationRow.kmsu !== undefined) {
+    thresholds.push(`КМСУ - ${classificationRow.kmsu}% - ${Math.floor((winnerScore * classificationRow.kmsu) / 100)}`);
+  }
+  if (classificationRow.first !== undefined) {
+    thresholds.push(`І р-д - ${classificationRow.first}% - ${Math.floor((winnerScore * classificationRow.first) / 100)}`);
+  }
+  if (classificationRow.secondYouth1 !== undefined) {
+    thresholds.push(`ІІ р-д - ${classificationRow.secondYouth1}% - ${Math.floor((winnerScore * classificationRow.secondYouth1) / 100)}`);
+  }
+  if (classificationRow.thirdYouth2 !== undefined) {
+    thresholds.push(`ІІІ р-д - ${classificationRow.thirdYouth2}% - ${Math.floor((winnerScore * classificationRow.thirdYouth2) / 100)}`);
+  }
+
+  if (thresholds.length > 0) {
+    lines.push(thresholds.join("; "));
+  }
+
+  return lines;
+}
+
 function isOpenRogainingClass(className: string, config: AppConfig): boolean {
   const parsed = parseRogainingClass(className, config);
 
@@ -1278,7 +1327,6 @@ function formatCourseRank(courseRank: number): string {
 function resolveClassificationRank(
   row: RogainingPointsClassificationRow | undefined,
   resultPercent: number,
-  isYouth: boolean,
 ): string {
   if (!row) {
     return "";
@@ -1293,15 +1341,15 @@ function resolveClassificationRank(
   }
 
   if (row.secondYouth1 !== undefined && resultPercent >= row.secondYouth1) {
-    return isYouth ? "I юн." : "II";
+    return "II";
   }
 
   if (row.thirdYouth2 !== undefined && resultPercent >= row.thirdYouth2) {
-    return isYouth ? "II юн." : "III";
+    return "III";
   }
 
   if (row.youth3 !== undefined && resultPercent >= row.youth3) {
-    return "III юн.";
+    return "III";
   }
 
   return "";
@@ -1349,33 +1397,48 @@ function buildRogainingResultsClasses(
       }
     }
 
-    const resultTeams = classGroup.teams.map((team) => {
+    const isOpenClass = isOpenRogainingClass(classGroup.name, config);
+    const hasEnoughRegionsForMsu = classRegions.size >= resultsReport.minRegionsForMsu;
+    const msuEarned = isOpenClass && hasEnoughRegionsForMsu && resultsReport.msuPlaces.length > 0;
+    const rankInfoLines = buildClassRankInfoLines(
+      courseRank,
+      winnerScore,
+      classificationRow,
+      resultsReport.msuPlaces,
+      msuEarned,
+      isOpenClass,
+    );
+
+    const resultTeams = classGroup.teams
+    .filter((team) => !RESULTS_EXCLUDED_STATUSES.has(team.status))
+    .map((team) => {
       const place = Number(team.place);
       const earnsMsu =
         Number.isFinite(place) &&
         resultsReport.msuPlaces.includes(place) &&
         isOpenRogainingClass(classGroup.name, config) &&
         classRegions.size >= resultsReport.minRegionsForMsu;
-      const resultPercent = winnerScore > 0 ? (team.totalScore / winnerScore) * 100 : 0;
+      const isDisqualified = team.place === "";
+      const resultPercent =
+        !isDisqualified && winnerScore > 0 ? (team.totalScore / winnerScore) * 100 : 0;
 
       return {
         place: team.place,
         teamName: team.teamName,
         members: team.members.map((_, memberIndex) => {
           const memberData = buildMemberData(team, memberIndex, bazaIndex, eventDate);
-          const isYouth = memberData.age !== undefined && memberData.age <= 18;
-
           return {
             ...memberData.member,
             awardedRank: earnsMsu
               ? "МСУ"
-              : resolveClassificationRank(classificationRow, resultPercent, isYouth),
+              : resolveClassificationRank(classificationRow, resultPercent),
           };
         }),
         score: team.grossScore,
         penalty: team.penalty,
         totalScore: team.totalScore,
         formattedTime: team.formattedTime,
+        isDisqualified,
       };
     });
 
@@ -1386,6 +1449,7 @@ function buildRogainingResultsClasses(
       controlTime: resultsReport.controlTime,
       courseChief: resultsReport.courseChief,
       teams: resultTeams,
+      rankInfoLines,
     };
   });
 }
