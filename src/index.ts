@@ -11,15 +11,15 @@ import { runWatchMode } from "./watch/run-watch-mode";
 
 function writeHtmlOutputs(
   reportType: string,
-  htmlMode: "none" | "view" | "pdf" | "both",
+  htmlMode: "none" | "view" | "pdf",
   viewHtml: string,
   pdfHtml: string,
 ): void {
-  if (htmlMode === "view" || htmlMode === "both") {
+  if (htmlMode === "view") {
     fs.writeFileSync(`${reportType}.html`, viewHtml);
   }
 
-  if (htmlMode === "pdf" || htmlMode === "both") {
+  if (htmlMode === "pdf") {
     fs.writeFileSync(`${reportType}.pdf.html`, pdfHtml);
   }
 }
@@ -36,9 +36,9 @@ async function main(): Promise<void> {
   const logger = createLogger(config);
   logger.info({ version: getAppVersion() }, "iof-reports starting");
 
-  const { inputPath, courseDataPath, report, html, diplomaTemplate } = parseCliArgs(process.argv, logger);
+  const { inputPath, courseDataPath, report, format, html, diplomaTemplate } = parseCliArgs(process.argv, logger);
 
-  logger.info({ file: inputPath, configPath, courseDataPath, report, html, diplomaTemplate }, "Reading XML file");
+  logger.info({ file: inputPath, configPath, courseDataPath, report, format, html, diplomaTemplate }, "Reading XML file");
 
   const xml = fs.readFileSync(inputPath, "utf-8");
   const courseDataXml = courseDataPath ? fs.readFileSync(courseDataPath, "utf-8") : undefined;
@@ -55,10 +55,24 @@ async function main(): Promise<void> {
       generatedReport.viewHtml,
       generatedReport.pdfHtml,
     );
-    await htmlToPdf(generatedReport.pdfHtml, `${generatedReport.reportType}.pdf`);
-    logger.info(
-      `${generatedReport.reportType[0].toUpperCase()}${generatedReport.reportType.slice(1)} PDF generated`,
-    );
+
+    if (format === "pdf") {
+      await htmlToPdf(generatedReport.pdfHtml, `${generatedReport.reportType}.pdf`);
+      logger.info(
+        `${generatedReport.reportType[0].toUpperCase()}${generatedReport.reportType.slice(1)} PDF generated`,
+      );
+    }
+
+    if (format === "docx") {
+      if (!generatedReport.docx) {
+        throw new Error(`${generatedReport.reportType} does not support DOCX export yet.`);
+      }
+
+      fs.writeFileSync(`${generatedReport.reportType}.docx`, generatedReport.docx);
+      logger.info(
+        `${generatedReport.reportType[0].toUpperCase()}${generatedReport.reportType.slice(1)} DOCX generated`,
+      );
+    }
   }
 
   logger.info("Report generation completed successfully");

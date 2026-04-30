@@ -80,6 +80,7 @@ describe("generateRogainingAwardsReportHtml", () => {
     expect(report.viewHtml).toContain(">ALL</h3>");
     expect(report.pdfHtml).toContain("Нагородний протокол рогейну");
     expect(report.pdfHtml).toContain(">ALL</h3>");
+    expect(report.docx?.subarray(0, 2).toString()).toBe("PK");
   });
 });
 

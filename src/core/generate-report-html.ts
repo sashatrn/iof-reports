@@ -6,6 +6,7 @@ import { parseRogainingIof } from "../io/parse-rogaining-iof";
 import { buildIndividualHtml } from "../reports/individual-report";
 import {
   buildRogainingAwardsHtml,
+  buildRogainingAwardsDocx,
   buildRogainingDiplomasHtml,
   buildRogainingScoreEntries,
   buildRogainingHtml,
@@ -22,6 +23,7 @@ export type GeneratedReport = {
   reportType: SingleReportType;
   viewHtml: string;
   pdfHtml: string;
+  docx?: Buffer;
   eventName?: string;
   eventDate?: string;
   itemCount: number;
@@ -145,6 +147,7 @@ export function generateRogainingAwardsReportHtml(
     reportType: "rogaining-awards",
     viewHtml: buildRogainingAwardsHtml(parsed.teams, eventDate, parsed.eventName, "view"),
     pdfHtml: buildRogainingAwardsHtml(parsed.teams, eventDate, parsed.eventName, "pdf"),
+    docx: buildRogainingAwardsDocx(parsed.teams, eventDate, parsed.eventName),
     eventName: parsed.eventName,
     eventDate: toIsoDate(eventDate),
     itemCount: parsed.teams.length,

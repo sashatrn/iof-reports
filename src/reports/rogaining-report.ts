@@ -2,6 +2,7 @@ import path from "path";
 import { AppConfig, loadConfig } from "../config";
 import { CourseControlPoint, ParsedCourseData } from "../io/parse-course-data";
 import { RogainingSplit, RogainingTeam } from "../io/parse-rogaining-iof";
+import { DocxBlock, renderDocx } from "../render/docx";
 import { renderTemplate } from "../render/template-engine";
 import { formatDate } from "../utils/date";
 import { imageToBase64 } from "../utils/image";
@@ -223,6 +224,10 @@ function formatRogainingScoreDateText(date: Date): string {
   const monthName = getUkrainianMonthName(date.getMonth());
 
   return `з "${day}" по "${day}" ${monthName} ${date.getFullYear()} року`;
+}
+
+function stripHtml(value: string): string {
+  return value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
 function rankTeams(teams: RogainingTeam[]): RankedRogainingTeam[] {
@@ -1230,6 +1235,86 @@ export function buildRogainingAwardsHtml(
     officials: config.officials,
     classes,
   });
+}
+
+export function buildRogainingAwardsDocx(
+  teams: RogainingTeam[],
+  eventDate: Date,
+  eventName?: string,
+): Buffer {
+  const config = loadConfig();
+  const normalizedTeams = applyRogainingRules(teams, config);
+  const classes = buildAwardsClasses(normalizedTeams, config);
+  const eventTitle = stripHtml(
+    config.reportHeader.title ??
+      eventName ??
+      `Нагородний протокол рогейну, ${formatDate(eventDate)}`,
+  );
+  const blocks: DocxBlock[] = [
+    {
+      type: "paragraph",
+      text: eventTitle,
+      style: "title",
+    },
+    {
+      type: "paragraph",
+      text: "Нагородний протокол рогейну",
+      style: "subtitle",
+    },
+    {
+      type: "paragraph",
+      text: `${config.reportHeader.location}    ${formatDate(eventDate)}`,
+    },
+  ];
+
+  for (const classGroup of classes) {
+    blocks.push({
+      type: "paragraph",
+      text: classGroup.name,
+      style: "heading",
+    });
+    blocks.push({
+      type: "table",
+      columnWidths: [700, 2300, 1100, 4200, 2200, 900, 1200],
+      rows: [
+        [
+          { text: "Місце" },
+          { text: "Команда" },
+          { text: "Заявл. клас" },
+          { text: "Учасники" },
+          { text: "Регіон" },
+          { text: "Разом" },
+          { text: "Час" },
+        ],
+        ...classGroup.teams.map((team) => [
+          { text: team.place, bold: true },
+          { text: team.teamName, bold: true },
+          { text: team.sourceClassName },
+          { text: team.membersLine },
+          { text: team.organisation },
+          { text: String(team.totalScore), bold: true },
+          { text: team.formattedTime },
+        ]),
+      ],
+    });
+  }
+
+  blocks.push(
+    {
+      type: "paragraph",
+      text: "",
+    },
+    {
+      type: "paragraph",
+      text: `Головний суддя    ${config.officials.chiefJudge}`,
+    },
+    {
+      type: "paragraph",
+      text: `Головний секретар    ${config.officials.chiefSecretary}`,
+    },
+  );
+
+  return renderDocx(blocks, { orientation: "landscape" });
 }
 
 export function buildRogainingDiplomasHtml(

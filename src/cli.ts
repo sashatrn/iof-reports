@@ -8,17 +8,19 @@ export type CliOptions = {
   configPath?: string;
   courseDataPath?: string;
   report: ReportType;
-  html: "none" | "view" | "pdf" | "both";
+  format: "pdf" | "docx";
+  html: "none" | "view" | "pdf";
   diplomaTemplate: "off" | "on";
 };
 
 const REPORT_VALUES = new Set<string>(REPORT_TYPES);
-const HTML_VALUES = new Set<string>(["none", "view", "pdf", "both"]);
+const HTML_VALUES = new Set<string>(["none", "view", "pdf"]);
+const FORMAT_VALUES = new Set<string>(["pdf", "docx"]);
 const DIPLOMA_TEMPLATE_VALUES = new Set<string>(["off", "on"]);
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-splits] [--courses courses.xml] [--html none|view|pdf|both] [--diploma-template off|on]",
+    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-splits] [--format pdf|docx] [--courses courses.xml] [--html none|view|pdf] [--diploma-template off|on]",
   );
 }
 
@@ -47,6 +49,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
   let report: CliOptions["report"] = "all";
   let configPath: string | undefined;
   let courseDataPath: string | undefined;
+  let format: CliOptions["format"] = "pdf";
   let html: CliOptions["html"] = "none";
   let diplomaTemplate: CliOptions["diplomaTemplate"] = "off";
 
@@ -115,13 +118,30 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       if (!value || !HTML_VALUES.has(value)) {
         logger.error(
           { html: value },
-          "Invalid html mode. Expected one of: none, view, pdf, both.",
+          "Invalid html mode. Expected one of: none, view, pdf.",
         );
         printUsage(logger);
         process.exit(1);
       }
 
       html = value as CliOptions["html"];
+      i += 1;
+      continue;
+    }
+
+    if (arg === "--format") {
+      const value = argv[i + 1];
+
+      if (!value || !FORMAT_VALUES.has(value)) {
+        logger.error(
+          { format: value },
+          "Invalid format. Expected one of: pdf, docx.",
+        );
+        printUsage(logger);
+        process.exit(1);
+      }
+
+      format = value as CliOptions["format"];
       i += 1;
       continue;
     }
@@ -182,6 +202,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
     configPath,
     courseDataPath,
     report,
+    format,
     html,
     diplomaTemplate,
   };
