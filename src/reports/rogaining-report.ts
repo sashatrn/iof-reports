@@ -142,6 +142,26 @@ type RogainingResultsClassGroup = {
   rankInfoLines: string[];
 };
 
+type RogainingResultsScoreTeamEntry = {
+  place: string;
+  teamName: string;
+  members: RogainingResultsMemberEntry[];
+  score: number;
+  penalty: number;
+  totalScore: number;
+  formattedTime: string;
+  isDisqualified: boolean;
+  points: number;
+};
+
+type RogainingResultsScoreClassGroup = {
+  name: string;
+  controlCount: number;
+  controlTime: string;
+  courseChief: string;
+  teams: RogainingResultsScoreTeamEntry[];
+};
+
 type RogainingSplitLegEntry = {
   controlCode: string;
   legTime: string;
@@ -1036,6 +1056,7 @@ function buildRogainingScoreReportInfo(
 ): RogainingScoreReportInfo {
   const scoreReport = config.rogaining.scoreReport;
   const competitionName =
+    config.rogaining.competitionName ??
     scoreReport.competitionName ??
     eventName ??
     `Протокол балів рогейну, ${formatDate(eventDate)}`;
@@ -1762,6 +1783,7 @@ export function buildRogainingResultsHtml(
     header: {
       lines: resultsReport.headerLines,
       competitionName:
+        config.rogaining.competitionName ??
         config.reportHeader.title ??
         eventName ??
         baza.eventName ??
@@ -1778,6 +1800,91 @@ export function buildRogainingResultsHtml(
         formattedCourseRank: formatCourseRank(classGroup.courseRank),
       }),
     ),
+  });
+}
+
+function buildRogainingResultsScoreClasses(
+  teams: RogainingTeam[],
+  baza: ParsedUofBaza,
+  eventDate: Date,
+  config: AppConfig,
+): RogainingResultsScoreClassGroup[] {
+  const bazaIndex = buildBazaIndex(baza);
+  const resultsReport = config.rogaining.resultsReport;
+
+  return buildRogainingClasses(teams, config)
+    .filter((classGroup) => classGroup.name !== AGGREGATE_OPEN_CLASS)
+    .filter((classGroup) => getRogainingScorePointsMap(classGroup.name, config) !== undefined)
+    .map((classGroup) => {
+      const pointsMap = getRogainingScorePointsMap(classGroup.name, config)!
+
+      const resultTeams = classGroup.teams
+        .filter((team) => !RESULTS_EXCLUDED_STATUSES.has(team.status))
+        .map((team) => {
+          const isDisqualified = team.place === "";
+          const points = isDisqualified ? 0 : getRogainingScorePoints(team.place, pointsMap);
+
+          return {
+            place: team.place,
+            teamName: team.teamName,
+            members: team.members.map((_, memberIndex) => {
+              const memberData = buildMemberData(team, memberIndex, bazaIndex, eventDate);
+              return { ...memberData.member, awardedRank: "" };
+            }),
+            score: team.grossScore,
+            penalty: team.penalty,
+            totalScore: team.totalScore,
+            formattedTime: team.formattedTime,
+            isDisqualified,
+            points,
+          };
+        });
+
+      return {
+        name: classGroup.name,
+        controlCount: resultsReport.controlCount ?? estimateClassControlCount(classGroup.teams),
+        controlTime: resultsReport.controlTime,
+        courseChief: resultsReport.courseChief,
+        teams: resultTeams,
+      };
+    });
+}
+
+export function buildRogainingResultsScoreHtml(
+  teams: RogainingTeam[],
+  baza: ParsedUofBaza,
+  eventDate: Date,
+  eventName?: string,
+  variant: HtmlVariant = "pdf",
+): string {
+  const config = loadConfig();
+  const normalizedTeams = applyRogainingRules(teams, config);
+  const resultsReport = config.rogaining.resultsReport;
+  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
+  const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
+  void variant;
+
+  return renderTemplate("rogaining-results-score-pdf.njk", {
+    reportTitle: "Протокол результатів змагань з орієнтування",
+    showDefaultHeader: false,
+    showDefaultFooter: false,
+    logo1: imageToBase64(logo1Path),
+    logo2: imageToBase64(logo2Path),
+    header: {
+      lines: resultsReport.headerLines,
+      competitionName:
+        config.rogaining.competitionName ??
+        config.reportHeader.title ??
+        eventName ??
+        baza.eventName ??
+        `Протокол результатів рогейну, ${formatDate(eventDate)}`,
+      title: resultsReport.title,
+      programName: resultsReport.programName,
+      date: formatDate(eventDate),
+      location: config.reportHeader.location,
+    },
+    officials: config.officials,
+    classes: buildRogainingResultsScoreClasses(normalizedTeams, baza, eventDate, config),
   });
 }
 

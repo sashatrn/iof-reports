@@ -19,6 +19,7 @@ export type AppConfig = {
       restrictedControls: string[];
       disqualifiedStatus: string;
     };
+    competitionName?: string;
     scorePoints: RogainingScorePoints;
     scoreReport: {
       sport: string;
