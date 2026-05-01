@@ -75,6 +75,9 @@ export type AppConfig = {
   officials: {
     chiefJudge: string;
     chiefSecretary: string;
+    joury1?: string;
+    joury2?: string;
+    joury3?: string;
   };
 };
 
