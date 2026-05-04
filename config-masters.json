@@ -25,6 +25,20 @@
       "eventInfo": "",
       "programName": "рогейн",
       "departmentName": ""
+    },
+    "resultsReport": {
+      "headerLines": [
+        "Міністерство молоді та спорту",
+        "України Федерація спортивного",
+        "орієнтування України"
+      ],
+      "title": "ПРОТОКОЛ РЕЗУЛЬТАТІВ ЗМАГАНЬ З ОРІЄНТУВАННЯ",
+      "programName": "РОГЕЙН",
+      "courseChief": "Трухній О.А.",
+      "controlCount": 69,
+      "controlTime": "12:00:00",
+      "msuPlaces": [1, 2],
+      "minRegionsForMsu": 6
     }
   },
   "genderMapping": {
@@ -38,7 +52,7 @@
     "location": "м. Коростишів"
   },
   "officials": {
-    "chiefJudge": "Ліпка В.М.",
-    "chiefSecretary": "Трухній О.А."
+    "chiefJudge": "Ліпка В.М., суддя н/к",
+    "chiefSecretary": "Трухній О.А., суддя II-к"
   }
 }

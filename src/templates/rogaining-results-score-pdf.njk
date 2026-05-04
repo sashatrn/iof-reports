@@ -226,7 +226,7 @@
     <div>
       <div>{{ officials.joury1 }}</div><br/>
       <div>{{ officials.joury2 }}</div><br/>
-      <div>{{ officials.joury3 }}</div>
+      {% if officials.joury3 %}<div>{{ officials.joury3 }}</div>{% endif %}
     </div>
   </div>
 </div>
