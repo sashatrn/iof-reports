@@ -235,10 +235,16 @@
   <div class="results-signature-row">
     <div>Судді</div>
     <div>
-      <div>{{ officials.joury1 }}</div><br/>
-      <div>{{ officials.joury2 }}</div><br/>
-      <div>{{ officials.joury3 }}</div>
+      <div>Іванов П.Є., суддя н/к</div>
     </div>
+  </div>
+  <div class="results-signature-row">
+    {% if officials.joury1 %}
+    <div>Журі</div>
+    <div>
+      <div>Машинський С.Р., суддя н/к</div>
+    </div>
+    {% endif %}
   </div>
 </div>
 

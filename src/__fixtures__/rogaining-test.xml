@@ -14576,7 +14576,7 @@
         </Result>
       </TeamMemberResult>
     </TeamResult>
-    <TeamResult>
+    <!-- <TeamResult>
       <EntryId type="MeOS">37</EntryId>
       <Name>Любітелі Прекрасного</Name>
       <Organisation>
@@ -15012,7 +15012,7 @@
           </ServiceRequest>
         </Result>
       </TeamMemberResult>
-    </TeamResult>
+    </TeamResult> -->
   </ClassResult>
   <ClassResult>
     <Class>

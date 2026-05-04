@@ -1812,42 +1812,60 @@ function buildRogainingResultsScoreClasses(
   const bazaIndex = buildBazaIndex(baza);
   const resultsReport = config.rogaining.resultsReport;
 
-  return buildRogainingClasses(teams, config)
+  const eligibleClasses = buildRogainingClasses(teams, config)
     .filter((classGroup) => classGroup.name !== AGGREGATE_OPEN_CLASS)
-    .filter((classGroup) => getRogainingScorePointsMap(classGroup.name, config) !== undefined)
-    .map((classGroup) => {
-      const pointsMap = getRogainingScorePointsMap(classGroup.name, config)!
+    .filter((classGroup) => getRogainingScorePointsMap(classGroup.name, config) !== undefined);
 
-      const resultTeams = classGroup.teams
-        .filter((team) => !RESULTS_EXCLUDED_STATUSES.has(team.status))
-        .map((team) => {
-          const isDisqualified = team.place === "";
-          const points = isDisqualified ? 0 : getRogainingScorePoints(team.place, pointsMap);
+  // Teams that earn points in their own declared class should not get points in other classes
+  const teamsWithOwnClassPoints = new Set<string>();
+  for (const classGroup of eligibleClasses) {
+    const pointsMap = getRogainingScorePointsMap(classGroup.name, config)!;
+    for (const team of classGroup.teams) {
+      if (team.className === classGroup.name && !RESULTS_EXCLUDED_STATUSES.has(team.status)) {
+        const points = team.place !== "" ? getRogainingScorePoints(team.place, pointsMap) : 0;
+        if (points > 0) {
+          teamsWithOwnClassPoints.add(team.teamName);
+        }
+      }
+    }
+  }
 
-          return {
-            place: team.place,
-            teamName: team.teamName,
-            members: team.members.map((_, memberIndex) => {
-              const memberData = buildMemberData(team, memberIndex, bazaIndex, eventDate);
-              return { ...memberData.member, awardedRank: "" };
-            }),
-            score: team.grossScore,
-            penalty: team.penalty,
-            totalScore: team.totalScore,
-            formattedTime: team.formattedTime,
-            isDisqualified,
-            points,
-          };
-        });
+  return eligibleClasses.map((classGroup) => {
+    const pointsMap = getRogainingScorePointsMap(classGroup.name, config)!;
 
-      return {
-        name: classGroup.name,
-        controlCount: resultsReport.controlCount ?? estimateClassControlCount(classGroup.teams),
-        controlTime: resultsReport.controlTime,
-        courseChief: resultsReport.courseChief,
-        teams: resultTeams,
-      };
-    });
+    const resultTeams = classGroup.teams
+      .filter((team) => !RESULTS_EXCLUDED_STATUSES.has(team.status))
+      .map((team) => {
+        const isDisqualified = team.place === "";
+        const earnedInOwnClass =
+          team.className !== classGroup.name && teamsWithOwnClassPoints.has(team.teamName);
+        const points =
+          isDisqualified || earnedInOwnClass ? 0 : getRogainingScorePoints(team.place, pointsMap);
+
+        return {
+          place: team.place,
+          teamName: team.teamName,
+          members: team.members.map((_, memberIndex) => {
+            const memberData = buildMemberData(team, memberIndex, bazaIndex, eventDate);
+            return { ...memberData.member, awardedRank: "" };
+          }),
+          score: team.grossScore,
+          penalty: team.penalty,
+          totalScore: team.totalScore,
+          formattedTime: team.formattedTime,
+          isDisqualified,
+          points,
+        };
+      });
+
+    return {
+      name: classGroup.name,
+      controlCount: resultsReport.controlCount ?? estimateClassControlCount(classGroup.teams),
+      controlTime: resultsReport.controlTime,
+      courseChief: resultsReport.courseChief,
+      teams: resultTeams,
+    };
+  });
 }
 
 export function buildRogainingResultsScoreHtml(
