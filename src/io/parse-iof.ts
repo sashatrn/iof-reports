@@ -11,10 +11,20 @@ export type Participant = {
   name: string;
   club: string;
   timeSec?: number;
+  timeBehindSec?: number;
   position?: number;
   status: string;
   points: number;
 };
+
+function toOptionalNumber(value: unknown): number | undefined {
+  if (value === undefined || value === null || value === "") {
+    return undefined;
+  }
+
+  const numberValue = Number(value);
+  return Number.isNaN(numberValue) ? undefined : numberValue;
+}
 
 export function parseIof(xml: string): ParsedIof {
   const parser = new XMLParser({
@@ -48,8 +58,9 @@ export function parseIof(xml: string): ParsedIof {
         className,
         name: `${pr.Person.Name.Given} ${pr.Person.Name.Family}`,
         club: pr.Organisation?.Name ?? "Unknown",
-        timeSec: result?.Time ? Number(result.Time) : undefined,
-        position: result?.Position ? Number(result.Position) : undefined,
+        timeSec: toOptionalNumber(result?.Time),
+        timeBehindSec: toOptionalNumber(result?.TimeBehind),
+        position: toOptionalNumber(result?.Position),
         status: result?.Status ?? "Unknown",
         points: 0,
       });

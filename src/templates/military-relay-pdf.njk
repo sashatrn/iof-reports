@@ -1,0 +1,38 @@
+{% extends "base-pdf.njk" %}
+
+{% block content %}
+
+{% for class in classes %}
+<div class="class-block">
+  <h3>{{ class.name }}</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Місце</th>
+        <th>Команда</th>
+        <th>Учасники</th>
+        <th>Організація</th>
+        <th>Час</th>
+        <th>Бали</th>
+        <th>Статус</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for team in class.teams %}
+      <tr>
+        <td><strong>{{ team.place }}</strong></td>
+        <td><strong>{{ team.teamName }}</strong></td>
+        <td>{{ team.membersLine }}</td>
+        <td>{{ team.organisation }}</td>
+        <td>{{ team.formattedTime }}</td>
+        <td><strong>{{ team.points }}</strong></td>
+        <td>{{ team.status }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endfor %}
+
+{% endblock %}

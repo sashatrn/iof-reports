@@ -6,6 +6,13 @@ import { parseRogainingIof } from "../io/parse-rogaining-iof";
 import { parseUofBaza } from "../io/parse-uof-baza";
 import { buildIndividualHtml } from "../reports/individual-report";
 import {
+  buildMilitaryIndividualHtml,
+  buildMilitaryRelayClasses,
+  buildMilitaryRelayHtml,
+  buildMilitaryTeamHtml,
+  buildMilitaryTeamStandings,
+} from "../reports/military-report";
+import {
   buildRogainingAwardsHtml,
   buildRogainingAwardsDocx,
   buildRogainingDiplomasHtml,
@@ -18,6 +25,7 @@ import {
   buildRogainingSplitsHtml,
 } from "../reports/rogaining-report";
 import { buildTeamHtml } from "../reports/team-report";
+import { militaryIndividualPointsFromPosition } from "../scoring/military-individual-points";
 import { pointsFromPosition } from "../scoring/points";
 import { computeTeamResults } from "../scoring/team";
 import { ReportType, SingleReportType } from "../report-types";
@@ -26,6 +34,7 @@ export type GeneratedReport = {
   reportType: SingleReportType;
   viewHtml: string;
   pdfHtml: string;
+  supportsView?: boolean;
   docx?: Buffer;
   eventName?: string;
   eventDate?: string;
@@ -37,6 +46,7 @@ type GenerateReportOptions = {
   includeDiplomaBackground?: boolean;
   courseDataXml?: string;
   bazaXml?: string | Buffer;
+  relayXml?: string;
 };
 
 function normalizeEventDate(eventDate: Date | undefined, logger?: Logger): Date {
@@ -52,7 +62,13 @@ function toIsoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-function parseParticipantsXml(xml: string, logger?: Logger) {
+type PointsCalculator = (position: number | undefined, status: string) => number;
+
+function parseParticipantsXml(
+  xml: string,
+  logger?: Logger,
+  pointsCalculator: PointsCalculator = pointsFromPosition,
+) {
   const parsed = parseIof(xml);
   const eventDate = normalizeEventDate(parsed.eventDate, logger);
 
@@ -68,12 +84,32 @@ function parseParticipantsXml(xml: string, logger?: Logger) {
   );
 
   for (const participant of parsed.participants) {
-    participant.points = pointsFromPosition(participant.position, participant.status);
+    participant.points = pointsCalculator(participant.position, participant.status);
   }
 
   return {
     participants: parsed.participants,
     eventDate,
+  };
+}
+
+function parseRelayXml(xml: string, logger?: Logger) {
+  const parsed = parseRogainingIof(xml);
+  const eventDate = normalizeEventDate(parsed.eventDate, logger);
+
+  if (parsed.teams.length === 0) {
+    throw new Error("No team results found in IOF XML.");
+  }
+
+  logger?.info(
+    { count: parsed.teams.length },
+    "Relay teams parsed successfully",
+  );
+
+  return {
+    teams: parsed.teams,
+    eventDate,
+    eventName: parsed.eventName,
   };
 }
 
@@ -108,6 +144,72 @@ export function generateTeamReportHtml(
     pdfHtml: buildTeamHtml(teamResults, eventDate, "pdf"),
     eventDate: toIsoDate(eventDate),
     itemCount: teamResults.men.length + teamResults.women.length,
+  };
+}
+
+export function generateMilitaryIndividualReportHtml(
+  xml: string,
+  options: GenerateReportOptions = {},
+): GeneratedReport {
+  const { logger } = options;
+  const { participants, eventDate } = parseParticipantsXml(
+    xml,
+    logger,
+    militaryIndividualPointsFromPosition,
+  );
+
+  return {
+    reportType: "military-individual",
+    viewHtml: buildMilitaryIndividualHtml(participants, eventDate, "view"),
+    pdfHtml: buildMilitaryIndividualHtml(participants, eventDate, "pdf"),
+    eventDate: toIsoDate(eventDate),
+    itemCount: participants.length,
+  };
+}
+
+export function generateMilitaryRelayReportHtml(
+  xml: string,
+  options: GenerateReportOptions = {},
+): GeneratedReport {
+  const { logger } = options;
+  const { teams, eventDate, eventName } = parseRelayXml(xml, logger);
+
+  return {
+    reportType: "military-relay",
+    viewHtml: buildMilitaryRelayHtml(teams, eventDate, "view"),
+    pdfHtml: buildMilitaryRelayHtml(teams, eventDate, "pdf"),
+    eventName,
+    eventDate: toIsoDate(eventDate),
+    itemCount: buildMilitaryRelayClasses(teams).flatMap((classGroup) => classGroup.teams).length,
+  };
+}
+
+export function generateMilitaryTeamReportHtml(
+  individualXml: string,
+  options: GenerateReportOptions = {},
+): GeneratedReport {
+  const { logger, relayXml } = options;
+
+  if (!relayXml) {
+    throw new Error("military-team report requires a relay/team IOF XML file.");
+  }
+
+  const { participants, eventDate } = parseParticipantsXml(
+    individualXml,
+    logger,
+    militaryIndividualPointsFromPosition,
+  );
+  const { teams: relayTeams, eventName } = parseRelayXml(relayXml, logger);
+  const html = buildMilitaryTeamHtml(participants, relayTeams, eventDate);
+
+  return {
+    reportType: "military-team",
+    viewHtml: html,
+    pdfHtml: html,
+    supportsView: false,
+    eventName,
+    eventDate: toIsoDate(eventDate),
+    itemCount: buildMilitaryTeamStandings(participants, relayTeams).length,
   };
 }
 
@@ -319,6 +421,12 @@ export function generateReportHtml(
       return generateRogainingResultsScoreReportHtml(xml, options);
     case "rogaining-splits":
       return generateRogainingSplitsReportHtml(xml, options);
+    case "military-individual":
+      return generateMilitaryIndividualReportHtml(xml, options);
+    case "military-relay":
+      return generateMilitaryRelayReportHtml(xml, options);
+    case "military-team":
+      return generateMilitaryTeamReportHtml(xml, options);
   }
 }
 

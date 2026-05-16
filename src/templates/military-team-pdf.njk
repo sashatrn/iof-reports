@@ -1,0 +1,28 @@
+{% extends "base-pdf.njk" %}
+
+{% block content %}
+
+<table>
+  <thead>
+    <tr>
+      <th>Місце</th>
+      <th>Команда</th>
+      <th>Індивідуальні бали</th>
+      <th>Естафетні бали</th>
+      <th>Сума</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for standing in standings %}
+    <tr>
+      <td><strong>{{ standing.place }}</strong></td>
+      <td>{{ standing.organisation }}</td>
+      <td>{{ standing.individualPoints }}</td>
+      <td>{{ standing.relayPoints }}</td>
+      <td><strong>{{ standing.totalPoints }}</strong></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

@@ -5,6 +5,7 @@ import { ReportType, REPORT_TYPES } from "./report-types";
 
 export type CliOptions = {
   inputPath: string;
+  relayInputPath?: string;
   configPath?: string;
   courseDataPath?: string;
   bazaPath?: string;
@@ -21,7 +22,7 @@ const DIPLOMA_TEMPLATE_VALUES = new Set<string>(["off", "on"]);
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-results|rogaining-splits] [--format pdf|docx] [--courses courses.xml] [--baza baza.xml] [--html none|view|pdf] [--diploma-template off|on]",
+    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-results|rogaining-results-score|rogaining-splits|military-individual|military-relay|military-team] [--format pdf|docx] [--courses courses.xml] [--baza baza.xml] [--relay relay.xml] [--html none|view|pdf] [--diploma-template off|on]",
   );
 }
 
@@ -47,6 +48,7 @@ export function extractConfigPathArg(argv: string[]): string | undefined {
 
 export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
   let input: string | undefined;
+  let relayInputPath: string | undefined;
   let report: CliOptions["report"] = "all";
   let configPath: string | undefined;
   let courseDataPath: string | undefined;
@@ -75,7 +77,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       if (!value || !REPORT_VALUES.has(value)) {
         logger.error(
           { report: value },
-          "Invalid report type. Expected one of: all, individual, team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-results, rogaining-splits.",
+          "Invalid report type. Expected one of: all, individual, team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-results, rogaining-results-score, rogaining-splits, military-individual, military-relay, military-team.",
         );
         printUsage(logger);
         process.exit(1);
@@ -110,6 +112,20 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       }
 
       courseDataPath = path.resolve(process.cwd(), value);
+      i += 1;
+      continue;
+    }
+
+    if (arg === "--relay" || arg === "--relay-xml" || arg === "--team-xml") {
+      const value = argv[i + 1];
+
+      if (!value) {
+        logger.error("No relay/team IOF XML file provided for --relay.");
+        printUsage(logger);
+        process.exit(1);
+      }
+
+      relayInputPath = path.resolve(process.cwd(), value);
       i += 1;
       continue;
     }
@@ -212,6 +228,11 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
     process.exit(1);
   }
 
+  if (relayInputPath && !fs.existsSync(relayInputPath)) {
+    logger.error({ path: relayInputPath }, "Relay/team IOF XML file not found.");
+    process.exit(1);
+  }
+
   if (report === "rogaining-splits" && !courseDataPath) {
     logger.error("rogaining-splits report requires --courses <courses.xml>.");
     printUsage(logger);
@@ -224,8 +245,15 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
     process.exit(1);
   }
 
+  if (report === "military-team" && !relayInputPath) {
+    logger.error("military-team report requires --relay <relay.xml>.");
+    printUsage(logger);
+    process.exit(1);
+  }
+
   return {
     inputPath: absolutePath,
+    relayInputPath,
     configPath,
     courseDataPath,
     bazaPath,

@@ -14,8 +14,9 @@ function writeHtmlOutputs(
   htmlMode: "none" | "view" | "pdf",
   viewHtml: string,
   pdfHtml: string,
+  supportsView = true,
 ): void {
-  if (htmlMode === "view") {
+  if (htmlMode === "view" && supportsView) {
     fs.writeFileSync(`${reportType}.html`, viewHtml);
   }
 
@@ -36,11 +37,12 @@ async function main(): Promise<void> {
   const logger = createLogger(config);
   logger.info({ version: getAppVersion() }, "iof-reports starting");
 
-  const { inputPath, courseDataPath, bazaPath, report, format, html, diplomaTemplate } = parseCliArgs(process.argv, logger);
+  const { inputPath, relayInputPath, courseDataPath, bazaPath, report, format, html, diplomaTemplate } = parseCliArgs(process.argv, logger);
 
-  logger.info({ file: inputPath, configPath, courseDataPath, bazaPath, report, format, html, diplomaTemplate }, "Reading XML file");
+  logger.info({ file: inputPath, configPath, relayInputPath, courseDataPath, bazaPath, report, format, html, diplomaTemplate }, "Reading XML file");
 
   const xml = fs.readFileSync(inputPath, "utf-8");
+  const relayXml = relayInputPath ? fs.readFileSync(relayInputPath, "utf-8") : undefined;
   const courseDataXml = courseDataPath ? fs.readFileSync(courseDataPath, "utf-8") : undefined;
   const bazaXml = bazaPath ? fs.readFileSync(bazaPath) : undefined;
   const generatedReports = generateReportsHtml(xml, report, {
@@ -48,6 +50,7 @@ async function main(): Promise<void> {
     includeDiplomaBackground: diplomaTemplate === "on",
     courseDataXml,
     bazaXml,
+    relayXml,
   });
 
   for (const generatedReport of generatedReports) {
@@ -56,6 +59,7 @@ async function main(): Promise<void> {
       html,
       generatedReport.viewHtml,
       generatedReport.pdfHtml,
+      generatedReport.supportsView,
     );
 
     if (format === "pdf") {

@@ -3,6 +3,9 @@ import path from "path";
 import { describe, expect, it } from "vitest";
 import {
   generateIndividualReportHtml,
+  generateMilitaryIndividualReportHtml,
+  generateMilitaryRelayReportHtml,
+  generateMilitaryTeamReportHtml,
   generateReportHtml,
   generateReportsHtml,
   generateRogainingAwardsReportHtml,
@@ -71,6 +74,53 @@ describe("generateTeamReportHtml", () => {
     expect(report.pdfHtml).toContain("Командний протокол");
     expect(report.viewHtml).toContain('class="page"');
     expect(report.pdfHtml).toContain("@page");
+  });
+});
+
+describe("generateMilitaryIndividualReportHtml", () => {
+  it("builds military individual report html from IOF XML", () => {
+    const report = generateMilitaryIndividualReportHtml(sampleXml);
+
+    expect(report.reportType).toBe("military-individual");
+    expect(report.itemCount).toBeGreaterThan(0);
+    expect(report.viewHtml).toContain("Довга дистанція");
+    expect(report.viewHtml).toContain("Ч 5-6");
+    expect(report.viewHtml).toContain("<th>Відставання</th>");
+    expect(report.viewHtml).toContain("<td>+0:08</td>");
+    expect(report.pdfHtml).toContain("@page");
+  });
+});
+
+describe("generateMilitaryRelayReportHtml", () => {
+  it("builds military relay report html from TeamResult IOF XML", () => {
+    const report = generateMilitaryRelayReportHtml(rogainingXml);
+
+    expect(report.reportType).toBe("military-relay");
+    expect(report.itemCount).toBeGreaterThan(0);
+    expect(report.viewHtml).toContain("Естафетний протокол Збройних Сил");
+    expect(report.viewHtml).toContain("<th>Учасники</th>");
+    expect(report.pdfHtml).toContain("@page");
+  });
+});
+
+describe("generateMilitaryTeamReportHtml", () => {
+  it("builds military team summary html from individual and relay XML files", () => {
+    const report = generateMilitaryTeamReportHtml(sampleXml, {
+      relayXml: rogainingXml,
+    });
+
+    expect(report.reportType).toBe("military-team");
+    expect(report.supportsView).toBe(false);
+    expect(report.itemCount).toBeGreaterThan(0);
+    expect(report.pdfHtml).toContain("Командний підсумок Збройних Сил");
+    expect(report.pdfHtml).toContain("<th>Індивідуальні бали</th>");
+    expect(report.pdfHtml).toContain("<th>Естафетні бали</th>");
+  });
+
+  it("requires relay/team XML", () => {
+    expect(() => generateMilitaryTeamReportHtml(sampleXml)).toThrow(
+      "relay/team IOF XML",
+    );
   });
 });
 
@@ -238,5 +288,17 @@ describe("generateReportHtml", () => {
 
     expect(report.reportType).toBe("rogaining-splits");
     expect(report.viewHtml).toContain("Спліти рогейну");
+  });
+
+  it("dispatches to military reports", () => {
+    const individualReport = generateReportHtml(sampleXml, "military-individual");
+    const relayReport = generateReportHtml(rogainingXml, "military-relay");
+    const teamReport = generateReportHtml(sampleXml, "military-team", {
+      relayXml: rogainingXml,
+    });
+
+    expect(individualReport.reportType).toBe("military-individual");
+    expect(relayReport.reportType).toBe("military-relay");
+    expect(teamReport.reportType).toBe("military-team");
   });
 });

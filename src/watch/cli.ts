@@ -17,7 +17,7 @@ export type WatchOptions = {
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-splits> [--config config.json] [--courses courses.xml] [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
+    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-splits|military-individual|military-relay> [--config config.json] [--courses courses.xml] [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
   );
 }
 
@@ -64,14 +64,18 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
       if (!value || !isSingleReportType(value)) {
         logger.error(
           { report: value },
-          "Invalid watch report type. Expected one of: individual, team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-splits.",
+          "Invalid watch report type. Expected one of: individual, team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-splits, military-individual, military-relay.",
         );
         printUsage(logger);
         process.exit(1);
       }
 
-      if (value === "rogaining-results") {
-        logger.error("rogaining-results is not supported in watch mode yet. Use the regular CLI with --baza <baza.xml>.");
+      if (
+        value === "rogaining-results" ||
+        value === "rogaining-results-score" ||
+        value === "military-team"
+      ) {
+        logger.error(`${value} is not supported in watch mode yet. Use the regular CLI with the required companion XML file.`);
         printUsage(logger);
         process.exit(1);
       }

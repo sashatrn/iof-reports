@@ -9,6 +9,9 @@ export const REPORT_TYPES = [
   "rogaining-results",
   "rogaining-results-score",
   "rogaining-splits",
+  "military-individual",
+  "military-relay",
+  "military-team",
 ] as const;
 
 export type ReportType = (typeof REPORT_TYPES)[number];
@@ -28,6 +31,9 @@ export function isSingleReportType(value: string): value is SingleReportType {
     value === "rogaining-score" ||
     value === "rogaining-results" ||
     value === "rogaining-results-score" ||
-    value === "rogaining-splits"
+    value === "rogaining-splits" ||
+    value === "military-individual" ||
+    value === "military-relay" ||
+    value === "military-team"
   );
 }
