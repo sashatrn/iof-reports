@@ -111,10 +111,110 @@
     h3 {
       margin: 3mm 0 1mm 0;
     }
+
+    h4 {
+      font-size: 10pt;
+      margin: 2mm 0 1mm 0;
+    }
+
+    .score-doc-title {
+      text-align: center;
+      font-size: 14pt;
+      margin: 0;
+    }
+
+    .score-doc-subtitle {
+      text-align: center;
+      font-size: 12pt;
+      margin: 0 0 5mm 0;
+    }
+
+    .score-doc-meta {
+      margin-bottom: 4mm;
+    }
+
+    .score-doc-meta-row {
+      display: grid;
+      grid-template-columns: 7mm 1fr;
+      column-gap: 1mm;
+      margin-bottom: 1mm;
+    }
+
+    .score-doc-meta-number {
+      text-align: right;
+    }
+
+    .score-doc-meta-extra {
+      margin-top: 1mm;
+    }
+
+    .score-doc-section-title {
+      margin: 3mm 0 2mm 0;
+      font-size: 10pt;
+      font-weight: 700;
+    }
+
+    .score-doc-results-title {
+      margin: 3mm 0 2mm 0;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .score-doc-results th,
+    .score-doc-results td,
+    .score-doc-region-groups th,
+    .score-doc-region-groups td {
+      font-size: 7.2pt;
+      padding: 0.45mm;
+    }
+
+    .score-doc-region-groups {
+      margin-bottom: 3mm;
+    }
+
+    .score-doc-region-groups .score-doc-number-cell {
+      width: 8mm;
+      text-align: center;
+    }
+
+    .score-doc-points-cell,
+    .score-doc-place-cell {
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .score-doc-signatures {
+      margin-top: 8mm;
+    }
+
+    .score-doc-signature-row {
+      display: grid;
+      grid-template-columns: 75mm 1fr;
+      align-items: center;
+      margin-bottom: 5mm;
+    }
+
+    .score-doc-footer-date {
+      margin-top: 3mm;
+    }
+
+    .split-team {
+      margin-bottom: 6mm;
+    }
+
+    .split-team:not(:first-child) {
+      break-before: page;
+      page-break-before: always;
+    }
+
+    .split-summary td {
+      font-size: 8pt;
+    }
   </style>
 </head>
 <body>
 
+{% if showDefaultHeader !== false %}
 <div class="top-content">
   <div class="header-brand">
     <div class="logo-slot">
@@ -149,9 +249,11 @@
     <div>{{ event.date }}</div>
   </div>
 </div>
+{% endif %}
 
 {% block content %}{% endblock %}
 
+{% if showDefaultFooter !== false %}
 <div class="footer">
   <div class="official-row">
     <div>Головний суддя</div>
@@ -163,6 +265,7 @@
     <div>{{ officials.chiefSecretary }}</div>
   </div>
 </div>
+{% endif %}
 
 </body>
 </html>

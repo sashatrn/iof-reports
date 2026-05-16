@@ -3,23 +3,23 @@ import fs from "fs";
 
 import { htmlToPdf } from "./render/pdf";
 import { getAppVersion } from "./app-version";
-import { loadConfig } from "./config";
+import { loadConfig, setConfigPath } from "./config";
 import { createLogger } from "./logger";
-import { parseCliArgs } from "./cli";
+import { extractConfigPathArg, parseCliArgs } from "./cli";
 import { generateReportsHtml } from "./core/generate-report-html";
 import { runWatchMode } from "./watch/run-watch-mode";
 
 function writeHtmlOutputs(
   reportType: string,
-  htmlMode: "none" | "view" | "pdf" | "both",
+  htmlMode: "none" | "view" | "pdf",
   viewHtml: string,
   pdfHtml: string,
 ): void {
-  if (htmlMode === "view" || htmlMode === "both") {
+  if (htmlMode === "view") {
     fs.writeFileSync(`${reportType}.html`, viewHtml);
   }
 
-  if (htmlMode === "pdf" || htmlMode === "both") {
+  if (htmlMode === "pdf") {
     fs.writeFileSync(`${reportType}.pdf.html`, pdfHtml);
   }
 }
@@ -30,18 +30,24 @@ async function main(): Promise<void> {
     return;
   }
 
+  const configPath = extractConfigPathArg(process.argv);
+  setConfigPath(configPath);
   const config = loadConfig();
   const logger = createLogger(config);
   logger.info({ version: getAppVersion() }, "iof-reports starting");
 
-  const { inputPath, report, html, diplomaTemplate } = parseCliArgs(process.argv, logger);
+  const { inputPath, courseDataPath, bazaPath, report, format, html, diplomaTemplate } = parseCliArgs(process.argv, logger);
 
-  logger.info({ file: inputPath, report, html, diplomaTemplate }, "Reading XML file");
+  logger.info({ file: inputPath, configPath, courseDataPath, bazaPath, report, format, html, diplomaTemplate }, "Reading XML file");
 
   const xml = fs.readFileSync(inputPath, "utf-8");
+  const courseDataXml = courseDataPath ? fs.readFileSync(courseDataPath, "utf-8") : undefined;
+  const bazaXml = bazaPath ? fs.readFileSync(bazaPath) : undefined;
   const generatedReports = generateReportsHtml(xml, report, {
     logger,
     includeDiplomaBackground: diplomaTemplate === "on",
+    courseDataXml,
+    bazaXml,
   });
 
   for (const generatedReport of generatedReports) {
@@ -51,10 +57,24 @@ async function main(): Promise<void> {
       generatedReport.viewHtml,
       generatedReport.pdfHtml,
     );
-    await htmlToPdf(generatedReport.pdfHtml, `${generatedReport.reportType}.pdf`);
-    logger.info(
-      `${generatedReport.reportType[0].toUpperCase()}${generatedReport.reportType.slice(1)} PDF generated`,
-    );
+
+    if (format === "pdf") {
+      await htmlToPdf(generatedReport.pdfHtml, `${generatedReport.reportType}.pdf`);
+      logger.info(
+        `${generatedReport.reportType[0].toUpperCase()}${generatedReport.reportType.slice(1)} PDF generated`,
+      );
+    }
+
+    if (format === "docx") {
+      if (!generatedReport.docx) {
+        throw new Error(`${generatedReport.reportType} does not support DOCX export yet.`);
+      }
+
+      fs.writeFileSync(`${generatedReport.reportType}.docx`, generatedReport.docx);
+      logger.info(
+        `${generatedReport.reportType[0].toUpperCase()}${generatedReport.reportType.slice(1)} DOCX generated`,
+      );
+    }
   }
 
   logger.info("Report generation completed successfully");

@@ -1,12 +1,21 @@
 import { Logger } from "pino";
 import { loadConfig } from "../config";
+import { parseCourseData } from "../io/parse-course-data";
 import { parseIof } from "../io/parse-iof";
 import { parseRogainingIof } from "../io/parse-rogaining-iof";
+import { parseUofBaza } from "../io/parse-uof-baza";
 import { buildIndividualHtml } from "../reports/individual-report";
 import {
   buildRogainingAwardsHtml,
+  buildRogainingAwardsDocx,
   buildRogainingDiplomasHtml,
+  buildRogainingScoreEntries,
   buildRogainingHtml,
+  buildRogainingResultsHtml,
+  buildRogainingResultsScoreHtml,
+  buildRogainingScoreHtml,
+  buildRogainingSplitTeamEntries,
+  buildRogainingSplitsHtml,
 } from "../reports/rogaining-report";
 import { buildTeamHtml } from "../reports/team-report";
 import { pointsFromPosition } from "../scoring/points";
@@ -17,6 +26,7 @@ export type GeneratedReport = {
   reportType: SingleReportType;
   viewHtml: string;
   pdfHtml: string;
+  docx?: Buffer;
   eventName?: string;
   eventDate?: string;
   itemCount: number;
@@ -25,6 +35,8 @@ export type GeneratedReport = {
 type GenerateReportOptions = {
   logger?: Logger;
   includeDiplomaBackground?: boolean;
+  courseDataXml?: string;
+  bazaXml?: string | Buffer;
 };
 
 function normalizeEventDate(eventDate: Date | undefined, logger?: Logger): Date {
@@ -139,6 +151,7 @@ export function generateRogainingAwardsReportHtml(
     reportType: "rogaining-awards",
     viewHtml: buildRogainingAwardsHtml(parsed.teams, eventDate, parsed.eventName, "view"),
     pdfHtml: buildRogainingAwardsHtml(parsed.teams, eventDate, parsed.eventName, "pdf"),
+    docx: buildRogainingAwardsDocx(parsed.teams, eventDate, parsed.eventName),
     eventName: parsed.eventName,
     eventDate: toIsoDate(eventDate),
     itemCount: parsed.teams.length,
@@ -172,6 +185,116 @@ export function generateRogainingDiplomasReportHtml(
   };
 }
 
+export function generateRogainingScoreReportHtml(
+  xml: string,
+  options: GenerateReportOptions = {},
+): GeneratedReport {
+  const { logger } = options;
+  const parsed = parseRogainingIof(xml);
+  const eventDate = normalizeEventDate(parsed.eventDate, logger);
+
+  logger?.info(
+    { count: parsed.teams.length },
+    "Rogaining teams parsed successfully for score report",
+  );
+
+  return {
+    reportType: "rogaining-score",
+    viewHtml: buildRogainingScoreHtml(parsed.teams, eventDate, parsed.eventName, "view"),
+    pdfHtml: buildRogainingScoreHtml(parsed.teams, eventDate, parsed.eventName, "pdf"),
+    eventName: parsed.eventName,
+    eventDate: toIsoDate(eventDate),
+    itemCount: buildRogainingScoreEntries(parsed.teams).length,
+  };
+}
+
+export function generateRogainingResultsReportHtml(
+  xml: string,
+  options: GenerateReportOptions = {},
+): GeneratedReport {
+  const { logger, bazaXml } = options;
+
+  if (!bazaXml) {
+    throw new Error("rogaining-results report requires a UOF baza XML file.");
+  }
+
+  const parsed = parseRogainingIof(xml);
+  const baza = parseUofBaza(bazaXml);
+  const eventDate = normalizeEventDate(parsed.eventDate, logger);
+
+  logger?.info(
+    { count: parsed.teams.length, bazaSportsmen: baza.sportsmen.length },
+    "Rogaining teams and UOF baza parsed successfully for results report",
+  );
+
+  return {
+    reportType: "rogaining-results",
+    viewHtml: buildRogainingResultsHtml(parsed.teams, baza, eventDate, parsed.eventName, "view"),
+    pdfHtml: buildRogainingResultsHtml(parsed.teams, baza, eventDate, parsed.eventName, "pdf"),
+    eventName: parsed.eventName,
+    eventDate: toIsoDate(eventDate),
+    itemCount: parsed.teams.length,
+  };
+}
+
+export function generateRogainingResultsScoreReportHtml(
+  xml: string,
+  options: GenerateReportOptions = {},
+): GeneratedReport {
+  const { logger, bazaXml } = options;
+
+  if (!bazaXml) {
+    throw new Error("rogaining-results-score report requires a UOF baza XML file.");
+  }
+
+  const parsed = parseRogainingIof(xml);
+  const baza = parseUofBaza(bazaXml);
+  const eventDate = normalizeEventDate(parsed.eventDate, logger);
+
+  logger?.info(
+    { count: parsed.teams.length, bazaSportsmen: baza.sportsmen.length },
+    "Rogaining teams and UOF baza parsed successfully for results-score report",
+  );
+
+  return {
+    reportType: "rogaining-results-score",
+    viewHtml: buildRogainingResultsScoreHtml(parsed.teams, baza, eventDate, parsed.eventName, "view"),
+    pdfHtml: buildRogainingResultsScoreHtml(parsed.teams, baza, eventDate, parsed.eventName, "pdf"),
+    eventName: parsed.eventName,
+    eventDate: toIsoDate(eventDate),
+    itemCount: parsed.teams.length,
+  };
+}
+
+export function generateRogainingSplitsReportHtml(
+  xml: string,
+  options: GenerateReportOptions = {},
+): GeneratedReport {
+  const { logger, courseDataXml } = options;
+
+  if (!courseDataXml) {
+    throw new Error("rogaining-splits report requires a CourseData XML file.");
+  }
+
+  const parsed = parseRogainingIof(xml);
+  const courseData = parseCourseData(courseDataXml);
+  const eventDate = normalizeEventDate(parsed.eventDate, logger);
+
+  logger?.info(
+    { count: parsed.teams.length, controls: courseData.controls.length },
+    "Rogaining teams and course data parsed successfully for splits report",
+  );
+
+  return {
+    reportType: "rogaining-splits",
+    viewHtml: buildRogainingSplitsHtml(parsed.teams, courseData, eventDate, parsed.eventName, "view"),
+    pdfHtml: buildRogainingSplitsHtml(parsed.teams, courseData, eventDate, parsed.eventName, "pdf"),
+    eventName: parsed.eventName,
+    eventDate: toIsoDate(eventDate),
+    itemCount: buildRogainingSplitTeamEntries(parsed.teams, courseData).length,
+  };
+}
+
 export function generateReportHtml(
   xml: string,
   reportType: SingleReportType,
@@ -188,6 +311,14 @@ export function generateReportHtml(
       return generateRogainingAwardsReportHtml(xml, options);
     case "rogaining-diplomas":
       return generateRogainingDiplomasReportHtml(xml, options);
+    case "rogaining-score":
+      return generateRogainingScoreReportHtml(xml, options);
+    case "rogaining-results":
+      return generateRogainingResultsReportHtml(xml, options);
+    case "rogaining-results-score":
+      return generateRogainingResultsScoreReportHtml(xml, options);
+    case "rogaining-splits":
+      return generateRogainingSplitsReportHtml(xml, options);
   }
 }
 

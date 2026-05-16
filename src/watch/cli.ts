@@ -6,6 +6,8 @@ import { isSingleReportType, SingleReportType } from "../report-types";
 export type WatchOptions = {
   inputDir: string;
   outputDir: string;
+  configPath?: string;
+  courseDataPath?: string;
   reportType: SingleReportType;
   pollMs: number;
   settleMs: number;
@@ -15,13 +17,15 @@ export type WatchOptions = {
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <individual|team|rogaining|rogaining-awards|rogaining-diplomas> [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
+    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-splits> [--config config.json] [--courses courses.xml] [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
   );
 }
 
 export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
   let inputDir = "";
   let outputDir = "";
+  let configPath: string | undefined;
+  let courseDataPath: string | undefined;
   let reportType: SingleReportType | undefined;
   let pollMs = 3000;
   let settleMs = 1000;
@@ -44,17 +48,47 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
       continue;
     }
 
+    if (arg === "--config" || arg === "-c") {
+      if (!value || value.startsWith("-")) {
+        logger.error("No config file provided for --config.");
+        printUsage(logger);
+        process.exit(1);
+      }
+
+      configPath = path.resolve(process.cwd(), value);
+      i += 1;
+      continue;
+    }
+
     if (arg === "--report") {
       if (!value || !isSingleReportType(value)) {
         logger.error(
           { report: value },
-          "Invalid watch report type. Expected one of: individual, team, rogaining, rogaining-awards, rogaining-diplomas.",
+          "Invalid watch report type. Expected one of: individual, team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-splits.",
         );
         printUsage(logger);
         process.exit(1);
       }
 
+      if (value === "rogaining-results") {
+        logger.error("rogaining-results is not supported in watch mode yet. Use the regular CLI with --baza <baza.xml>.");
+        printUsage(logger);
+        process.exit(1);
+      }
+
       reportType = value;
+      i += 1;
+      continue;
+    }
+
+    if (arg === "--courses" || arg === "--course") {
+      if (!value) {
+        logger.error("No CourseData XML file provided for --courses.");
+        printUsage(logger);
+        process.exit(1);
+      }
+
+      courseDataPath = path.resolve(process.cwd(), value);
       i += 1;
       continue;
     }
@@ -108,6 +142,22 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
     process.exit(1);
   }
 
+  if (configPath && !fs.existsSync(configPath)) {
+    logger.error({ path: configPath }, "Config file not found.");
+    process.exit(1);
+  }
+
+  if (courseDataPath && !fs.existsSync(courseDataPath)) {
+    logger.error({ path: courseDataPath }, "CourseData XML file not found.");
+    process.exit(1);
+  }
+
+  if (reportType === "rogaining-splits" && !courseDataPath) {
+    logger.error("rogaining-splits report requires --courses <courses.xml>.");
+    printUsage(logger);
+    process.exit(1);
+  }
+
   if (!Number.isFinite(pollMs) || pollMs < 500) {
     logger.error({ pollMs }, "poll-ms must be a number >= 500.");
     process.exit(1);
@@ -126,6 +176,8 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
   return {
     inputDir,
     outputDir,
+    configPath,
+    courseDataPath,
     reportType,
     pollMs,
     settleMs,

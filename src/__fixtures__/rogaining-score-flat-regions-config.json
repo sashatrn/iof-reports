@@ -1,0 +1,19 @@
+{
+  "rogaining": {
+    "scorePoints": {
+      "adult": {
+        "1": 300,
+        "2": 250,
+        "3": 200,
+        "4": 75,
+        "5": 60,
+        "6": 50,
+        "7": 40,
+        "8": 25
+      }
+    },
+    "scoreReport": {
+      "regionTableLayout": "flat"
+    }
+  }
+}

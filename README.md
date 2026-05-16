@@ -5,6 +5,8 @@ CLI-інструмент для перетворення результатів 
 - Індивідуальний протокол (по класах)
 - Командний протокол (окремо чоловіки та жінки)
 - Протокол результатів рогейну
+- Протокол балів рогейну
+- Протокол сплітів рогейну
 
 Результати в протоколах розраховуються згідно правил національного проекту Пліч-о-пліч
 
@@ -30,20 +32,26 @@ CLI-інструмент для перетворення результатів 
 
 1. Відкрийте командний рядок Windows
 1. Виконайте `iof-reports <results.xml>`, де `<results.xml>` - IOF XML файл результатів.
-1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team`, `--report rogaining`, `--report rogaining-awards` або `--report rogaining-diplomas`.
-1. За потреби згенеруйте HTML-файли: `--html view`, `--html pdf` або `--html both`.
+1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team`, `--report rogaining`, `--report rogaining-awards`, `--report rogaining-diplomas`, `--report rogaining-score`, `--report rogaining-results` або `--report rogaining-splits`.
+1. За потреби вкажіть інший файл конфігурації: `--config my-config.json`. За замовчуванням використовується `config.json` з поточної теки.
+1. За потреби виберіть формат файлу: `--format pdf` або `--format docx`. DOCX наразі підтримується для `rogaining-awards`.
+1. За потреби згенеруйте HTML-файл: `--html view` або `--html pdf`.
 1. Для `rogaining-diplomas` за потреби увімкніть друк фону диплома через `--diploma-template on`. За замовчуванням `off`.
 
-Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`.
-Доступні значення для `--html`: `none` (за замовчуванням), `view`, `pdf`, `both`.
+Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`, `rogaining-score`, `rogaining-results`, `rogaining-splits`.
+Доступні значення для `--html`: `none` (за замовчуванням), `view`, `pdf`.
 
 Приклади:
 
 - `iof-reports results.xml --report rogaining --html view` - створити `rogaining.html` для перегляду
 - `iof-reports results.xml --report rogaining --html pdf` - створити `rogaining.pdf.html` для PDF-рендерингу
-- `iof-reports results.xml --report rogaining --html both` - створити обидва HTML-файли і PDF
 - `iof-reports results.xml --report rogaining-diplomas` - створити PDF для друку на готові дипломи
 - `iof-reports results.xml --report rogaining-diplomas --diploma-template on` - створити дипломи разом із фоновим бланком у PDF
+- `iof-reports results.xml --report rogaining-score` - створити протокол балів учасників рогейну
+- `iof-reports results.xml --config championship-config.json --report rogaining-score` - створити протокол з іншим файлом конфігурації
+- `iof-reports results.xml --report rogaining-results --baza baza.xml` - створити офіційний протокол результатів рогейну з розрахунком виконаних розрядів
+- `iof-reports results.xml --report rogaining-splits --courses courses.xml` - створити протокол сплітів рогейну з відстанями між КП
+- `iof-reports results.xml --report rogaining-awards --format docx` - створити редагований DOCX нагородного протоколу
 
 Якщо є проблема з виводом кіриличних символів в консолі Windows, виконайте команду `chcp 65001` перед запуском додатку.
 
@@ -80,6 +88,9 @@ iof-reports watch \
 - `--settle-ms 1000` - пауза для перевірки, що latest XML уже не дописується
 - `--port 4173` - порт локального HTTP-сервера
 - `--diploma-template off|on` - чи вкладати фон диплома в `rogaining-diplomas`
+- `--courses courses.xml` - файл `CourseData` для `rogaining-splits`
+- `--baza baza.xml` - файл бази УФО для `rogaining-results`; з нього беруться поточні кваліфікації, дати народження, регіони та тренери
+- `--config config.json` - файл конфігурації, за замовчуванням `config.json`
 
 Після запуску відкривайте viewer через браузер:
 
@@ -104,6 +115,24 @@ npm run dev:watch -- --input-dir ./incoming --output-dir ./out --report rogainin
 - `womenPrefixes`
 - `mixPrefixes`
 - `menPrefixes`
+
+Бали для `rogaining-score` налаштовуються в `rogaining.scorePoints`:
+
+- `youthUnder18` - юнаки/дівчата до 18 років включно
+- `youthUnder23` - молодь старше 18 і до 23 років включно
+- `adult` - дорослі класи
+- `masters` - ветеранські класи 45+ і старші
+
+У `rogaining-score` враховуються тільки ті категорії балів, які явно присутні в `scorePoints` завантаженого конфігу. Наприклад, якщо в конфігу є тільки `masters`, то дорослі, молодь і юнаки не додають рядків у протокол балів.
+
+Службові поля звіту `rogaining-score` налаштовуються в `rogaining.scoreReport`: вид спорту, назва змагань, наказ, дата, місце, текст командного місця, назви програми, групи регіонів та підписи.
+
+Формат таблиці регіонів у `rogaining-score` задається через `rogaining.scoreReport.regionTableLayout`:
+
+- `groups` - поточний формат з I, II, III групами
+- `flat` - одна таблиця регіонів у дві колонки та окрема колонка ФСТ/відомств
+
+Для `flat` порядок регіонів можна перевизначити через `rogaining.scoreReport.flatRegions`.
 
 ## Вимоги до проекту
 

@@ -1,0 +1,251 @@
+{% extends "base-pdf.njk" %}
+
+{% block content %}
+
+<style>
+  @page {
+    size: A4 landscape;
+    margin: 8mm 8mm 8mm 8mm;
+  }
+
+  body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 9pt;
+    line-height: 1.08;
+  }
+
+  .results-header {
+    text-align: center;
+    margin-bottom: 4mm;
+  }
+
+  .results-header-line {
+    font-weight: 700;
+  }
+
+  .results-competition {
+    font-weight: 700;
+    margin-top: 2mm;
+  }
+
+  .results-title {
+    font-weight: 700;
+    margin-top: 4mm;
+    text-transform: uppercase;
+  }
+
+  .results-program {
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .results-date-location {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: 5mm;
+    font-size: 10pt;
+  }
+
+  .results-date-location .location {
+    text-align: right;
+  }
+
+  .results-class {
+    margin-bottom: 5mm;
+  }
+
+  .results-class-next {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .results-class-meta {
+    font-weight: 700;
+    margin-bottom: 1mm;
+  }
+
+  .results-course-meta {
+    margin-bottom: 1mm;
+  }
+
+  .rogaining-results-table th,
+  .rogaining-results-table td {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 8.2pt;
+    padding: 0.35mm 0.55mm;
+    border: 0.25mm solid #000;
+    vertical-align: top;
+  }
+
+  .rogaining-results-table th {
+    text-align: center;
+    background: white;
+    font-weight: 700;
+  }
+
+  .results-number {
+    width: 8mm;
+    text-align: center;
+  }
+
+  .results-name {
+    width: 45mm;
+  }
+
+  .results-birthday {
+    width: 24mm;
+    text-align: center;
+  }
+
+  .results-region {
+    width: 34mm;
+  }
+
+  .results-trainer {
+    width: 42mm;
+  }
+
+  .results-score,
+  .results-penalty,
+  .results-total,
+  .results-place {
+    width: 13mm;
+    text-align: center;
+  }
+
+  .results-time {
+    width: 23mm;
+    text-align: center;
+  }
+
+  .results-rank {
+    width: 17mm;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  .results-rank-info {
+    margin-top: 1mm;
+    font-size: 8.2pt;
+  }
+
+  .results-signatures {
+    width: 120mm;
+    margin-top: 8mm;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .results-signature-row {
+    display: grid;
+    grid-template-columns: 55mm 1fr;
+    margin-bottom: 5mm;
+  }
+</style>
+
+<div class="header-brand">
+  <div class="logo-slot">
+    {% if logo1 %}<img src="{{ logo1 }}" alt="Logo1" />{% endif %}
+  </div>
+  <div class="results-header">
+    {% for line in header.lines %}
+    <div class="results-header-line">{{ line }}</div>
+    {% endfor %}
+    <div class="results-competition">{{ header.competitionName }}</div>
+    <div class="results-title">{{ header.title }}</div>
+    <div class="results-program">{{ header.programName }}</div>
+  </div>
+  <div class="logo-slot right">
+    {% if logo2 %}<img src="{{ logo2 }}" alt="Logo2" />{% endif %}
+  </div>
+</div>
+
+<div class="results-date-location">
+  <div>{{ header.date }}</div>
+  <div class="location">{{ header.location }}</div>
+</div>
+
+{% for class in classes %}
+<div class="results-class{% if not loop.first %} results-class-next{% endif %}">
+  <div class="results-class-meta">
+    Вікова група&nbsp;&nbsp;{{ class.name }}
+    {% if class.courseChief %}&nbsp;&nbsp;&nbsp;&nbsp;Начальник дистанції: {{ class.courseChief }}{% endif %}
+  </div>
+  <div class="results-course-meta">
+    {% if class.controlCount > 0 %}{{ class.controlCount }} КП&nbsp;&nbsp;{% endif %}Контрольний час:{{ class.controlTime }}
+  </div>
+
+  <table class="rogaining-results-table">
+    <thead>
+      <tr>
+        <th class="results-number">№<br>п/п</th>
+        <th class="results-name">Прізвище, ім'я</th>
+        <th class="results-birthday">Рік народ-<br>ження</th>
+        <th class="results-region">Регіон</th>
+        <th class="results-trainer">Тренер</th>
+        <th class="results-score">Бали</th>
+        <th class="results-penalty">Штраф</th>
+        <th class="results-total">Бали зі<br>штраф.</th>
+        <th class="results-time">Час</th>
+        <th class="results-place">Місце</th>
+        <th class="results-rank">Квалі-<br>фікація</th>
+        <th class="results-rank">Викон.<br>розряд</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for team in class.teams %}
+        {% for member in team.members %}
+        <tr>
+          <td class="results-number">{% if loop.first %}{{ team.place }}{% endif %}</td>
+          <td class="results-name">{{ member.name }}</td>
+          <td class="results-birthday">{{ member.birthday }}</td>
+          <td class="results-region">{{ member.region }}</td>
+          <td class="results-trainer">{{ member.trainers }}</td>
+          <td class="results-score">{% if loop.first %}{{ team.score }}{% endif %}</td>
+          <td class="results-penalty">{% if loop.first %}{% if team.isDisqualified %}DSQ{% elif team.penalty > 0 %}{{ team.penalty }}{% endif %}{% endif %}</td>
+          <td class="results-total">{% if loop.first %}{% if team.isDisqualified %}0{% else %}{{ team.totalScore }}{% endif %}{% endif %}</td>
+          <td class="results-time">{% if loop.first %}{{ team.formattedTime }}{% endif %}</td>
+          <td class="results-place">{% if loop.first %}{{ team.place }}{% endif %}</td>
+          <td class="results-rank">{{ member.qualification }}</td>
+          <td class="results-rank">{{ member.awardedRank }}</td>
+        </tr>
+        {% endfor %}
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if class.rankInfoLines.length > 0 %}
+  <div class="results-rank-info">
+    {% for line in class.rankInfoLines %}
+    <div>{{ line }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endfor %}
+
+<div class="results-signatures">
+  <div class="results-signature-row">
+    <div>Головний суддя</div>
+    <div>{{ officials.chiefJudge }}</div>
+  </div>
+  <div class="results-signature-row">
+    <div>Головний секретар</div>
+    <div>{{ officials.chiefSecretary }}</div>
+  </div>
+  <div class="results-signature-row">
+    <div>Судді</div>
+    <div>
+      <div>Іванов П.Є., суддя н/к</div>
+    </div>
+  </div>
+  <div class="results-signature-row">
+    {% if officials.joury1 %}
+    <div>Журі</div>
+    <div>
+      <div>Машинський С.Р., суддя н/к</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

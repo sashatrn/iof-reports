@@ -5,36 +5,69 @@ import { ReportType, REPORT_TYPES } from "./report-types";
 
 export type CliOptions = {
   inputPath: string;
+  configPath?: string;
+  courseDataPath?: string;
+  bazaPath?: string;
   report: ReportType;
-  html: "none" | "view" | "pdf" | "both";
+  format: "pdf" | "docx";
+  html: "none" | "view" | "pdf";
   diplomaTemplate: "off" | "on";
 };
 
 const REPORT_VALUES = new Set<string>(REPORT_TYPES);
-const HTML_VALUES = new Set<string>(["none", "view", "pdf", "both"]);
+const HTML_VALUES = new Set<string>(["none", "view", "pdf"]);
+const FORMAT_VALUES = new Set<string>(["pdf", "docx"]);
 const DIPLOMA_TEMPLATE_VALUES = new Set<string>(["off", "on"]);
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--report all|individual|team|rogaining|rogaining-awards|rogaining-diplomas] [--html none|view|pdf|both] [--diploma-template off|on]",
+    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-results|rogaining-splits] [--format pdf|docx] [--courses courses.xml] [--baza baza.xml] [--html none|view|pdf] [--diploma-template off|on]",
   );
 }
 
-export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
-  const input = argv[2];
+export function extractConfigPathArg(argv: string[]): string | undefined {
+  for (let i = 2; i < argv.length; i += 1) {
+    const arg = argv[i];
 
-  if (!input) {
-    logger.error("No XML file provided.");
-    printUsage(logger);
-    process.exit(1);
+    if (arg !== "--config" && arg !== "-c") {
+      continue;
+    }
+
+    const value = argv[i + 1];
+
+    if (!value || value.startsWith("-")) {
+      throw new Error("No config file provided for --config.");
+    }
+
+    return path.resolve(process.cwd(), value);
   }
 
+  return undefined;
+}
+
+export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
+  let input: string | undefined;
   let report: CliOptions["report"] = "all";
+  let configPath: string | undefined;
+  let courseDataPath: string | undefined;
+  let bazaPath: string | undefined;
+  let format: CliOptions["format"] = "pdf";
   let html: CliOptions["html"] = "none";
   let diplomaTemplate: CliOptions["diplomaTemplate"] = "off";
 
-  for (let i = 3; i < argv.length; i += 1) {
+  for (let i = 2; i < argv.length; i += 1) {
     const arg = argv[i];
+
+    if (!arg.startsWith("-")) {
+      if (!input) {
+        input = arg;
+        continue;
+      }
+
+      logger.error({ arg }, "Unexpected positional argument.");
+      printUsage(logger);
+      process.exit(1);
+    }
 
     if (arg === "--report" || arg === "-r") {
       const value = argv[i + 1];
@@ -42,7 +75,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       if (!value || !REPORT_VALUES.has(value)) {
         logger.error(
           { report: value },
-          "Invalid report type. Expected one of: all, individual, team, rogaining, rogaining-awards, rogaining-diplomas.",
+          "Invalid report type. Expected one of: all, individual, team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-results, rogaining-splits.",
         );
         printUsage(logger);
         process.exit(1);
@@ -53,19 +86,78 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       continue;
     }
 
+    if (arg === "--config" || arg === "-c") {
+      const value = argv[i + 1];
+
+      if (!value || value.startsWith("-")) {
+        logger.error("No config file provided for --config.");
+        printUsage(logger);
+        process.exit(1);
+      }
+
+      configPath = path.resolve(process.cwd(), value);
+      i += 1;
+      continue;
+    }
+
+    if (arg === "--courses" || arg === "--course") {
+      const value = argv[i + 1];
+
+      if (!value) {
+        logger.error("No CourseData XML file provided for --courses.");
+        printUsage(logger);
+        process.exit(1);
+      }
+
+      courseDataPath = path.resolve(process.cwd(), value);
+      i += 1;
+      continue;
+    }
+
+    if (arg === "--baza" || arg === "--base") {
+      const value = argv[i + 1];
+
+      if (!value) {
+        logger.error("No UOF baza XML file provided for --baza.");
+        printUsage(logger);
+        process.exit(1);
+      }
+
+      bazaPath = path.resolve(process.cwd(), value);
+      i += 1;
+      continue;
+    }
+
     if (arg === "--html") {
       const value = argv[i + 1];
 
       if (!value || !HTML_VALUES.has(value)) {
         logger.error(
           { html: value },
-          "Invalid html mode. Expected one of: none, view, pdf, both.",
+          "Invalid html mode. Expected one of: none, view, pdf.",
         );
         printUsage(logger);
         process.exit(1);
       }
 
       html = value as CliOptions["html"];
+      i += 1;
+      continue;
+    }
+
+    if (arg === "--format") {
+      const value = argv[i + 1];
+
+      if (!value || !FORMAT_VALUES.has(value)) {
+        logger.error(
+          { format: value },
+          "Invalid format. Expected one of: pdf, docx.",
+        );
+        printUsage(logger);
+        process.exit(1);
+      }
+
+      format = value as CliOptions["format"];
       i += 1;
       continue;
     }
@@ -92,6 +184,12 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
     process.exit(1);
   }
 
+  if (!input) {
+    logger.error("No XML file provided.");
+    printUsage(logger);
+    process.exit(1);
+  }
+
   const absolutePath = path.resolve(process.cwd(), input);
 
   if (!fs.existsSync(absolutePath)) {
@@ -99,9 +197,40 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
     process.exit(1);
   }
 
+  if (configPath && !fs.existsSync(configPath)) {
+    logger.error({ path: configPath }, "Config file not found.");
+    process.exit(1);
+  }
+
+  if (courseDataPath && !fs.existsSync(courseDataPath)) {
+    logger.error({ path: courseDataPath }, "CourseData XML file not found.");
+    process.exit(1);
+  }
+
+  if (bazaPath && !fs.existsSync(bazaPath)) {
+    logger.error({ path: bazaPath }, "UOF baza XML file not found.");
+    process.exit(1);
+  }
+
+  if (report === "rogaining-splits" && !courseDataPath) {
+    logger.error("rogaining-splits report requires --courses <courses.xml>.");
+    printUsage(logger);
+    process.exit(1);
+  }
+
+  if (report === "rogaining-results" && !bazaPath) {
+    logger.error("rogaining-results report requires --baza <baza.xml>.");
+    printUsage(logger);
+    process.exit(1);
+  }
+
   return {
     inputPath: absolutePath,
+    configPath,
+    courseDataPath,
+    bazaPath,
     report,
+    format,
     html,
     diplomaTemplate,
   };
