@@ -1,10 +1,15 @@
-import { describe, expect, it } from "vitest";
+import fs from "fs";
+import os from "os";
+import path from "path";
+import { afterEach, describe, expect, it } from "vitest";
+import { setConfigPath } from "../config";
 import { type Participant } from "../io/parse-iof";
 import { type RogainingTeam } from "../io/parse-rogaining-iof";
 import {
   buildMilitaryIndividualTeamResults,
   buildMilitaryRelayClasses,
   buildMilitaryRelayTeamResults,
+  buildMilitaryTeamStandings,
 } from "./military-report";
 
 const teamGroups = [
@@ -17,6 +22,10 @@ const teamGroups = [
     classRegex: "ЗСУ",
   },
 ];
+
+afterEach(() => {
+  setConfigPath(undefined);
+});
 
 describe("buildMilitaryIndividualTeamResults", () => {
   it("sums only organisations matching the military team filter", () => {
@@ -256,6 +265,40 @@ describe("buildMilitaryRelayClasses", () => {
     ]);
   });
 
+  it("puts relay teams with a problem status after unfinished teams", () => {
+    const classes = buildMilitaryRelayClasses([
+      makeRelayTeam("Ч ВВНЗ", "MissingPunch", "ІВМС", 2600, false, [
+        800,
+        900,
+        900,
+      ], "MissingPunch", ["OK", "OK", "MissingPunch"]),
+      makeRelayTeam("Ч ВВНЗ", "DidNotFinish", "ВІТВ", 3000, false, [1200, 1000]),
+      makeRelayTeam("Ч ВВНЗ", "OK", "ЖВІ", 3100, true, [900, 900, 1300]),
+    ]);
+
+    expect(classes[0].teams).toMatchObject([
+      {
+        teamName: "OK",
+        place: "1",
+        points: 126,
+        status: "OK",
+      },
+      {
+        teamName: "DidNotFinish",
+        place: "",
+        points: 0,
+        status: "DidNotFinish",
+      },
+      {
+        teamName: "MissingPunch",
+        place: "",
+        points: 0,
+        stageTimes: ["13:20", "15:00", "Не всі КП"],
+        status: "MissingPunch",
+      },
+    ]);
+  });
+
   it("keeps relay places but removes points for classes outside the class filter", () => {
     const classes = buildMilitaryRelayClasses(
       [
@@ -337,6 +380,64 @@ describe("buildMilitaryRelayTeamResults", () => {
   });
 });
 
+describe("buildMilitaryTeamStandings", () => {
+  it("includes only organisations matching the military team filter", () => {
+    const configPath = writeTempConfig({
+      military: {
+        teamFilterRegex: "^ЖВІ$",
+        classFilterRegex: ".*",
+        individualTeamGroups: teamGroups,
+      },
+    });
+    setConfigPath(configPath);
+
+    const standings = buildMilitaryTeamStandings(
+      [
+        makeParticipant("ЖВІ", 45, "Ч ВВНЗ"),
+        makeParticipant("Клуб", 42, "Ч ВВНЗ"),
+      ],
+      [
+        makeRelayTeam("Ч ВВНЗ", "ЖВІ - 1", "ЖВІ", 3000, true, [1000, 1000, 1000]),
+        makeRelayTeam("Ч ВВНЗ", "Клуб - 1", "Клуб", 2900, true, [900, 1000, 1000]),
+      ],
+    );
+
+    expect(standings).toHaveLength(1);
+    expect(standings[0]).toMatchObject({
+      organisation: "ЖВІ",
+      individualPoints: 45,
+      relayPoints: 111,
+      totalPoints: 156,
+    });
+  });
+
+  it("applies the military team filter after normalising empty organisations to Unknown", () => {
+    const configPath = writeTempConfig({
+      military: {
+        teamFilterRegex: "^(?!.*Unknown).*$",
+        classFilterRegex: ".*",
+        individualTeamGroups: teamGroups,
+      },
+    });
+    setConfigPath(configPath);
+
+    const standings = buildMilitaryTeamStandings(
+      [makeParticipant(" ", 45, "Ч ВВНЗ"), makeParticipant("ЖВІ", 42, "Ч ВВНЗ")],
+      [],
+    );
+
+    expect(standings).toEqual([
+      {
+        place: 1,
+        organisation: "ЖВІ",
+        individualPoints: 42,
+        relayPoints: 0,
+        totalPoints: 42,
+      },
+    ]);
+  });
+});
+
 function makeParticipant(club: string, points: number, className = "Ч ВВНЗ"): Participant {
   return {
     className,
@@ -354,6 +455,8 @@ function makeRelayTeam(
   timeSec: number,
   allMembersFinished = true,
   memberTimeSecs?: Array<number | undefined>,
+  status = "OK",
+  memberStatuses?: string[],
 ): RogainingTeam {
   const members = memberTimeSecs?.map((_, index) => `${teamName} ${index + 1}`) ?? [teamName];
 
@@ -363,12 +466,23 @@ function makeRelayTeam(
     organisation,
     members,
     memberTimeSecs,
+    memberStatuses,
     memberCount: members.length,
     score: 0,
     penalty: 0,
     totalScore: 0,
     timeSec,
-    status: "OK",
+    status,
     allMembersFinished,
   };
+}
+
+function writeTempConfig(config: unknown): string {
+  const configPath = path.join(
+    fs.mkdtempSync(path.join(os.tmpdir(), "iof-reports-test-")),
+    "config.json",
+  );
+
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+  return configPath;
 }

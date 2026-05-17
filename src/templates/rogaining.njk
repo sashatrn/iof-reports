@@ -33,7 +33,7 @@
         <td>{{ team.penalty }}</td>
         <td>{{ team.totalScore }}</td>
         <td>{{ team.formattedTime }}</td>
-        <td>{{ team.status }}</td>
+        <td>{{ team.status | statusLabel }}</td>
       </tr>
       {% endfor %}
     </tbody>

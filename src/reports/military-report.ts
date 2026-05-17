@@ -11,6 +11,7 @@ import {
 import { militaryRelayPointsFromPlace } from "../scoring/military-relay-points";
 import { formatDate } from "../utils/date";
 import { imageToBase64 } from "../utils/image";
+import { formatResultStatus } from "../utils/result-status";
 
 type HtmlVariant = "view" | "pdf";
 
@@ -55,6 +56,10 @@ const PLACEABLE_STATUSES = new Set(["OK"]);
 const RELAY_INCOMPLETE_STATUS = "DidNotFinish";
 const MILITARY_RELAY_STAGE_COUNT = 3;
 
+function normalizeMilitaryOrganisation(organisation: string): string {
+  return organisation.trim() || "Unknown";
+}
+
 function formatTime(sec?: number): string {
   if (sec === undefined) {
     return "";
@@ -78,6 +83,14 @@ function formatTimeBehind(sec?: number): string {
   const seconds = sec % 60;
 
   return `+${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+function formatRelayStage(timeSec: number | undefined, status: string | undefined): string {
+  if (status !== undefined && status !== "OK") {
+    return formatResultStatus(status);
+  }
+
+  return formatTime(timeSec);
 }
 
 function buildClassGroupMatchers(
@@ -141,6 +154,15 @@ function buildMilitaryEvent(eventDate: Date, reportTitle: string) {
 
 function getMilitaryRelayStatus(team: RogainingTeam): string {
   if (
+    !PLACEABLE_STATUSES.has(team.status) &&
+    team.status !== RELAY_INCOMPLETE_STATUS &&
+    team.status !== "Inactive" &&
+    team.status !== "Unknown"
+  ) {
+    return team.status;
+  }
+
+  if (
     team.memberTimeSecs !== undefined &&
     getRelayCompletedStageCount(team) < MILITARY_RELAY_STAGE_COUNT
   ) {
@@ -196,10 +218,29 @@ function getRelayStageSum(team: RogainingTeam, stageCount: number): number | und
   return sum;
 }
 
+function getRelaySortGroup(status: string): number {
+  if (PLACEABLE_STATUSES.has(status)) {
+    return 0;
+  }
+
+  if (status === RELAY_INCOMPLETE_STATUS) {
+    return 1;
+  }
+
+  return 2;
+}
+
 function rankRelayTeams(teams: RogainingTeam[], classCanScore = true): MilitaryRelayEntry[] {
   const sortedTeams = [...teams].sort((left, right) => {
     const leftStatus = getMilitaryRelayStatus(left);
     const rightStatus = getMilitaryRelayStatus(right);
+    const leftSortGroup = getRelaySortGroup(leftStatus);
+    const rightSortGroup = getRelaySortGroup(rightStatus);
+
+    if (leftSortGroup !== rightSortGroup) {
+      return leftSortGroup - rightSortGroup;
+    }
+
     const leftCompletedStageCount = getRelayCompletedStageCount(left);
     const rightCompletedStageCount = getRelayCompletedStageCount(right);
 
@@ -257,7 +298,7 @@ function rankRelayTeams(teams: RogainingTeam[], classCanScore = true): MilitaryR
       currentPlace = place;
     }
 
-    const organisationKey = team.organisation.trim() || "Unknown";
+    const organisationKey = normalizeMilitaryOrganisation(team.organisation);
     const canScore =
       classCanScore && place !== undefined && !scoredOrganisations.has(organisationKey);
 
@@ -272,7 +313,7 @@ function rankRelayTeams(teams: RogainingTeam[], classCanScore = true): MilitaryR
       membersLine: team.members.join(", "),
       organisation: team.organisation,
       stageTimes: Array.from({ length: MILITARY_RELAY_STAGE_COUNT }, (_, index) =>
-        formatTime(team.memberTimeSecs?.[index]),
+        formatRelayStage(team.memberTimeSecs?.[index], team.memberStatuses?.[index]),
       ),
       formattedTime: formatTime(team.timeSec),
       timeBehind:
@@ -312,6 +353,7 @@ export function buildMilitaryTeamStandings(
 ): MilitaryTeamStanding[] {
   const config = loadConfig();
   const classFilter = buildMilitaryClassFilter(config.military.classFilterRegex);
+  const teamFilter = buildMilitaryTeamFilter(config.military.teamFilterRegex);
   const byOrganisation = new Map<
     string,
     {
@@ -321,7 +363,7 @@ export function buildMilitaryTeamStandings(
   >();
 
   const getEntry = (organisation: string) => {
-    const key = organisation.trim() || "Unknown";
+    const key = normalizeMilitaryOrganisation(organisation);
     const existing = byOrganisation.get(key);
 
     if (existing) {
@@ -337,21 +379,30 @@ export function buildMilitaryTeamStandings(
   };
 
   for (const participant of participants) {
+    const organisation = normalizeMilitaryOrganisation(participant.club);
+
     if (
       participant.pointsLabel === MILITARY_OUT_OF_COMPETITION_POINTS ||
+      !teamFilter.test(organisation) ||
       !classFilter.test(participant.className)
     ) {
       continue;
     }
 
-    getEntry(participant.club).individualPoints += participant.points;
+    getEntry(organisation).individualPoints += participant.points;
   }
 
   for (const relayEntry of buildMilitaryRelayClasses(
     relayTeams,
     config.military.classFilterRegex,
   ).flatMap((classGroup) => classGroup.teams)) {
-    getEntry(relayEntry.organisation).relayPoints += relayEntry.points;
+    const organisation = normalizeMilitaryOrganisation(relayEntry.organisation);
+
+    if (!teamFilter.test(organisation)) {
+      continue;
+    }
+
+    getEntry(organisation).relayPoints += relayEntry.points;
   }
 
   return [...byOrganisation.entries()]
@@ -395,14 +446,15 @@ export function buildMilitaryIndividualTeamResults(
   const pointsByGroup = new Map<string, Map<string, number>>();
 
   for (const participant of participants) {
-    if (!classFilter.test(participant.className) || !teamFilter.test(participant.club)) {
+    const organisation = normalizeMilitaryOrganisation(participant.club);
+
+    if (!classFilter.test(participant.className) || !teamFilter.test(organisation)) {
       continue;
     }
 
     const groupName =
       groupMatchers.find((group) => group.regex.test(participant.className))?.name ??
       "Загальний залік";
-    const organisation = participant.club.trim() || "Unknown";
     const pointsByOrganisation = pointsByGroup.get(groupName) ?? new Map<string, number>();
 
     pointsByOrganisation.set(
@@ -467,11 +519,12 @@ export function buildMilitaryRelayTeamResults(
       "Загальний залік";
 
     for (const team of classGroup.teams) {
-      if (!teamFilter.test(team.organisation)) {
+      const organisation = normalizeMilitaryOrganisation(team.organisation);
+
+      if (!teamFilter.test(organisation)) {
         continue;
       }
 
-      const organisation = team.organisation.trim() || "Unknown";
       const pointsByOrganisation = pointsByGroup.get(groupName) ?? new Map<string, number>();
 
       pointsByOrganisation.set(
@@ -589,7 +642,7 @@ export function buildMilitaryTeamHtml(
   eventDate: Date,
 ): string {
   return renderTemplate("military-team-pdf.njk", {
-    ...buildMilitaryEvent(eventDate, "Командний підсумок Збройних Сил"),
+    ...buildMilitaryEvent(eventDate, "Командний підсумок"),
     standings: buildMilitaryTeamStandings(participants, relayTeams),
   });
 }

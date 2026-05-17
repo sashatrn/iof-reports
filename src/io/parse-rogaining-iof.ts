@@ -32,6 +32,7 @@ export type RogainingTeam = {
   members: string[];
   memberOrganisations?: string[];
   memberTimeSecs?: Array<number | undefined>;
+  memberStatuses?: string[];
   memberControls?: string[][];
   memberSplits?: RogainingSplit[][];
   controlGateStatus?: "OK" | "-" | "DSQ";
@@ -220,10 +221,33 @@ function hasFinishedRelayLeg(member: RogainingMember): boolean {
   );
 }
 
+function getRelayMemberProblemStatus(memberResults: RogainingMember[]): string | undefined {
+  for (const member of memberResults) {
+    const statuses = [member.overallStatus, member.status].filter(
+      (status): status is string => status !== undefined && status !== "OK",
+    );
+    const problemStatus = statuses.find(
+      (status) => status !== "Inactive" && status !== "Unknown",
+    );
+
+    if (problemStatus) {
+      return problemStatus;
+    }
+  }
+
+  return undefined;
+}
+
 function normalizeRelayTeamStatus(
   status: string,
   memberResults: RogainingMember[],
 ): string {
+  const problemStatus = getRelayMemberProblemStatus(memberResults);
+
+  if (problemStatus) {
+    return problemStatus;
+  }
+
   if (memberResults.length > 0 && !memberResults.every(hasFinishedRelayLeg)) {
     return "DidNotFinish";
   }
@@ -302,6 +326,7 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
         members: memberResults.map((member) => member.name),
         memberOrganisations: memberResults.map((member) => member.organisation),
         memberTimeSecs: memberResults.map((member) => member.finishTimeSec),
+        memberStatuses: memberResults.map((member) => member.overallStatus ?? member.status),
         memberControls: memberResults.map((member) => member.controls),
         memberSplits: memberResults.map((member) => member.splits),
         memberCount: memberResults.length,

@@ -284,4 +284,74 @@ describe("parseRogainingIof", () => {
     expect(parsed.teams[0].status).toBe("DidNotFinish");
     expect(parsed.teams[0].memberTimeSecs).toEqual([2919, undefined]);
   });
+
+  it("keeps relay team problem status from a member result", () => {
+    const parsed = parseRogainingIof(`
+      <ResultList>
+        <ClassResult>
+          <Class>
+            <Name>Ч ВВНЗ</Name>
+          </Class>
+          <TeamResult>
+            <Name>ІВМС - 2</Name>
+            <Organisation>
+              <Name>ІВМС</Name>
+            </Organisation>
+            <TeamMemberResult>
+              <Person>
+                <Name>
+                  <Family>Перший</Family>
+                  <Given>Учасник</Given>
+                </Name>
+              </Person>
+              <Result>
+                <Time>2697</Time>
+                <Status>OK</Status>
+                <OverallResult>
+                  <Time>2697</Time>
+                  <Status>OK</Status>
+                </OverallResult>
+              </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+              <Person>
+                <Name>
+                  <Family>Другий</Family>
+                  <Given>Учасник</Given>
+                </Name>
+              </Person>
+              <Result>
+                <Time>2869</Time>
+                <Status>OK</Status>
+                <OverallResult>
+                  <Time>5566</Time>
+                  <Status>OK</Status>
+                </OverallResult>
+              </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+              <Person>
+                <Name>
+                  <Family>Третій</Family>
+                  <Given>Учасник</Given>
+                </Name>
+              </Person>
+              <Result>
+                <Time>3014</Time>
+                <Status>MissingPunch</Status>
+                <OverallResult>
+                  <Status>MissingPunch</Status>
+                </OverallResult>
+              </Result>
+            </TeamMemberResult>
+          </TeamResult>
+        </ClassResult>
+      </ResultList>
+    `);
+
+    expect(parsed.teams[0].status).toBe("MissingPunch");
+    expect(parsed.teams[0].allMembersFinished).toBe(false);
+    expect(parsed.teams[0].memberTimeSecs).toEqual([2697, 2869, 3014]);
+    expect(parsed.teams[0].memberStatuses).toEqual(["OK", "OK", "MissingPunch"]);
+  });
 });

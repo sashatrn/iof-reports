@@ -174,10 +174,11 @@ describe("generateMilitaryRelayReportHtml", () => {
     const viewRow = expectRowContaining(report.viewHtml, "ВА м.Одеса - 3");
     const pdfRow = expectRowContaining(report.pdfHtml, "ВА м.Одеса - 3");
 
-    expect(viewRow).toContain("<td>DidNotFinish</td>");
+    expect(viewRow).toContain('data-status="DidNotFinish"');
+    expect(viewRow).toContain("<td>Не фінішував</td>");
     expect(viewRow).toContain("<td><strong>0</strong></td>");
     expect(viewRow).not.toContain("<td>OK</td>");
-    expect(pdfRow).toContain("<td>DidNotFinish</td>");
+    expect(pdfRow).toContain("<td>Не фінішував</td>");
     expect(pdfRow).toContain("<td><strong>0</strong></td>");
     expect(pdfRow).not.toContain("<td>OK</td>");
   });
@@ -192,9 +193,9 @@ describe("generateMilitaryTeamReportHtml", () => {
     expect(report.reportType).toBe("military-team");
     expect(report.supportsView).toBe(false);
     expect(report.itemCount).toBeGreaterThan(0);
-    expect(report.pdfHtml).toContain("Командний підсумок Збройних Сил");
-    expect(report.pdfHtml).toContain("<th>Індивідуальні бали</th>");
-    expect(report.pdfHtml).toContain("<th>Естафетні бали</th>");
+    expect(report.pdfHtml).toContain("Командний підсумок");
+    expect(report.pdfHtml).toContain("<th>Індивідуальні очки</th>");
+    expect(report.pdfHtml).toContain("<th>Естафетні очки</th>");
   });
 
   it("requires relay/team XML", () => {

@@ -39,7 +39,7 @@
         {% if showControlGateColumn %}
         <td>{{ team.controlGateStatus }}</td>
         {% endif %}
-        <td>{{ team.status }}</td>
+        <td>{{ team.status | statusLabel }}</td>
       </tr>
       {% endfor %}
     </tbody>

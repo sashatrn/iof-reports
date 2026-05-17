@@ -285,7 +285,8 @@ describe("buildRogainingHtml", () => {
     expect(openSection).toContain("До 22");
     expect(openSection).toContain("Без 22");
     expect(openSection).toContain("<td>DSQ</td>");
-    expect(openSection).toContain("<td>disqualified</td>");
+    expect(openSection).toContain('data-status="disqualified"');
+    expect(openSection).toContain("<td>Дискваліфіковано</td>");
   });
 });
 

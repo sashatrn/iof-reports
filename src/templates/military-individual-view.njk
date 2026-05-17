@@ -27,7 +27,7 @@
         <td>{{ participant.time }}</td>
         <td>{{ participant.timeBehind }}</td>
         <td>{{ participant.points }}</td>
-        <td>{{ participant.status }}</td>
+        <td>{{ participant.status | statusLabel }}</td>
       </tr>
       {% endfor %}
     </tbody>

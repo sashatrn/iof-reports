@@ -7,6 +7,9 @@ CLI-інструмент для перетворення результатів 
 - Протокол результатів рогейну
 - Протокол балів рогейну
 - Протокол сплітів рогейну
+- Військовий індивідуальний протокол
+- Військовий протокол естафети
+- Військовий загальнокомандний підсумок
 
 Результати в протоколах розраховуються згідно правил національного проекту Пліч-о-пліч
 
@@ -32,13 +35,13 @@ CLI-інструмент для перетворення результатів 
 
 1. Відкрийте командний рядок Windows
 1. Виконайте `iof-reports <results.xml>`, де `<results.xml>` - IOF XML файл результатів.
-1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team`, `--report rogaining`, `--report rogaining-awards`, `--report rogaining-diplomas`, `--report rogaining-score`, `--report rogaining-results` або `--report rogaining-splits`.
+1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team`, `--report rogaining`, `--report rogaining-awards`, `--report rogaining-diplomas`, `--report rogaining-score`, `--report rogaining-results`, `--report rogaining-splits`, `--report military-individual`, `--report military-relay` або `--report military-team`.
 1. За потреби вкажіть інший файл конфігурації: `--config my-config.json`. За замовчуванням використовується `config.json` з поточної теки.
 1. За потреби виберіть формат файлу: `--format pdf` або `--format docx`. DOCX наразі підтримується для `rogaining-awards`.
 1. За потреби згенеруйте HTML-файл: `--html view` або `--html pdf`.
 1. Для `rogaining-diplomas` за потреби увімкніть друк фону диплома через `--diploma-template on`. За замовчуванням `off`.
 
-Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`, `rogaining-score`, `rogaining-results`, `rogaining-splits`.
+Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`, `rogaining-score`, `rogaining-results`, `rogaining-results-score`, `rogaining-splits`, `military-individual`, `military-relay`, `military-team`.
 Доступні значення для `--html`: `none` (за замовчуванням), `view`, `pdf`.
 
 Приклади:
@@ -52,8 +55,68 @@ CLI-інструмент для перетворення результатів 
 - `iof-reports results.xml --report rogaining-results --baza baza.xml` - створити офіційний протокол результатів рогейну з розрахунком виконаних розрядів
 - `iof-reports results.xml --report rogaining-splits --courses courses.xml` - створити протокол сплітів рогейну з відстанями між КП
 - `iof-reports results.xml --report rogaining-awards --format docx` - створити редагований DOCX нагородного протоколу
+- `iof-reports long.xml --report military-individual --html view` - створити військовий індивідуальний HTML-протокол
+- `iof-reports relay.xml --report military-relay --html view` - створити військовий протокол естафети
+- `iof-reports long.xml --report military-team --relay relay.xml` - створити військовий загальнокомандний підсумок за довгою дистанцією та естафетою
 
 Якщо є проблема з виводом кіриличних символів в консолі Windows, виконайте команду `chcp 65001` перед запуском додатку.
+
+## Military протоколи
+
+Для військових змагань доступні три типи протоколів:
+
+- `military-individual` - індивідуальний протокол довгої дистанції з очками та командним підсумком у PDF
+- `military-relay` - протокол естафети з очками, часами етапів та командним підсумком у PDF
+- `military-team` - загальнокомандний підсумок, який об'єднує індивідуальні та естафетні очки
+
+Індивідуальний military-протокол очікує звичайний IOF XML з індивідуальними результатами:
+
+```bash
+iof-reports results-long.xml --report military-individual --html view
+```
+
+Естафетний military-протокол очікує IOF XML з `TeamResult`:
+
+```bash
+iof-reports results-relay.xml --report military-relay --html view
+```
+
+Загальнокомандний military-протокол потребує два XML-файли: основний файл індивідуальної дистанції та файл естафети через `--relay`:
+
+```bash
+iof-reports results-long.xml --report military-team --relay results-relay.xml
+```
+
+Налаштування military-заліку знаходяться в `config.json` у секції `military`:
+
+```json
+{
+  "military": {
+    "teamFilterRegex": ".*",
+    "classFilterRegex": ".*",
+    "individualTeamGroups": [
+      {
+        "name": "ВВНЗ",
+        "classRegex": "ВВНЗ"
+      },
+      {
+        "name": "ЗСУ",
+        "classRegex": "ЗСУ"
+      }
+    ]
+  }
+}
+```
+
+- `teamFilterRegex` - регулярний вираз для організацій, які беруть участь у нарахуванні очок. Місце в протоколі не змінюється. Якщо організація не проходить фільтр, очки не нараховуються.
+- `classFilterRegex` - регулярний вираз для класів/груп, у яких нараховуються очки. Місце в протоколі не змінюється. Якщо клас не проходить фільтр, очки не нараховуються.
+- `individualTeamGroups` - групи командного підсумку та порядок виводу класів у military-протоколах. `classRegex` визначає, до якої групи належить клас.
+
+В індивідуальному military-протоколі очки для учасників рахуються тільки серед тих, хто проходить `teamFilterRegex` і `classFilterRegex`. Якщо перед учасником фінішували спортсмени поза фільтром, вони не впливають на позицію для підрахунку очок.
+
+В естафеті очки приносить тільки перша команда від організації в межах тієї самої дистанції. Команди поза `teamFilterRegex` або `classFilterRegex` залишаються в протоколі, але не отримують очок. Якщо команда має не всі три етапи з часом, у протоколі вона отримує статус `DidNotFinish`, місце не ставиться, очки дорівнюють `0`.
+
+Колонка `Відст.` в естафеті показує відставання за сумою етапів до поточного етапу. Наприклад, команда з двома етапами порівнюється з найкращою сумою перших двох етапів серед усіх команд цього класу.
 
 ## Watch режим
 
@@ -97,6 +160,8 @@ iof-reports watch \
 - `http://127.0.0.1:4173/viewer` - viewer з автооновленням і автоскролом
 - `http://127.0.0.1:4173/report` - поточний HTML-звіт
 - `http://127.0.0.1:4173/meta` - метадані поточного звіту
+
+У viewer-панелі доступні перемикачі для показу/приховування рядків і колонок. Для military relay корисні `Show participants` для колонки учасників і `Show Club` для колонки організації (`ВВНЗ, військо`).
 
 Для локальної розробки:
 
