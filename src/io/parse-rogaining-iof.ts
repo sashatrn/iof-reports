@@ -40,6 +40,7 @@ export type RogainingTeam = {
   totalScore: number;
   timeSec?: number;
   status: string;
+  allMembersFinished?: boolean;
 };
 
 export type ParsedRogainingIof = {
@@ -208,6 +209,16 @@ function normalizeTeam(memberResults: RogainingMember[]): {
   };
 }
 
+function hasFinishedRelayLeg(member: RogainingMember): boolean {
+  const overallStatusOk = member.overallStatus === undefined || member.overallStatus === "OK";
+
+  return (
+    member.status === "OK" &&
+    overallStatusOk &&
+    (member.finishTimeSec !== undefined || member.overallTimeSec !== undefined)
+  );
+}
+
 export function parseRogainingIof(xml: string): ParsedRogainingIof {
   const parser = new XMLParser({
     ignoreAttributes: false,
@@ -230,32 +241,31 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
     }
 
     for (const teamResult of asArray(classResult.TeamResult)) {
-      const memberResults = asArray(teamResult?.TeamMemberResult)
-        .map((teamMemberResult) => {
-          const result = teamMemberResult?.Result;
-          const splits = extractSplits(result?.SplitTime);
+      const rawMemberResults = asArray(teamResult?.TeamMemberResult).map((teamMemberResult) => {
+        const result = teamMemberResult?.Result;
+        const splits = extractSplits(result?.SplitTime);
 
-          return {
-            name: extractMemberName(teamMemberResult),
-            organisation:
-              extractOrganisationName(teamMemberResult?.Organisation?.Name) ??
-              "Unknown",
-            controls: extractControls(splits),
-            splits,
-            finishTimeSec: toNumber(result?.Time),
-            score: findScoreByType(result?.Score, "Score"),
-            penalty: findScoreByType(result?.Score, "Penalty"),
-            status: result?.Status ?? "Unknown",
-            overallTimeSec: toNumber(result?.OverallResult?.Time),
-            overallStatus: result?.OverallResult?.Status,
-          };
-        })
-        .filter(
-          (member) =>
-            !shouldExcludeResultStatus(member.status, ignoredStatuses) &&
-            !shouldExcludeResultStatus(member.overallStatus, ignoredStatuses) &&
-            (member.name !== "Unknown" || member.status !== "Unknown"),
-        );
+        return {
+          name: extractMemberName(teamMemberResult),
+          organisation:
+            extractOrganisationName(teamMemberResult?.Organisation?.Name) ??
+            "Unknown",
+          controls: extractControls(splits),
+          splits,
+          finishTimeSec: toNumber(result?.Time),
+          score: findScoreByType(result?.Score, "Score"),
+          penalty: findScoreByType(result?.Score, "Penalty"),
+          status: result?.Status ?? "Unknown",
+          overallTimeSec: toNumber(result?.OverallResult?.Time),
+          overallStatus: result?.OverallResult?.Status,
+        };
+      });
+      const memberResults = rawMemberResults.filter(
+        (member) =>
+          !shouldExcludeResultStatus(member.status, ignoredStatuses) &&
+          !shouldExcludeResultStatus(member.overallStatus, ignoredStatuses) &&
+          (member.name !== "Unknown" || member.status !== "Unknown"),
+      );
 
       if (memberResults.length === 0) {
         continue;
@@ -282,6 +292,8 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
         totalScore: normalizedTeam.score,
         timeSec: normalizedTeam.timeSec,
         status: normalizedTeam.status,
+        allMembersFinished:
+          rawMemberResults.length > 0 && rawMemberResults.every(hasFinishedRelayLeg),
       });
     }
   }

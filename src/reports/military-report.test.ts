@@ -154,6 +154,28 @@ describe("buildMilitaryRelayClasses", () => {
       },
     ]);
   });
+
+  it("marks incomplete relay teams as DoNotFinish without place or points", () => {
+    const classes = buildMilitaryRelayClasses([
+      makeRelayTeam("Ч ВВНЗ", "ЖВІ - 1", "ЖВІ", 3000),
+      makeRelayTeam("Ч ВВНЗ", "ВІТВ - 2", "ВІТВ", 2900, false),
+    ]);
+
+    expect(classes[0].teams).toMatchObject([
+      {
+        teamName: "ЖВІ - 1",
+        place: "1",
+        points: 126,
+        status: "OK",
+      },
+      {
+        teamName: "ВІТВ - 2",
+        place: "",
+        points: 0,
+        status: "DoNotFinish",
+      },
+    ]);
+  });
 });
 
 describe("buildMilitaryRelayTeamResults", () => {
@@ -206,6 +228,7 @@ function makeRelayTeam(
   teamName: string,
   organisation: string,
   timeSec: number,
+  allMembersFinished = true,
 ): RogainingTeam {
   return {
     className,
@@ -218,5 +241,6 @@ function makeRelayTeam(
     totalScore: 0,
     timeSec,
     status: "OK",
+    allMembersFinished,
   };
 }

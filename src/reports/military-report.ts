@@ -49,6 +49,7 @@ type MilitaryIndividualTeamGroup = {
 };
 
 const PLACEABLE_STATUSES = new Set(["OK"]);
+const RELAY_INCOMPLETE_STATUS = "DoNotFinish";
 
 function formatTime(sec?: number): string {
   if (sec === undefined) {
@@ -134,10 +135,16 @@ function buildMilitaryEvent(eventDate: Date, reportTitle: string) {
   };
 }
 
+function getMilitaryRelayStatus(team: RogainingTeam): string {
+  return team.allMembersFinished === false ? RELAY_INCOMPLETE_STATUS : team.status;
+}
+
 function rankRelayTeams(teams: RogainingTeam[]): MilitaryRelayEntry[] {
   const sortedTeams = [...teams].sort((left, right) => {
-    const leftPlaceable = PLACEABLE_STATUSES.has(left.status);
-    const rightPlaceable = PLACEABLE_STATUSES.has(right.status);
+    const leftStatus = getMilitaryRelayStatus(left);
+    const rightStatus = getMilitaryRelayStatus(right);
+    const leftPlaceable = PLACEABLE_STATUSES.has(leftStatus);
+    const rightPlaceable = PLACEABLE_STATUSES.has(rightStatus);
 
     if (leftPlaceable !== rightPlaceable) {
       return leftPlaceable ? -1 : 1;
@@ -157,7 +164,8 @@ function rankRelayTeams(teams: RogainingTeam[]): MilitaryRelayEntry[] {
   const scoredOrganisations = new Set<string>();
 
   return sortedTeams.map((team) => {
-    const place = PLACEABLE_STATUSES.has(team.status) ? currentPlace + 1 : undefined;
+    const status = getMilitaryRelayStatus(team);
+    const place = PLACEABLE_STATUSES.has(status) ? currentPlace + 1 : undefined;
 
     if (place !== undefined) {
       currentPlace = place;
@@ -177,8 +185,8 @@ function rankRelayTeams(teams: RogainingTeam[]): MilitaryRelayEntry[] {
       membersLine: team.members.join(", "),
       organisation: team.organisation,
       formattedTime: formatTime(team.timeSec),
-      points: canScore ? militaryRelayPointsFromPlace(place, team.status) : 0,
-      status: team.status,
+      points: canScore ? militaryRelayPointsFromPlace(place, status) : 0,
+      status,
     };
   });
 }

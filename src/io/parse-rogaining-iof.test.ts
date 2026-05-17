@@ -235,4 +235,51 @@ describe("parseRogainingIof", () => {
     expect(parsed.teams[0].teamName).toBe("Фінішували");
     expect(parsed.teams[0].members).toEqual(["Учасник Перший"]);
   });
+
+  it("marks relay teams as incomplete when at least one member did not finish", () => {
+    const parsed = parseRogainingIof(`
+      <ResultList>
+        <ClassResult>
+          <Class>
+            <Name>Естафета</Name>
+          </Class>
+          <TeamResult>
+            <Name>ВІТВ - 2</Name>
+            <TeamMemberResult>
+              <Person>
+                <Name>
+                  <Family>Перший</Family>
+                  <Given>Учасник</Given>
+                </Name>
+              </Person>
+              <Result>
+                <Time>2919</Time>
+                <Status>OK</Status>
+                <OverallResult>
+                  <Time>2919</Time>
+                  <Status>OK</Status>
+                </OverallResult>
+              </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+              <Person>
+                <Name>
+                  <Family>Другий</Family>
+                  <Given>Учасник</Given>
+                </Name>
+              </Person>
+              <Result>
+                <Status>Inactive</Status>
+                <OverallResult>
+                  <Status>Inactive</Status>
+                </OverallResult>
+              </Result>
+            </TeamMemberResult>
+          </TeamResult>
+        </ClassResult>
+      </ResultList>
+    `);
+
+    expect(parsed.teams[0].allMembersFinished).toBe(false);
+  });
 });
