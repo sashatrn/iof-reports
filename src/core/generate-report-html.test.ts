@@ -163,6 +163,7 @@ describe("generateMilitaryRelayReportHtml", () => {
     expect(report.itemCount).toBeGreaterThan(0);
     expect(report.viewHtml).toContain("Естафета");
     expect(report.viewHtml).toContain("<th>Учасники</th>");
+    expect(report.viewHtml).toContain("<th>Відст.</th>");
     expect(report.viewHtml).not.toContain("Загальнокомандний результат");
     expect(report.pdfHtml).toContain("Загальнокомандний результат");
     expect(report.pdfHtml).toContain("@page");

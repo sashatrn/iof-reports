@@ -22,6 +22,7 @@ type MilitaryRelayEntry = {
   organisation: string;
   stageTimes: string[];
   formattedTime: string;
+  timeBehind: string;
   points: number;
   status: string;
 };
@@ -169,6 +170,32 @@ function getRelayProgressTime(team: RogainingTeam): number {
   return team.timeSec ?? Number.MAX_SAFE_INTEGER;
 }
 
+function getRelayStageSum(team: RogainingTeam, stageCount: number): number | undefined {
+  if (stageCount <= 0) {
+    return undefined;
+  }
+
+  const memberTimeSecs = team.memberTimeSecs;
+
+  if (memberTimeSecs === undefined) {
+    return team.timeSec;
+  }
+
+  let sum = 0;
+
+  for (let index = 0; index < stageCount; index += 1) {
+    const stageTime = memberTimeSecs[index];
+
+    if (stageTime === undefined) {
+      return undefined;
+    }
+
+    sum += stageTime;
+  }
+
+  return sum;
+}
+
 function rankRelayTeams(teams: RogainingTeam[], classCanScore = true): MilitaryRelayEntry[] {
   const sortedTeams = [...teams].sort((left, right) => {
     const leftStatus = getMilitaryRelayStatus(left);
@@ -199,9 +226,31 @@ function rankRelayTeams(teams: RogainingTeam[], classCanScore = true): MilitaryR
 
   let currentPlace = 0;
   const scoredOrganisations = new Set<string>();
+  const bestStageSumByStageCount = new Map<number, number>();
+
+  for (const team of sortedTeams) {
+    const completedStageCount = getRelayCompletedStageCount(team);
+
+    for (let stageCount = 1; stageCount <= completedStageCount; stageCount += 1) {
+      const stageSum = getRelayStageSum(team, stageCount);
+
+      if (stageSum === undefined) {
+        continue;
+      }
+
+      const bestStageSum = bestStageSumByStageCount.get(stageCount);
+
+      if (bestStageSum === undefined || stageSum < bestStageSum) {
+        bestStageSumByStageCount.set(stageCount, stageSum);
+      }
+    }
+  }
 
   return sortedTeams.map((team) => {
     const status = getMilitaryRelayStatus(team);
+    const completedStageCount = getRelayCompletedStageCount(team);
+    const stageSum = getRelayStageSum(team, completedStageCount);
+    const bestStageSum = bestStageSumByStageCount.get(completedStageCount);
     const place = PLACEABLE_STATUSES.has(status) ? currentPlace + 1 : undefined;
 
     if (place !== undefined) {
@@ -226,6 +275,10 @@ function rankRelayTeams(teams: RogainingTeam[], classCanScore = true): MilitaryR
         formatTime(team.memberTimeSecs?.[index]),
       ),
       formattedTime: formatTime(team.timeSec),
+      timeBehind:
+        bestStageSum === undefined || stageSum === undefined
+          ? ""
+          : formatTimeBehind(stageSum - bestStageSum),
       points: canScore ? militaryRelayPointsFromPlace(place, status) : 0,
       status,
     };

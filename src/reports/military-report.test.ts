@@ -222,7 +222,7 @@ describe("buildMilitaryRelayClasses", () => {
     const classes = buildMilitaryRelayClasses([
       makeRelayTeam("Ч ВВНЗ", "Два повільно", "ВІТВ", 3000, false, [1200, 1000]),
       makeRelayTeam("Ч ВВНЗ", "Один етап", "НАСВ", 900, false, [900]),
-      makeRelayTeam("Ч ВВНЗ", "Фініш", "ЖВІ", 3100, true, [1100, 1000, 1000]),
+      makeRelayTeam("Ч ВВНЗ", "Фініш", "ЖВІ", 3100, true, [900, 900, 1300]),
       makeRelayTeam("Ч ВВНЗ", "Два швидко", "ВА", 2200, false, [1000, 900]),
     ]);
 
@@ -230,23 +230,27 @@ describe("buildMilitaryRelayClasses", () => {
       {
         teamName: "Фініш",
         place: "1",
-        stageTimes: ["18:20", "16:40", "16:40"],
+        stageTimes: ["15:00", "15:00", "21:40"],
+        timeBehind: "",
         status: "OK",
       },
       {
         teamName: "Два швидко",
         place: "",
         stageTimes: ["16:40", "15:00", ""],
+        timeBehind: "+1:40",
         status: "DidNotFinish",
       },
       {
         teamName: "Два повільно",
         place: "",
+        timeBehind: "+6:40",
         status: "DidNotFinish",
       },
       {
         teamName: "Один етап",
         place: "",
+        timeBehind: "",
         status: "DidNotFinish",
       },
     ]);
