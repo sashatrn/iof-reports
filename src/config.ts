@@ -8,6 +8,11 @@ type RogainingScorePoints = {
   masters?: Record<string, number>;
 };
 
+export type MilitaryIndividualTeamGroupConfig = {
+  name: string;
+  classRegex: string;
+};
+
 export type AppConfig = {
   logging: {
     level: string;
@@ -15,6 +20,7 @@ export type AppConfig = {
   ignoredStatuses: string[];
   military: {
     teamFilterRegex: string;
+    individualTeamGroups: MilitaryIndividualTeamGroupConfig[];
   };
   rogaining: {
     controlGateRule: {
@@ -93,6 +99,16 @@ const defaultConfig: AppConfig = {
   ignoredStatuses: ["DidNotEnter"],
   military: {
     teamFilterRegex: ".*",
+    individualTeamGroups: [
+      {
+        name: "ВВНЗ",
+        classRegex: "ВВНЗ",
+      },
+      {
+        name: "ЗСУ",
+        classRegex: "ЗСУ",
+      },
+    ],
   },
   rogaining: {
     controlGateRule: {

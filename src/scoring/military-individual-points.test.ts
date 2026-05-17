@@ -20,9 +20,9 @@ describe("militaryIndividualPointsFromPosition", () => {
     expect(militaryIndividualPointsFromPosition(40, "OK")).toBe(1);
   });
 
-  it("uses minimum points for missing or non-OK results", () => {
-    expect(militaryIndividualPointsFromPosition(undefined, "OK")).toBe(1);
-    expect(militaryIndividualPointsFromPosition(1, "DNF")).toBe(1);
+  it("uses zero points for missing or non-OK results", () => {
+    expect(militaryIndividualPointsFromPosition(undefined, "OK")).toBe(0);
+    expect(militaryIndividualPointsFromPosition(1, "DNF")).toBe(0);
     expect(militaryIndividualPointsFromPosition(41, "OK")).toBe(1);
   });
 

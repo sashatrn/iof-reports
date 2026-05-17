@@ -29,6 +29,10 @@ const coursesXml = fs.readFileSync(
   path.resolve(__dirname, "../__fixtures__/courses.xml"),
   "utf-8",
 );
+const militaryLongXml = fs.readFileSync(
+  path.resolve(__dirname, "../__fixtures__/military-long.xml"),
+  "utf-8",
+);
 const bazaXml = `<?xml version="1.0" encoding="utf-8"?>
 <UOFData>
   <Names>Тестовий рогейн</Names>
@@ -87,7 +91,17 @@ describe("generateMilitaryIndividualReportHtml", () => {
     expect(report.viewHtml).toContain("Ч 5-6");
     expect(report.viewHtml).toContain("<th>Відст.</th>");
     expect(report.viewHtml).toContain("<td>+0:08</td>");
+    expect(report.viewHtml).not.toContain("Командні результати");
+    expect(report.pdfHtml).toContain("Командні результати");
     expect(report.pdfHtml).toContain("@page");
+  });
+
+  it("separates military individual team results by ВВНЗ and ЗСУ groups", () => {
+    const report = generateMilitaryIndividualReportHtml(militaryLongXml);
+
+    expect(report.pdfHtml).toContain("Командні результати");
+    expect(report.pdfHtml).toContain("<h4>ВВНЗ</h4>");
+    expect(report.pdfHtml).toContain("<h4>ЗСУ</h4>");
   });
 });
 

@@ -17,7 +17,7 @@ export function militaryIndividualPointsFromPosition(
   return points > 1 ? points : 1;
 }
 
-function buildTeamFilter(teamFilterRegex: string): RegExp {
+export function buildMilitaryTeamFilter(teamFilterRegex: string): RegExp {
   try {
     return new RegExp(teamFilterRegex);
   } catch (error) {
@@ -46,7 +46,7 @@ export function applyMilitaryIndividualPoints(
   participants: Participant[],
   teamFilterRegex: string,
 ): void {
-  const teamFilter = buildTeamFilter(teamFilterRegex);
+  const teamFilter = buildMilitaryTeamFilter(teamFilterRegex);
   const byClass = new Map<string, Participant[]>();
 
   for (const participant of participants) {

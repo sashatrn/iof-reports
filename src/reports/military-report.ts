@@ -1,9 +1,12 @@
 import path from "path";
-import { loadConfig } from "../config";
+import { loadConfig, type MilitaryIndividualTeamGroupConfig } from "../config";
 import { Participant } from "../io/parse-iof";
 import { RogainingTeam } from "../io/parse-rogaining-iof";
 import { renderTemplate } from "../render/template-engine";
-import { MILITARY_OUT_OF_COMPETITION_POINTS } from "../scoring/military-individual-points";
+import {
+  buildMilitaryTeamFilter,
+  MILITARY_OUT_OF_COMPETITION_POINTS,
+} from "../scoring/military-individual-points";
 import { pointsFromPosition } from "../scoring/points";
 import { formatDate } from "../utils/date";
 import { imageToBase64 } from "../utils/image";
@@ -34,6 +37,17 @@ type MilitaryTeamStanding = {
   totalPoints: number;
 };
 
+type MilitaryIndividualTeamResult = {
+  place: number;
+  organisation: string;
+  points: number;
+};
+
+type MilitaryIndividualTeamGroup = {
+  name: string;
+  teams: MilitaryIndividualTeamResult[];
+};
+
 const PLACEABLE_STATUSES = new Set(["OK"]);
 
 function formatTime(sec?: number): string {
@@ -59,6 +73,23 @@ function formatTimeBehind(sec?: number): string {
   const seconds = sec % 60;
 
   return `+${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+function buildClassGroupMatchers(
+  groups: MilitaryIndividualTeamGroupConfig[],
+): Array<MilitaryIndividualTeamGroupConfig & { regex: RegExp }> {
+  return groups.map((group, index) => {
+    try {
+      return {
+        ...group,
+        regex: new RegExp(group.classRegex),
+      };
+    } catch (error) {
+      throw new Error(
+        `Invalid military.individualTeamGroups[${index}].classRegex: ${(error as Error).message}`,
+      );
+    }
+  });
 }
 
 function buildMilitaryEvent(eventDate: Date, reportTitle: string) {
@@ -210,11 +241,73 @@ export function buildMilitaryTeamStandings(
     }));
 }
 
+export function buildMilitaryIndividualTeamResults(
+  participants: Participant[],
+  teamFilterRegex: string,
+  teamGroups: MilitaryIndividualTeamGroupConfig[],
+): MilitaryIndividualTeamGroup[] {
+  const teamFilter = buildMilitaryTeamFilter(teamFilterRegex);
+  const groupMatchers = buildClassGroupMatchers(teamGroups);
+  const pointsByGroup = new Map<string, Map<string, number>>();
+
+  for (const participant of participants) {
+    if (!teamFilter.test(participant.club)) {
+      continue;
+    }
+
+    const groupName =
+      groupMatchers.find((group) => group.regex.test(participant.className))?.name ??
+      "Загальний залік";
+    const organisation = participant.club.trim() || "Unknown";
+    const pointsByOrganisation = pointsByGroup.get(groupName) ?? new Map<string, number>();
+
+    pointsByOrganisation.set(
+      organisation,
+      (pointsByOrganisation.get(organisation) ?? 0) + participant.points,
+    );
+    pointsByGroup.set(groupName, pointsByOrganisation);
+  }
+
+  return [...pointsByGroup.entries()]
+    .sort(([leftGroup], [rightGroup]) => {
+      const leftIndex = teamGroups.findIndex((group) => group.name === leftGroup);
+      const rightIndex = teamGroups.findIndex((group) => group.name === rightGroup);
+
+      if (leftIndex !== -1 || rightIndex !== -1) {
+        return (leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex) -
+          (rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex);
+      }
+
+      return leftGroup.localeCompare(rightGroup, "uk");
+    })
+    .map(([name, pointsByOrganisation]) => ({
+      name,
+      teams: [...pointsByOrganisation.entries()]
+        .map(([organisation, points]) => ({
+          place: 0,
+          organisation,
+          points,
+        }))
+        .sort((left, right) => {
+          if (left.points !== right.points) {
+            return right.points - left.points;
+          }
+
+          return left.organisation.localeCompare(right.organisation, "uk");
+        })
+        .map((result, index) => ({
+          ...result,
+          place: index + 1,
+        })),
+    }));
+}
+
 export function buildMilitaryIndividualHtml(
   participants: Participant[],
   eventDate: Date,
   variant: HtmlVariant = "pdf",
 ): string {
+  const config = loadConfig();
   const byClass = new Map<string, Participant[]>();
 
   for (const participant of participants) {
@@ -246,6 +339,11 @@ export function buildMilitaryIndividualHtml(
   return renderTemplate(`military-individual-${variant}.njk`, {
     ...buildMilitaryEvent(eventDate, "Довга дистанція"),
     classes,
+    teamResults: buildMilitaryIndividualTeamResults(
+      participants,
+      config.military.teamFilterRegex,
+      config.military.individualTeamGroups,
+    ),
   });
 }
 

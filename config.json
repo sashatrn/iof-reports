@@ -69,7 +69,17 @@
     }
   },
   "military": {
-    "teamFilterRegex": ".*"
+    "teamFilterRegex": ".*",
+    "individualTeamGroups": [
+      {
+        "name": "ВВНЗ",
+        "classRegex": "ВВНЗ"
+      },
+      {
+        "name": "ЗСУ",
+        "classRegex": "ЗСУ"
+      }
+    ]
   },
   "genderMapping": {
     "menPrefixes": ["M", "Ч", "Х"],
