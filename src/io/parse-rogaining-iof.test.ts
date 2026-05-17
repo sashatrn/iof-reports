@@ -130,4 +130,69 @@ describe("parseRogainingIof", () => {
       "Київська",
     ]);
   });
+
+  it("excludes DidNotEnter team members and empty teams", () => {
+    const parsed = parseRogainingIof(`
+      <ResultList>
+        <ClassResult>
+          <Class>
+            <Name>Естафета</Name>
+          </Class>
+          <TeamResult>
+            <Name>Не стартували</Name>
+            <TeamMemberResult>
+              <Person>
+                <Name>
+                  <Family>Неявка</Family>
+                  <Given>Учасник</Given>
+                </Name>
+              </Person>
+              <Result>
+                <Status>DidNotEnter</Status>
+                <OverallResult>
+                  <Status>DidNotEnter</Status>
+                </OverallResult>
+              </Result>
+            </TeamMemberResult>
+          </TeamResult>
+          <TeamResult>
+            <Name>Фінішували</Name>
+            <TeamMemberResult>
+              <Person>
+                <Name>
+                  <Family>Перший</Family>
+                  <Given>Учасник</Given>
+                </Name>
+              </Person>
+              <Organisation>
+                <Name>Команда</Name>
+              </Organisation>
+              <Result>
+                <Status>OK</Status>
+                <OverallResult>
+                  <Time>3600</Time>
+                  <Status>OK</Status>
+                </OverallResult>
+              </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+              <Person>
+                <Name>
+                  <Family>Неявка</Family>
+                  <Given>Другий</Given>
+                </Name>
+              </Person>
+              <Result>
+                <Status>DidNotEnter</Status>
+              </Result>
+            </TeamMemberResult>
+          </TeamResult>
+        </ClassResult>
+      </ResultList>
+    `);
+
+    expect(parsed.teams).toHaveLength(1);
+    expect(parsed.teams[0].teamName).toBe("Фінішували");
+    expect(parsed.teams[0].members).toEqual(["Учасник Перший"]);
+  });
 });

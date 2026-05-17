@@ -1,4 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
+import { loadIgnoredResultStatuses, shouldExcludeResultStatus } from "./parse-iof";
 import { parseIsoDate } from "../utils/date";
 
 type IofScoreEntry = {
@@ -208,6 +209,7 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
   const eventDate = parseIsoDate(json?.ResultList?.Event?.StartTime?.Date);
   const eventName = json?.ResultList?.Event?.Name;
   const classResults = asArray(json?.ResultList?.ClassResult);
+  const ignoredStatuses = loadIgnoredResultStatuses();
 
   const teams: RogainingTeam[] = [];
 
@@ -239,7 +241,12 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
             overallStatus: result?.OverallResult?.Status,
           };
         })
-        .filter((member) => member.name !== "Unknown" || member.status !== "Unknown");
+        .filter(
+          (member) =>
+            !shouldExcludeResultStatus(member.status, ignoredStatuses) &&
+            !shouldExcludeResultStatus(member.overallStatus, ignoredStatuses) &&
+            (member.name !== "Unknown" || member.status !== "Unknown"),
+        );
 
       if (memberResults.length === 0) {
         continue;

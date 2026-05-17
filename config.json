@@ -2,6 +2,7 @@
   "logging": {
     "level": "info"
   },
+  "ignoredStatuses": ["DidNotEnter"],
   "rogaining": {
     "controlGateRule": {
       "enabled": true,
@@ -66,6 +67,9 @@
       "msuPlaces": [1, 2],
       "minRegionsForMsu": 6
     }
+  },
+  "military": {
+    "teamFilterRegex": ".*"
   },
   "genderMapping": {
     "menPrefixes": ["M", "Ч", "Х"],

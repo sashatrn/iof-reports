@@ -25,7 +25,7 @@ import {
   buildRogainingSplitsHtml,
 } from "../reports/rogaining-report";
 import { buildTeamHtml } from "../reports/team-report";
-import { militaryIndividualPointsFromPosition } from "../scoring/military-individual-points";
+import { applyMilitaryIndividualPoints } from "../scoring/military-individual-points";
 import { pointsFromPosition } from "../scoring/points";
 import { computeTeamResults } from "../scoring/team";
 import { ReportType, SingleReportType } from "../report-types";
@@ -152,11 +152,9 @@ export function generateMilitaryIndividualReportHtml(
   options: GenerateReportOptions = {},
 ): GeneratedReport {
   const { logger } = options;
-  const { participants, eventDate } = parseParticipantsXml(
-    xml,
-    logger,
-    militaryIndividualPointsFromPosition,
-  );
+  const { participants, eventDate } = parseParticipantsXml(xml, logger);
+  const config = loadConfig();
+  applyMilitaryIndividualPoints(participants, config.military.teamFilterRegex);
 
   return {
     reportType: "military-individual",
@@ -194,11 +192,9 @@ export function generateMilitaryTeamReportHtml(
     throw new Error("military-team report requires a relay/team IOF XML file.");
   }
 
-  const { participants, eventDate } = parseParticipantsXml(
-    individualXml,
-    logger,
-    militaryIndividualPointsFromPosition,
-  );
+  const { participants, eventDate } = parseParticipantsXml(individualXml, logger);
+  const config = loadConfig();
+  applyMilitaryIndividualPoints(participants, config.military.teamFilterRegex);
   const { teams: relayTeams, eventName } = parseRelayXml(relayXml, logger);
   const html = buildMilitaryTeamHtml(participants, relayTeams, eventDate);
 

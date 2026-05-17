@@ -3,6 +3,7 @@ import { loadConfig } from "../config";
 import { Participant } from "../io/parse-iof";
 import { RogainingTeam } from "../io/parse-rogaining-iof";
 import { renderTemplate } from "../render/template-engine";
+import { MILITARY_OUT_OF_COMPETITION_POINTS } from "../scoring/military-individual-points";
 import { pointsFromPosition } from "../scoring/points";
 import { formatDate } from "../utils/date";
 import { imageToBase64 } from "../utils/image";
@@ -63,7 +64,7 @@ function formatTimeBehind(sec?: number): string {
 function buildMilitaryEvent(eventDate: Date, reportTitle: string) {
   const config = loadConfig();
   const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
-  const logo2Path = path.resolve(__dirname, "../assets/logo2.png");
+  const logo2Path = path.resolve(__dirname, "../assets/zhvi-logo.png");
 
   return {
     reportTitle,
@@ -167,6 +168,10 @@ export function buildMilitaryTeamStandings(
   };
 
   for (const participant of participants) {
+    if (participant.pointsLabel === MILITARY_OUT_OF_COMPETITION_POINTS) {
+      continue;
+    }
+
     getEntry(participant.club).individualPoints += participant.points;
   }
 
@@ -232,7 +237,7 @@ export function buildMilitaryIndividualHtml(
           organisation: participant.club,
           time: formatTime(participant.timeSec),
           timeBehind: formatTimeBehind(participant.timeBehindSec),
-          points: participant.points,
+          points: participant.pointsLabel ?? participant.points,
           status: participant.status,
         })),
     }),

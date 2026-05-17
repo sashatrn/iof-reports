@@ -85,7 +85,7 @@ describe("generateMilitaryIndividualReportHtml", () => {
     expect(report.itemCount).toBeGreaterThan(0);
     expect(report.viewHtml).toContain("Довга дистанція");
     expect(report.viewHtml).toContain("Ч 5-6");
-    expect(report.viewHtml).toContain("<th>Відставання</th>");
+    expect(report.viewHtml).toContain("<th>Відст.</th>");
     expect(report.viewHtml).toContain("<td>+0:08</td>");
     expect(report.pdfHtml).toContain("@page");
   });

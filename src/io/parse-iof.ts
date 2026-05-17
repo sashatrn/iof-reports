@@ -1,4 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
+import { loadConfig } from "../config";
 import { parseIsoDate } from "../utils/date";
 
 export type ParsedIof = {
@@ -15,7 +16,19 @@ export type Participant = {
   position?: number;
   status: string;
   points: number;
+  pointsLabel?: string;
 };
+
+export function loadIgnoredResultStatuses(): Set<string> {
+  return new Set(loadConfig().ignoredStatuses);
+}
+
+export function shouldExcludeResultStatus(
+  status: string | undefined,
+  ignoredStatuses: Set<string> = loadIgnoredResultStatuses(),
+): boolean {
+  return status !== undefined && ignoredStatuses.has(status);
+}
 
 function toOptionalNumber(value: unknown): number | undefined {
   if (value === undefined || value === null || value === "") {
@@ -38,6 +51,7 @@ export function parseIof(xml: string): ParsedIof {
 
   const classResults = json.ResultList.ClassResult;
   const classes = Array.isArray(classResults) ? classResults : [classResults];
+  const ignoredStatuses = loadIgnoredResultStatuses();
 
   const participants: Participant[] = [];
 
@@ -53,6 +67,11 @@ export function parseIof(xml: string): ParsedIof {
 
     for (const pr of persons) {
       const result = pr.Result;
+      const status = result?.Status ?? "Unknown";
+
+      if (shouldExcludeResultStatus(status, ignoredStatuses)) {
+        continue;
+      }
 
       participants.push({
         className,
@@ -61,7 +80,7 @@ export function parseIof(xml: string): ParsedIof {
         timeSec: toOptionalNumber(result?.Time),
         timeBehindSec: toOptionalNumber(result?.TimeBehind),
         position: toOptionalNumber(result?.Position),
-        status: result?.Status ?? "Unknown",
+        status,
         points: 0,
       });
     }

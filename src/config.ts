@@ -12,6 +12,10 @@ export type AppConfig = {
   logging: {
     level: string;
   };
+  ignoredStatuses: string[];
+  military: {
+    teamFilterRegex: string;
+  };
   rogaining: {
     controlGateRule: {
       enabled: boolean;
@@ -85,6 +89,10 @@ export type AppConfig = {
 const defaultConfig: AppConfig = {
   logging: {
     level: "debug",
+  },
+  ignoredStatuses: ["DidNotEnter"],
+  military: {
+    teamFilterRegex: ".*",
   },
   rogaining: {
     controlGateRule: {
@@ -302,6 +310,7 @@ export function loadConfig(configPath?: string): AppConfig {
   return {
     ...defaultConfig,
     ...parsed,
+    ignoredStatuses: parsed.ignoredStatuses ?? defaultConfig.ignoredStatuses,
     rogaining: {
       ...defaultConfig.rogaining,
       ...parsed.rogaining,
@@ -347,6 +356,10 @@ export function loadConfig(configPath?: string): AppConfig {
           parsed.rogaining?.resultsReport?.msuPlaces ??
           defaultConfig.rogaining.resultsReport.msuPlaces,
       },
+    },
+    military: {
+      ...defaultConfig.military,
+      ...parsed.military,
     },
     genderMapping: {
       ...defaultConfig.genderMapping,
