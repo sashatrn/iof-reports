@@ -13,6 +13,9 @@
         <th>Команда</th>
         <th>Учасники</th>
         <th>ВВНЗ, військо</th>
+        <th>Етап 1</th>
+        <th>Етап 2</th>
+        <th>Етап 3</th>
         <th>Час</th>
         <th>Очки</th>
         <th>Статус</th>
@@ -25,6 +28,9 @@
         <td><strong>{{ team.teamName }}</strong></td>
         <td>{{ team.membersLine }}</td>
         <td>{{ team.organisation }}</td>
+        <td>{{ team.stageTimes[0] }}</td>
+        <td>{{ team.stageTimes[1] }}</td>
+        <td>{{ team.stageTimes[2] }}</td>
         <td>{{ team.formattedTime }}</td>
         <td><strong>{{ team.points }}</strong></td>
         <td>{{ team.status }}</td>

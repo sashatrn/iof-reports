@@ -281,5 +281,7 @@ describe("parseRogainingIof", () => {
     `);
 
     expect(parsed.teams[0].allMembersFinished).toBe(false);
+    expect(parsed.teams[0].status).toBe("DidNotFinish");
+    expect(parsed.teams[0].memberTimeSecs).toEqual([2919, undefined]);
   });
 });

@@ -19,6 +19,7 @@ type MilitaryRelayEntry = {
   sourceClassName: string;
   membersLine: string;
   organisation: string;
+  stageTimes: string[];
   formattedTime: string;
   points: number;
   status: string;
@@ -49,7 +50,8 @@ type MilitaryIndividualTeamGroup = {
 };
 
 const PLACEABLE_STATUSES = new Set(["OK"]);
-const RELAY_INCOMPLETE_STATUS = "DoNotFinish";
+const RELAY_INCOMPLETE_STATUS = "DidNotFinish";
+const MILITARY_RELAY_STAGE_COUNT = 3;
 
 function formatTime(sec?: number): string {
   if (sec === undefined) {
@@ -136,25 +138,59 @@ function buildMilitaryEvent(eventDate: Date, reportTitle: string) {
 }
 
 function getMilitaryRelayStatus(team: RogainingTeam): string {
+  if (
+    team.memberTimeSecs !== undefined &&
+    getRelayCompletedStageCount(team) < MILITARY_RELAY_STAGE_COUNT
+  ) {
+    return RELAY_INCOMPLETE_STATUS;
+  }
+
   return team.allMembersFinished === false ? RELAY_INCOMPLETE_STATUS : team.status;
+}
+
+function getRelayCompletedStageCount(team: RogainingTeam): number {
+  if (team.memberTimeSecs === undefined) {
+    return PLACEABLE_STATUSES.has(team.status) ? team.memberCount : 0;
+  }
+
+  const memberTimeSecs = team.memberTimeSecs;
+  const completedStageCount = memberTimeSecs.filter((timeSec) => timeSec !== undefined).length;
+  return completedStageCount;
+}
+
+function getRelayProgressTime(team: RogainingTeam): number {
+  const memberTimeSecs = team.memberTimeSecs?.filter((timeSec) => timeSec !== undefined) ?? [];
+
+  if (memberTimeSecs.length > 0) {
+    return memberTimeSecs.reduce((sum, timeSec) => sum + timeSec, 0);
+  }
+
+  return team.timeSec ?? Number.MAX_SAFE_INTEGER;
 }
 
 function rankRelayTeams(teams: RogainingTeam[]): MilitaryRelayEntry[] {
   const sortedTeams = [...teams].sort((left, right) => {
     const leftStatus = getMilitaryRelayStatus(left);
     const rightStatus = getMilitaryRelayStatus(right);
+    const leftCompletedStageCount = getRelayCompletedStageCount(left);
+    const rightCompletedStageCount = getRelayCompletedStageCount(right);
+
+    if (leftCompletedStageCount !== rightCompletedStageCount) {
+      return rightCompletedStageCount - leftCompletedStageCount;
+    }
+
+    const leftTime = getRelayProgressTime(left);
+    const rightTime = getRelayProgressTime(right);
+
+    if (leftTime !== rightTime) {
+      return leftTime - rightTime;
+    }
+
     const leftPlaceable = PLACEABLE_STATUSES.has(leftStatus);
     const rightPlaceable = PLACEABLE_STATUSES.has(rightStatus);
 
     if (leftPlaceable !== rightPlaceable) {
       return leftPlaceable ? -1 : 1;
-    }
-
-    const leftTime = left.timeSec ?? Number.MAX_SAFE_INTEGER;
-    const rightTime = right.timeSec ?? Number.MAX_SAFE_INTEGER;
-
-    if (leftTime !== rightTime) {
-      return leftTime - rightTime;
     }
 
     return left.teamName.localeCompare(right.teamName, "uk");
@@ -184,6 +220,9 @@ function rankRelayTeams(teams: RogainingTeam[]): MilitaryRelayEntry[] {
       sourceClassName: team.className,
       membersLine: team.members.join(", "),
       organisation: team.organisation,
+      stageTimes: Array.from({ length: MILITARY_RELAY_STAGE_COUNT }, (_, index) =>
+        formatTime(team.memberTimeSecs?.[index]),
+      ),
       formattedTime: formatTime(team.timeSec),
       points: canScore ? militaryRelayPointsFromPlace(place, status) : 0,
       status,

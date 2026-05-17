@@ -40,6 +40,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
   const options = parseWatchArgs(argv, logger);
   const statePath = path.join(options.outputDir, ".watch-state.json");
   let state = readWatchState(statePath);
+  let forceRegenerate = true;
   let running = false;
   let stopping = false;
 
@@ -92,7 +93,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
         : undefined;
       const hash = sha256(`${xml}\n${courseDataXml ?? ""}`);
 
-      if (state.lastFilePath === latestFile.path && state.lastFileHash === hash) {
+      if (!forceRegenerate && state.lastFilePath === latestFile.path && state.lastFileHash === hash) {
         logger.debug({ file: latestFile.path }, "No XML changes detected");
         return;
       }
@@ -140,6 +141,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
         updatedAt,
       };
       writeWatchState(statePath, state);
+      forceRegenerate = false;
 
       logger.info(
         {

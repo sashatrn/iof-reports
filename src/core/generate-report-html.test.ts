@@ -33,6 +33,10 @@ const militaryLongXml = fs.readFileSync(
   path.resolve(__dirname, "../__fixtures__/military-long.xml"),
   "utf-8",
 );
+const militaryRelayXml = fs.readFileSync(
+  path.resolve(__dirname, "../__fixtures__/relay.xml"),
+  "utf-8",
+);
 const bazaXml = `<?xml version="1.0" encoding="utf-8"?>
 <UOFData>
   <Names>Тестовий рогейн</Names>
@@ -65,6 +69,20 @@ function expectInOrder(text: string, fragments: string[]): void {
     ).toBeGreaterThan(previousIndex);
     previousIndex = currentIndex;
   }
+}
+
+function expectRowContaining(text: string, rowFragment: string): string {
+  const fragmentIndex = text.indexOf(rowFragment);
+
+  expect(fragmentIndex, `Expected row containing "${rowFragment}" to exist`).toBeGreaterThan(-1);
+
+  const rowStart = text.lastIndexOf("<tr", fragmentIndex);
+  const rowEnd = text.indexOf("</tr>", fragmentIndex);
+
+  expect(rowStart, `Expected row start before "${rowFragment}"`).toBeGreaterThan(-1);
+  expect(rowEnd, `Expected row end after "${rowFragment}"`).toBeGreaterThan(-1);
+
+  return text.slice(rowStart, rowEnd + "</tr>".length);
 }
 
 describe("generateIndividualReportHtml", () => {
@@ -148,6 +166,19 @@ describe("generateMilitaryRelayReportHtml", () => {
     expect(report.viewHtml).not.toContain("Загальнокомандний результат");
     expect(report.pdfHtml).toContain("Загальнокомандний результат");
     expect(report.pdfHtml).toContain("@page");
+  });
+
+  it("marks military relay teams with unfinished stages as DidNotFinish in view and pdf", () => {
+    const report = generateMilitaryRelayReportHtml(militaryRelayXml);
+    const viewRow = expectRowContaining(report.viewHtml, "ВА м.Одеса - 3");
+    const pdfRow = expectRowContaining(report.pdfHtml, "ВА м.Одеса - 3");
+
+    expect(viewRow).toContain("<td>DidNotFinish</td>");
+    expect(viewRow).toContain("<td><strong>0</strong></td>");
+    expect(viewRow).not.toContain("<td>OK</td>");
+    expect(pdfRow).toContain("<td>DidNotFinish</td>");
+    expect(pdfRow).toContain("<td><strong>0</strong></td>");
+    expect(pdfRow).not.toContain("<td>OK</td>");
   });
 });
 

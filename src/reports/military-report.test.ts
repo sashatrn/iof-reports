@@ -155,9 +155,9 @@ describe("buildMilitaryRelayClasses", () => {
     ]);
   });
 
-  it("marks incomplete relay teams as DoNotFinish without place or points", () => {
+  it("marks incomplete relay teams as DidNotFinish without place or points", () => {
     const classes = buildMilitaryRelayClasses([
-      makeRelayTeam("Ч ВВНЗ", "ЖВІ - 1", "ЖВІ", 3000),
+      makeRelayTeam("Ч ВВНЗ", "ЖВІ - 1", "ЖВІ", 3000, true, [1000, 1000, 1000]),
       makeRelayTeam("Ч ВВНЗ", "ВІТВ - 2", "ВІТВ", 2900, false),
     ]);
 
@@ -172,7 +172,61 @@ describe("buildMilitaryRelayClasses", () => {
         teamName: "ВІТВ - 2",
         place: "",
         points: 0,
-        status: "DoNotFinish",
+        status: "DidNotFinish",
+      },
+    ]);
+  });
+
+  it("marks relay teams with missing stage times as DidNotFinish", () => {
+    const classes = buildMilitaryRelayClasses([
+      makeRelayTeam("Ж ВВНЗ", "ВА м.Одеса - 3", "ВА м.Одеса", 2460, true, [
+        2460,
+        undefined,
+        undefined,
+      ]),
+    ]);
+
+    expect(classes[0].teams).toMatchObject([
+      {
+        teamName: "ВА м.Одеса - 3",
+        place: "",
+        points: 0,
+        stageTimes: ["41:00", "", ""],
+        status: "DidNotFinish",
+      },
+    ]);
+  });
+
+  it("sorts relay teams by completed stages and cumulative stage time", () => {
+    const classes = buildMilitaryRelayClasses([
+      makeRelayTeam("Ч ВВНЗ", "Два повільно", "ВІТВ", 3000, false, [1200, 1000]),
+      makeRelayTeam("Ч ВВНЗ", "Один етап", "НАСВ", 900, false, [900]),
+      makeRelayTeam("Ч ВВНЗ", "Фініш", "ЖВІ", 3100, true, [1100, 1000, 1000]),
+      makeRelayTeam("Ч ВВНЗ", "Два швидко", "ВА", 2200, false, [1000, 900]),
+    ]);
+
+    expect(classes[0].teams).toMatchObject([
+      {
+        teamName: "Фініш",
+        place: "1",
+        stageTimes: ["18:20", "16:40", "16:40"],
+        status: "OK",
+      },
+      {
+        teamName: "Два швидко",
+        place: "",
+        stageTimes: ["16:40", "15:00", ""],
+        status: "DidNotFinish",
+      },
+      {
+        teamName: "Два повільно",
+        place: "",
+        status: "DidNotFinish",
+      },
+      {
+        teamName: "Один етап",
+        place: "",
+        status: "DidNotFinish",
       },
     ]);
   });
@@ -229,13 +283,17 @@ function makeRelayTeam(
   organisation: string,
   timeSec: number,
   allMembersFinished = true,
+  memberTimeSecs?: Array<number | undefined>,
 ): RogainingTeam {
+  const members = memberTimeSecs?.map((_, index) => `${teamName} ${index + 1}`) ?? [teamName];
+
   return {
     className,
     teamName,
     organisation,
-    members: [teamName],
-    memberCount: 1,
+    members,
+    memberTimeSecs,
+    memberCount: members.length,
     score: 0,
     penalty: 0,
     totalScore: 0,

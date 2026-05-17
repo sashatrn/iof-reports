@@ -31,6 +31,7 @@ export type RogainingTeam = {
   organisation: string;
   members: string[];
   memberOrganisations?: string[];
+  memberTimeSecs?: Array<number | undefined>;
   memberControls?: string[][];
   memberSplits?: RogainingSplit[][];
   controlGateStatus?: "OK" | "-" | "DSQ";
@@ -219,6 +220,17 @@ function hasFinishedRelayLeg(member: RogainingMember): boolean {
   );
 }
 
+function normalizeRelayTeamStatus(
+  status: string,
+  memberResults: RogainingMember[],
+): string {
+  if (memberResults.length > 0 && !memberResults.every(hasFinishedRelayLeg)) {
+    return "DidNotFinish";
+  }
+
+  return status;
+}
+
 export function parseRogainingIof(xml: string): ParsedRogainingIof {
   const parser = new XMLParser({
     ignoreAttributes: false,
@@ -272,6 +284,11 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
       }
 
       const normalizedTeam = normalizeTeam(memberResults);
+      const allMembersFinished = memberResults.every(hasFinishedRelayLeg);
+      const normalizedStatus = normalizeRelayTeamStatus(
+        normalizedTeam.status,
+        memberResults,
+      );
       const organisation = formatTeamOrganisation(
         memberResults,
         teamResult?.Organisation?.Name,
@@ -284,6 +301,7 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
         organisation,
         members: memberResults.map((member) => member.name),
         memberOrganisations: memberResults.map((member) => member.organisation),
+        memberTimeSecs: memberResults.map((member) => member.finishTimeSec),
         memberControls: memberResults.map((member) => member.controls),
         memberSplits: memberResults.map((member) => member.splits),
         memberCount: memberResults.length,
@@ -291,9 +309,8 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
         penalty: normalizedTeam.penalty,
         totalScore: normalizedTeam.score,
         timeSec: normalizedTeam.timeSec,
-        status: normalizedTeam.status,
-        allMembersFinished:
-          rawMemberResults.length > 0 && rawMemberResults.every(hasFinishedRelayLeg),
+        status: normalizedStatus,
+        allMembersFinished,
       });
     }
   }
