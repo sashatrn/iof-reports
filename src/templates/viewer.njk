@@ -169,6 +169,7 @@
         <label><input id="activeToggle" type="checkbox" /> Show Active</label>
         <label><input id="openClassToggle" type="checkbox" checked /> Show ALL</label>
         <label><input id="clubToggle" type="checkbox" checked /> Show Club</label>
+        <label><input id="participantsToggle" type="checkbox" checked /> Show participants</label>
         <label><input id="emptyClassToggle" type="checkbox" checked /> Show Empty Classes</label>
         <label>Speed <input id="speed" type="range" min="10" max="200" step="5" value="45" /></label>
         <label>Pause edge <input id="pause" type="range" min="0" max="5000" step="250" value="1500" /></label>
@@ -192,6 +193,7 @@
     const activeToggle = document.getElementById("activeToggle");
     const openClassToggle = document.getElementById("openClassToggle");
     const clubToggle = document.getElementById("clubToggle");
+    const participantsToggle = document.getElementById("participantsToggle");
     const emptyClassToggle = document.getElementById("emptyClassToggle");
     const speedInput = document.getElementById("speed");
     const pauseInput = document.getElementById("pause");
@@ -218,6 +220,7 @@
     let showActive = false;
     let showOpenClass = true;
     let showClub = true;
+    let showParticipants = true;
     let showEmptyClasses = true;
 
     function formatBrowserLocalDateTime(value) {
@@ -314,7 +317,7 @@
         const headerCells = [...headerRow.children];
         const clubColumnIndex = headerCells.findIndex((cell) => {
           const label = (cell.textContent || "").trim();
-          return label === "Регіон" || label === "Організація";
+          return label === "Регіон" || label === "Організація" || label === "ВВНЗ, військо";
         });
 
         if (clubColumnIndex === -1) {
@@ -327,6 +330,41 @@
           const cell = row.children[clubColumnIndex];
           if (cell && "style" in cell) {
             cell.style.display = showClub ? "" : "none";
+          }
+        }
+      }
+    }
+
+    function applyParticipantsVisibility(targetFrame = activeFrame) {
+      const doc = targetFrame.contentDocument;
+      if (!doc) {
+        return;
+      }
+
+      const tables = doc.querySelectorAll("table");
+
+      for (const table of tables) {
+        const headerRow = table.querySelector("thead tr");
+        if (!headerRow) {
+          continue;
+        }
+
+        const headerCells = [...headerRow.children];
+        const participantsColumnIndex = headerCells.findIndex((cell) => {
+          const label = (cell.textContent || "").trim();
+          return label === "Учасники";
+        });
+
+        if (participantsColumnIndex === -1) {
+          continue;
+        }
+
+        const rows = table.querySelectorAll("tr");
+
+        for (const row of rows) {
+          const cell = row.children[participantsColumnIndex];
+          if (cell && "style" in cell) {
+            cell.style.display = showParticipants ? "" : "none";
           }
         }
       }
@@ -356,6 +394,7 @@
       applyActiveVisibility(targetFrame);
       applyOpenClassVisibility(targetFrame);
       applyClubVisibility(targetFrame);
+      applyParticipantsVisibility(targetFrame);
       applyEmptyClassVisibility(targetFrame);
 
       const scrollable = getScrollable(targetFrame);
@@ -499,6 +538,14 @@
       showClub = clubToggle.checked;
       applyClubVisibility(activeFrame);
       applyClubVisibility(standbyFrame);
+      applyEmptyClassVisibility(activeFrame);
+      applyEmptyClassVisibility(standbyFrame);
+    });
+
+    participantsToggle.addEventListener("change", () => {
+      showParticipants = participantsToggle.checked;
+      applyParticipantsVisibility(activeFrame);
+      applyParticipantsVisibility(standbyFrame);
       applyEmptyClassVisibility(activeFrame);
       applyEmptyClassVisibility(standbyFrame);
     });
