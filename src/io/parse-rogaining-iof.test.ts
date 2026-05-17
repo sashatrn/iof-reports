@@ -131,6 +131,46 @@ describe("parseRogainingIof", () => {
     ]);
   });
 
+  it("uses team organisation before member organisations", () => {
+    const parsed = parseRogainingIof(`
+      <ResultList>
+        <ClassResult>
+          <Class>
+            <Name>Ж ВВНЗ</Name>
+          </Class>
+          <TeamResult>
+            <Name>ВА м.Одеса - 3</Name>
+            <Organisation>
+              <Name>ВА м.Одеса</Name>
+            </Organisation>
+            <TeamMemberResult>
+              <Person>
+                <Name>
+                  <Family></Family>
+                  <Given>X</Given>
+                </Name>
+              </Person>
+              <Organisation>
+                <Name>ХНУПС</Name>
+              </Organisation>
+              <Result>
+                <Status>OK</Status>
+                <OverallResult>
+                  <Time>2460</Time>
+                  <Status>OK</Status>
+                </OverallResult>
+              </Result>
+            </TeamMemberResult>
+          </TeamResult>
+        </ClassResult>
+      </ResultList>
+    `);
+
+    expect(parsed.teams[0].teamName).toBe("ВА м.Одеса - 3");
+    expect(parsed.teams[0].organisation).toBe("ВА м.Одеса");
+    expect(parsed.teams[0].memberOrganisations).toEqual(["ХНУПС"]);
+  });
+
   it("excludes DidNotEnter team members and empty teams", () => {
     const parsed = parseRogainingIof(`
       <ResultList>

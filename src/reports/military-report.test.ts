@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { type Participant } from "../io/parse-iof";
-import { buildMilitaryIndividualTeamResults } from "./military-report";
+import { type RogainingTeam } from "../io/parse-rogaining-iof";
+import {
+  buildMilitaryIndividualTeamResults,
+  buildMilitaryRelayClasses,
+  buildMilitaryRelayTeamResults,
+} from "./military-report";
 
 const teamGroups = [
   {
@@ -115,6 +120,77 @@ describe("buildMilitaryIndividualTeamResults", () => {
   });
 });
 
+describe("buildMilitaryRelayClasses", () => {
+  it("scores only the first relay team from an organisation on the same distance", () => {
+    const classes = buildMilitaryRelayClasses([
+      makeRelayTeam("Ч ВВНЗ", "ЖВІ - 1", "ЖВІ", 3000),
+      makeRelayTeam("Ч ВВНЗ", "ЖВІ - 2", "ЖВІ", 3100),
+      makeRelayTeam("Ч ВВНЗ", "НАСВ - 1", "НАСВ", 3200),
+      makeRelayTeam("Ж ВВНЗ", "ЖВІ - 1", "ЖВІ", 3300),
+    ]);
+
+    expect(classes.find((classGroup) => classGroup.name === "Ч ВВНЗ")?.teams).toMatchObject([
+      {
+        teamName: "ЖВІ - 1",
+        place: "1",
+        points: 126,
+      },
+      {
+        teamName: "ЖВІ - 2",
+        place: "2",
+        points: 0,
+      },
+      {
+        teamName: "НАСВ - 1",
+        place: "3",
+        points: 99,
+      },
+    ]);
+    expect(classes.find((classGroup) => classGroup.name === "Ж ВВНЗ")?.teams).toMatchObject([
+      {
+        teamName: "ЖВІ - 1",
+        place: "1",
+        points: 126,
+      },
+    ]);
+  });
+});
+
+describe("buildMilitaryRelayTeamResults", () => {
+  it("sums relay points by configured team groups", () => {
+    const classes = buildMilitaryRelayClasses([
+      makeRelayTeam("Ч ВВНЗ", "ЖВІ - 1", "ЖВІ", 3000),
+      makeRelayTeam("Ч ВВНЗ", "ЖВІ - 2", "ЖВІ", 3100),
+      makeRelayTeam("Ж ВВНЗ", "ЖВІ - 3", "ЖВІ", 3200),
+      makeRelayTeam("Ч ЗСУ", "СВ - 1", "СВ", 3300),
+      makeRelayTeam("Ч ЗСУ", "Клуб - 1", "Клуб", 3400),
+    ]);
+
+    expect(buildMilitaryRelayTeamResults(classes, "^(ЖВІ|СВ)$", teamGroups)).toEqual([
+      {
+        name: "ВВНЗ",
+        teams: [
+          {
+            place: 1,
+            organisation: "ЖВІ",
+            points: 252,
+          },
+        ],
+      },
+      {
+        name: "ЗСУ",
+        teams: [
+          {
+            place: 1,
+            organisation: "СВ",
+            points: 126,
+          },
+        ],
+      },
+    ]);
+  });
+});
+
 function makeParticipant(club: string, points: number, className = "Ч ВВНЗ"): Participant {
   return {
     className,
@@ -122,5 +198,25 @@ function makeParticipant(club: string, points: number, className = "Ч ВВНЗ"
     club,
     status: "OK",
     points,
+  };
+}
+
+function makeRelayTeam(
+  className: string,
+  teamName: string,
+  organisation: string,
+  timeSec: number,
+): RogainingTeam {
+  return {
+    className,
+    teamName,
+    organisation,
+    members: [teamName],
+    memberCount: 1,
+    score: 0,
+    penalty: 0,
+    totalScore: 0,
+    timeSec,
+    status: "OK",
   };
 }

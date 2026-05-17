@@ -53,6 +53,20 @@ const bazaXml = `<?xml version="1.0" encoding="utf-8"?>
   </Sportsman>
 </UOFData>`;
 
+function expectInOrder(text: string, fragments: string[]): void {
+  let previousIndex = -1;
+
+  for (const fragment of fragments) {
+    const currentIndex = text.indexOf(fragment);
+    expect(currentIndex, `Expected fragment "${fragment}" to exist`).toBeGreaterThan(-1);
+    expect(
+      currentIndex,
+      `Expected fragment "${fragment}" to appear after the previous one`,
+    ).toBeGreaterThan(previousIndex);
+    previousIndex = currentIndex;
+  }
+}
+
 describe("generateIndividualReportHtml", () => {
   it("builds individual report html from IOF XML", () => {
     const report = generateIndividualReportHtml(sampleXml);
@@ -103,6 +117,24 @@ describe("generateMilitaryIndividualReportHtml", () => {
     expect(report.pdfHtml).toContain("<h4>ВВНЗ</h4>");
     expect(report.pdfHtml).toContain("<h4>ЗСУ</h4>");
   });
+
+  it("orders military individual class tables by configured team groups", () => {
+    const report = generateMilitaryIndividualReportHtml(militaryLongXml);
+
+    expectInOrder(report.pdfHtml, [
+      "<h3>Ж ВВНЗ</h3>",
+      "<h3>Ч ВВНЗ</h3>",
+      "<h3>Ж ЗСУ</h3>",
+      "<h3>Ч ЗСУ</h3>",
+      "Командні результати",
+    ]);
+    expectInOrder(report.viewHtml, [
+      "<h3>Ж ВВНЗ</h3>",
+      "<h3>Ч ВВНЗ</h3>",
+      "<h3>Ж ЗСУ</h3>",
+      "<h3>Ч ЗСУ</h3>",
+    ]);
+  });
 });
 
 describe("generateMilitaryRelayReportHtml", () => {
@@ -111,8 +143,10 @@ describe("generateMilitaryRelayReportHtml", () => {
 
     expect(report.reportType).toBe("military-relay");
     expect(report.itemCount).toBeGreaterThan(0);
-    expect(report.viewHtml).toContain("Естафетний протокол Збройних Сил");
+    expect(report.viewHtml).toContain("Естафета");
     expect(report.viewHtml).toContain("<th>Учасники</th>");
+    expect(report.viewHtml).not.toContain("Загальнокомандний результат");
+    expect(report.pdfHtml).toContain("Загальнокомандний результат");
     expect(report.pdfHtml).toContain("@page");
   });
 });

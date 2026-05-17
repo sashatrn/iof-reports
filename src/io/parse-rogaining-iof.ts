@@ -135,6 +135,7 @@ function formatTeamOrganisation(
   teamOrganisationName: unknown,
   classOrganisationName: unknown,
 ): string {
+  const teamOrganisation = extractOrganisationName(teamOrganisationName);
   const seen = new Set<string>();
   const memberOrganisations: string[] = [];
 
@@ -147,12 +148,20 @@ function formatTeamOrganisation(
     memberOrganisations.push(member.organisation);
   }
 
+  if (
+    teamOrganisation &&
+    isKnownMemberOrganisation(teamOrganisation) &&
+    (memberOrganisations.length <= 1 || !memberOrganisations.includes(teamOrganisation))
+  ) {
+    return teamOrganisation;
+  }
+
   if (memberOrganisations.length > 0) {
     return memberOrganisations.join(", ");
   }
 
   return (
-    extractOrganisationName(teamOrganisationName) ??
+    teamOrganisation ??
     memberResults.find((member) => member.organisation !== "Unknown")?.organisation ??
     extractOrganisationName(classOrganisationName) ??
     "Unknown"

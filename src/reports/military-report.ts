@@ -7,7 +7,7 @@ import {
   buildMilitaryTeamFilter,
   MILITARY_OUT_OF_COMPETITION_POINTS,
 } from "../scoring/military-individual-points";
-import { pointsFromPosition } from "../scoring/points";
+import { militaryRelayPointsFromPlace } from "../scoring/military-relay-points";
 import { formatDate } from "../utils/date";
 import { imageToBase64 } from "../utils/image";
 
@@ -92,6 +92,28 @@ function buildClassGroupMatchers(
   });
 }
 
+function getClassGroupIndex(
+  className: string,
+  groupMatchers: Array<MilitaryIndividualTeamGroupConfig & { regex: RegExp }>,
+): number {
+  const groupIndex = groupMatchers.findIndex((group) => group.regex.test(className));
+  return groupIndex === -1 ? Number.MAX_SAFE_INTEGER : groupIndex;
+}
+
+function compareMilitaryClassNames(
+  left: string,
+  right: string,
+  groupMatchers: Array<MilitaryIndividualTeamGroupConfig & { regex: RegExp }>,
+): number {
+  const groupDiff = getClassGroupIndex(left, groupMatchers) - getClassGroupIndex(right, groupMatchers);
+
+  if (groupDiff !== 0) {
+    return groupDiff;
+  }
+
+  return left.localeCompare(right, "uk");
+}
+
 function buildMilitaryEvent(eventDate: Date, reportTitle: string) {
   const config = loadConfig();
   const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
@@ -132,12 +154,20 @@ function rankRelayTeams(teams: RogainingTeam[]): MilitaryRelayEntry[] {
   });
 
   let currentPlace = 0;
+  const scoredOrganisations = new Set<string>();
 
   return sortedTeams.map((team) => {
     const place = PLACEABLE_STATUSES.has(team.status) ? currentPlace + 1 : undefined;
 
     if (place !== undefined) {
       currentPlace = place;
+    }
+
+    const organisationKey = team.organisation.trim() || "Unknown";
+    const canScore = place !== undefined && !scoredOrganisations.has(organisationKey);
+
+    if (canScore) {
+      scoredOrganisations.add(organisationKey);
     }
 
     return {
@@ -147,7 +177,7 @@ function rankRelayTeams(teams: RogainingTeam[]): MilitaryRelayEntry[] {
       membersLine: team.members.join(", "),
       organisation: team.organisation,
       formattedTime: formatTime(team.timeSec),
-      points: pointsFromPosition(place, team.status),
+      points: canScore ? militaryRelayPointsFromPlace(place, team.status) : 0,
       status: team.status,
     };
   });
@@ -302,12 +332,77 @@ export function buildMilitaryIndividualTeamResults(
     }));
 }
 
+export function buildMilitaryRelayTeamResults(
+  relayClasses: MilitaryRelayClass[],
+  teamFilterRegex: string,
+  teamGroups: MilitaryIndividualTeamGroupConfig[],
+): MilitaryIndividualTeamGroup[] {
+  const teamFilter = buildMilitaryTeamFilter(teamFilterRegex);
+  const groupMatchers = buildClassGroupMatchers(teamGroups);
+  const pointsByGroup = new Map<string, Map<string, number>>();
+
+  for (const classGroup of relayClasses) {
+    const groupName =
+      groupMatchers.find((group) => group.regex.test(classGroup.name))?.name ??
+      "Загальний залік";
+
+    for (const team of classGroup.teams) {
+      if (!teamFilter.test(team.organisation)) {
+        continue;
+      }
+
+      const organisation = team.organisation.trim() || "Unknown";
+      const pointsByOrganisation = pointsByGroup.get(groupName) ?? new Map<string, number>();
+
+      pointsByOrganisation.set(
+        organisation,
+        (pointsByOrganisation.get(organisation) ?? 0) + team.points,
+      );
+      pointsByGroup.set(groupName, pointsByOrganisation);
+    }
+  }
+
+  return [...pointsByGroup.entries()]
+    .sort(([leftGroup], [rightGroup]) => {
+      const leftIndex = teamGroups.findIndex((group) => group.name === leftGroup);
+      const rightIndex = teamGroups.findIndex((group) => group.name === rightGroup);
+
+      if (leftIndex !== -1 || rightIndex !== -1) {
+        return (leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex) -
+          (rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex);
+      }
+
+      return leftGroup.localeCompare(rightGroup, "uk");
+    })
+    .map(([name, pointsByOrganisation]) => ({
+      name,
+      teams: [...pointsByOrganisation.entries()]
+        .map(([organisation, points]) => ({
+          place: 0,
+          organisation,
+          points,
+        }))
+        .sort((left, right) => {
+          if (left.points !== right.points) {
+            return right.points - left.points;
+          }
+
+          return left.organisation.localeCompare(right.organisation, "uk");
+        })
+        .map((result, index) => ({
+          ...result,
+          place: index + 1,
+        })),
+    }));
+}
+
 export function buildMilitaryIndividualHtml(
   participants: Participant[],
   eventDate: Date,
   variant: HtmlVariant = "pdf",
 ): string {
   const config = loadConfig();
+  const groupMatchers = buildClassGroupMatchers(config.military.individualTeamGroups);
   const byClass = new Map<string, Participant[]>();
 
   for (const participant of participants) {
@@ -316,8 +411,9 @@ export function buildMilitaryIndividualHtml(
     byClass.set(participant.className, classParticipants);
   }
 
-  const classes = [...byClass.keys()].sort((left, right) => left.localeCompare(right, "uk")).map(
-    (className) => ({
+  const classes = [...byClass.keys()]
+    .sort((left, right) => compareMilitaryClassNames(left, right, groupMatchers))
+    .map((className) => ({
       name: className,
       participants: [...(byClass.get(className) ?? [])]
         .sort((left, right) => {
@@ -333,8 +429,7 @@ export function buildMilitaryIndividualHtml(
           points: participant.pointsLabel ?? participant.points,
           status: participant.status,
         })),
-    }),
-  );
+    }));
 
   return renderTemplate(`military-individual-${variant}.njk`, {
     ...buildMilitaryEvent(eventDate, "Довга дистанція"),
@@ -352,9 +447,17 @@ export function buildMilitaryRelayHtml(
   eventDate: Date,
   variant: HtmlVariant = "pdf",
 ): string {
+  const config = loadConfig();
+  const classes = buildMilitaryRelayClasses(teams);
+
   return renderTemplate(`military-relay-${variant}.njk`, {
-    ...buildMilitaryEvent(eventDate, "Естафетний протокол Збройних Сил"),
-    classes: buildMilitaryRelayClasses(teams),
+    ...buildMilitaryEvent(eventDate, "Естафета"),
+    classes,
+    teamResults: buildMilitaryRelayTeamResults(
+      classes,
+      config.military.teamFilterRegex,
+      config.military.individualTeamGroups,
+    ),
   });
 }
 

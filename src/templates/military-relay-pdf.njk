@@ -12,9 +12,9 @@
         <th>Місце</th>
         <th>Команда</th>
         <th>Учасники</th>
-        <th>Організація</th>
+        <th>ВВНЗ, військо</th>
         <th>Час</th>
-        <th>Бали</th>
+        <th>Очки</th>
         <th>Статус</th>
       </tr>
     </thead>
@@ -34,5 +34,34 @@
   </table>
 </div>
 {% endfor %}
+
+{% if teamResults and teamResults.length %}
+<div class="class-block">
+  <h3>Загальнокомандний результат</h3>
+
+  {% for group in teamResults %}
+  <h4>{{ group.name }}</h4>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Місце</th>
+        <th>Команда</th>
+        <th>Очки</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for team in group.teams %}
+      <tr>
+        <td><strong>{{ team.place }}</strong></td>
+        <td>{{ team.organisation }}</td>
+        <td><strong>{{ team.points }}</strong></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endfor %}
+</div>
+{% endif %}
 
 {% endblock %}
