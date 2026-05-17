@@ -79,10 +79,12 @@ function formatTimeBehind(sec?: number): string {
     return "";
   }
 
-  const minutes = Math.floor(sec / 60);
-  const seconds = sec % 60;
+  const sign = sec < 0 ? "-" : "+";
+  const absoluteSeconds = Math.abs(sec);
+  const minutes = Math.floor(absoluteSeconds / 60);
+  const seconds = absoluteSeconds % 60;
 
-  return `+${minutes}:${String(seconds).padStart(2, "0")}`;
+  return `${sign}${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
 function formatRelayStage(timeSec: number | undefined, status: string | undefined): string {
@@ -230,6 +232,10 @@ function getRelaySortGroup(status: string): number {
   return 2;
 }
 
+function canUseRelayTeamAsStageLeader(status: string): boolean {
+  return getRelaySortGroup(status) !== 2;
+}
+
 function rankRelayTeams(teams: RogainingTeam[], classCanScore = true): MilitaryRelayEntry[] {
   const sortedTeams = [...teams].sort((left, right) => {
     const leftStatus = getMilitaryRelayStatus(left);
@@ -270,6 +276,12 @@ function rankRelayTeams(teams: RogainingTeam[], classCanScore = true): MilitaryR
   const bestStageSumByStageCount = new Map<number, number>();
 
   for (const team of sortedTeams) {
+    const status = getMilitaryRelayStatus(team);
+
+    if (!canUseRelayTeamAsStageLeader(status)) {
+      continue;
+    }
+
     const completedStageCount = getRelayCompletedStageCount(team);
 
     for (let stageCount = 1; stageCount <= completedStageCount; stageCount += 1) {

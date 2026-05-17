@@ -265,6 +265,21 @@ describe("buildMilitaryRelayClasses", () => {
     ]);
   });
 
+  it("formats negative relay time behind with a single minus sign", () => {
+    const classes = buildMilitaryRelayClasses([
+      makeRelayTeam("Ч ВВНЗ", "Знятий швидше", "ЖВІ", 2600, false, [
+        800,
+        900,
+        900,
+      ], "MissingPunch", ["OK", "OK", "MissingPunch"]),
+      makeRelayTeam("Ч ВВНЗ", "Фініш", "ХНУПС", 3200, true, [1000, 1000, 1200]),
+    ]);
+
+    expect(classes[0].teams.find((team) => team.teamName === "Знятий швидше")).toMatchObject({
+      timeBehind: "-10:00",
+    });
+  });
+
   it("puts relay teams with a problem status after unfinished teams", () => {
     const classes = buildMilitaryRelayClasses([
       makeRelayTeam("Ч ВВНЗ", "MissingPunch", "ІВМС", 2600, false, [
@@ -281,6 +296,7 @@ describe("buildMilitaryRelayClasses", () => {
         teamName: "OK",
         place: "1",
         points: 126,
+        timeBehind: "",
         status: "OK",
       },
       {
