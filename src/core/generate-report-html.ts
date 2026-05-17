@@ -154,7 +154,11 @@ export function generateMilitaryIndividualReportHtml(
   const { logger } = options;
   const { participants, eventDate } = parseParticipantsXml(xml, logger);
   const config = loadConfig();
-  applyMilitaryIndividualPoints(participants, config.military.teamFilterRegex);
+  applyMilitaryIndividualPoints(
+    participants,
+    config.military.teamFilterRegex,
+    config.military.classFilterRegex,
+  );
 
   return {
     reportType: "military-individual",
@@ -170,6 +174,7 @@ export function generateMilitaryRelayReportHtml(
   options: GenerateReportOptions = {},
 ): GeneratedReport {
   const { logger } = options;
+  const config = loadConfig();
   const { teams, eventDate, eventName } = parseRelayXml(xml, logger);
 
   return {
@@ -178,7 +183,10 @@ export function generateMilitaryRelayReportHtml(
     pdfHtml: buildMilitaryRelayHtml(teams, eventDate, "pdf"),
     eventName,
     eventDate: toIsoDate(eventDate),
-    itemCount: buildMilitaryRelayClasses(teams).flatMap((classGroup) => classGroup.teams).length,
+    itemCount: buildMilitaryRelayClasses(
+      teams,
+      config.military.classFilterRegex,
+    ).flatMap((classGroup) => classGroup.teams).length,
   };
 }
 
@@ -194,7 +202,11 @@ export function generateMilitaryTeamReportHtml(
 
   const { participants, eventDate } = parseParticipantsXml(individualXml, logger);
   const config = loadConfig();
-  applyMilitaryIndividualPoints(participants, config.military.teamFilterRegex);
+  applyMilitaryIndividualPoints(
+    participants,
+    config.military.teamFilterRegex,
+    config.military.classFilterRegex,
+  );
   const { teams: relayTeams, eventName } = parseRelayXml(relayXml, logger);
   const html = buildMilitaryTeamHtml(participants, relayTeams, eventDate);
 

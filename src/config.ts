@@ -20,6 +20,7 @@ export type AppConfig = {
   ignoredStatuses: string[];
   military: {
     teamFilterRegex: string;
+    classFilterRegex: string;
     individualTeamGroups: MilitaryIndividualTeamGroupConfig[];
   };
   rogaining: {
@@ -99,6 +100,7 @@ const defaultConfig: AppConfig = {
   ignoredStatuses: ["DidNotEnter"],
   military: {
     teamFilterRegex: ".*",
+    classFilterRegex: ".*",
     individualTeamGroups: [
       {
         name: "ВВНЗ",

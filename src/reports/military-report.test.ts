@@ -27,7 +27,7 @@ describe("buildMilitaryIndividualTeamResults", () => {
       makeParticipant("ВЧ Б2000", 38),
     ];
 
-    expect(buildMilitaryIndividualTeamResults(participants, "^ВЧ", teamGroups)).toEqual([
+    expect(buildMilitaryIndividualTeamResults(participants, "^ВЧ", ".*", teamGroups)).toEqual([
       {
         name: "ВВНЗ",
         teams: [
@@ -54,7 +54,7 @@ describe("buildMilitaryIndividualTeamResults", () => {
       makeParticipant("СВ", 38, "Ж ЗСУ"),
     ];
 
-    expect(buildMilitaryIndividualTeamResults(participants, ".*", teamGroups)).toEqual([
+    expect(buildMilitaryIndividualTeamResults(participants, ".*", ".*", teamGroups)).toEqual([
       {
         name: "ВВНЗ",
         teams: [
@@ -85,7 +85,7 @@ describe("buildMilitaryIndividualTeamResults", () => {
     ];
 
     expect(
-      buildMilitaryIndividualTeamResults(participants, ".*", [
+      buildMilitaryIndividualTeamResults(participants, ".*", ".*", [
         {
           name: "Група A",
           classRegex: "A$",
@@ -113,6 +113,27 @@ describe("buildMilitaryIndividualTeamResults", () => {
             place: 1,
             organisation: "Команда B",
             points: 42,
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("sums only classes matching the military class filter", () => {
+    const participants: Participant[] = [
+      makeParticipant("НАСВ", 45, "Ч ВВНЗ"),
+      makeParticipant("НАСВ", 42, "Ж ВВНЗ"),
+      makeParticipant("СВ", 40, "Ч ЗСУ"),
+    ];
+
+    expect(buildMilitaryIndividualTeamResults(participants, ".*", "ВВНЗ", teamGroups)).toEqual([
+      {
+        name: "ВВНЗ",
+        teams: [
+          {
+            place: 1,
+            organisation: "НАСВ",
+            points: 87,
           },
         ],
       },
@@ -230,6 +251,31 @@ describe("buildMilitaryRelayClasses", () => {
       },
     ]);
   });
+
+  it("keeps relay places but removes points for classes outside the class filter", () => {
+    const classes = buildMilitaryRelayClasses(
+      [
+        makeRelayTeam("Ч ВВНЗ", "ЖВІ - 1", "ЖВІ", 3000, true, [1000, 1000, 1000]),
+        makeRelayTeam("Ч ЗСУ", "СВ - 1", "СВ", 3100, true, [1000, 1000, 1100]),
+      ],
+      "ВВНЗ",
+    );
+
+    expect(classes.find((classGroup) => classGroup.name === "Ч ВВНЗ")?.teams).toMatchObject([
+      {
+        teamName: "ЖВІ - 1",
+        place: "1",
+        points: 126,
+      },
+    ]);
+    expect(classes.find((classGroup) => classGroup.name === "Ч ЗСУ")?.teams).toMatchObject([
+      {
+        teamName: "СВ - 1",
+        place: "1",
+        points: 0,
+      },
+    ]);
+  });
 });
 
 describe("buildMilitaryRelayTeamResults", () => {
@@ -242,7 +288,7 @@ describe("buildMilitaryRelayTeamResults", () => {
       makeRelayTeam("Ч ЗСУ", "Клуб - 1", "Клуб", 3400),
     ]);
 
-    expect(buildMilitaryRelayTeamResults(classes, "^(ЖВІ|СВ)$", teamGroups)).toEqual([
+    expect(buildMilitaryRelayTeamResults(classes, "^(ЖВІ|СВ)$", ".*", teamGroups)).toEqual([
       {
         name: "ВВНЗ",
         teams: [
@@ -259,6 +305,26 @@ describe("buildMilitaryRelayTeamResults", () => {
           {
             place: 1,
             organisation: "СВ",
+            points: 126,
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("skips relay team results outside the class filter", () => {
+    const classes = buildMilitaryRelayClasses([
+      makeRelayTeam("Ч ВВНЗ", "ЖВІ - 1", "ЖВІ", 3000, true, [1000, 1000, 1000]),
+      makeRelayTeam("Ч ЗСУ", "СВ - 1", "СВ", 3300, true, [1100, 1100, 1100]),
+    ]);
+
+    expect(buildMilitaryRelayTeamResults(classes, ".*", "ВВНЗ", teamGroups)).toEqual([
+      {
+        name: "ВВНЗ",
+        teams: [
+          {
+            place: 1,
+            organisation: "ЖВІ",
             points: 126,
           },
         ],

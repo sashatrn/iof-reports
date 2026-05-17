@@ -55,11 +55,25 @@ describe("militaryIndividualPointsFromPosition", () => {
     expect(participants[5].points).toBe(42);
     expect(participants[5].pointsLabel).toBe("42");
   });
+
+  it("marks participants outside the class filter as out of competition", () => {
+    const participants: Participant[] = [
+      makeParticipant("Target Team", 1, "Ч ВВНЗ"),
+      makeParticipant("Target Team", 1, "Ч ЗСУ"),
+    ];
+
+    applyMilitaryIndividualPoints(participants, ".*", "ВВНЗ");
+
+    expect(participants[0].points).toBe(45);
+    expect(participants[0].pointsLabel).toBe("45");
+    expect(participants[1].points).toBe(0);
+    expect(participants[1].pointsLabel).toBe(MILITARY_OUT_OF_COMPETITION_POINTS);
+  });
 });
 
-function makeParticipant(club: string, position: number): Participant {
+function makeParticipant(club: string, position: number, className = "Ч"): Participant {
   return {
-    className: "Ч",
+    className,
     name: `${club} athlete`,
     club,
     timeSec: 3600 + position,

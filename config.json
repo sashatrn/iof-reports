@@ -70,6 +70,7 @@
   },
   "military": {
     "teamFilterRegex": ".*",
+    "classFilterRegex": ".*",
     "individualTeamGroups": [
       {
         "name": "ВВНЗ",

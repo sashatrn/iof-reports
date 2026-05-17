@@ -25,6 +25,14 @@ export function buildMilitaryTeamFilter(teamFilterRegex: string): RegExp {
   }
 }
 
+export function buildMilitaryClassFilter(classFilterRegex: string): RegExp {
+  try {
+    return new RegExp(classFilterRegex);
+  } catch (error) {
+    throw new Error(`Invalid military.classFilterRegex: ${(error as Error).message}`);
+  }
+}
+
 function sortByResult(left: Participant, right: Participant): number {
   const positionDiff = (left.position ?? 9999) - (right.position ?? 9999);
 
@@ -45,8 +53,10 @@ function sortByResult(left: Participant, right: Participant): number {
 export function applyMilitaryIndividualPoints(
   participants: Participant[],
   teamFilterRegex: string,
+  classFilterRegex = ".*",
 ): void {
   const teamFilter = buildMilitaryTeamFilter(teamFilterRegex);
+  const classFilter = buildMilitaryClassFilter(classFilterRegex);
   const byClass = new Map<string, Participant[]>();
 
   for (const participant of participants) {
@@ -56,6 +66,15 @@ export function applyMilitaryIndividualPoints(
   }
 
   for (const classParticipants of byClass.values()) {
+    if (!classFilter.test(classParticipants[0]?.className ?? "")) {
+      for (const participant of classParticipants) {
+        participant.points = 0;
+        participant.pointsLabel = MILITARY_OUT_OF_COMPETITION_POINTS;
+      }
+
+      continue;
+    }
+
     let scoredCount = 0;
     let previousOfficialPosition: number | undefined;
     let currentScoringPosition = 0;
