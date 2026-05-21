@@ -49,14 +49,22 @@ export function parseIof(xml: string): ParsedIof {
 
   const eventDate = parseIsoDate(json?.ResultList?.Event?.StartTime?.Date);
 
-  const classResults = json.ResultList.ClassResult;
-  const classes = Array.isArray(classResults) ? classResults : [classResults];
+  const classResults = json?.ResultList?.ClassResult;
+  const classes = classResults === undefined
+    ? []
+    : Array.isArray(classResults)
+      ? classResults
+      : [classResults];
   const ignoredStatuses = loadIgnoredResultStatuses();
 
   const participants: Participant[] = [];
 
   for (const cr of classes) {
-    const className = cr.Class.Name;
+    const className = cr?.Class?.Name;
+    if (!className) {
+      continue;
+    }
+
     if (!cr.PersonResult) {
       continue;
     }

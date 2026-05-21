@@ -56,6 +56,19 @@ const bazaXml = `<?xml version="1.0" encoding="utf-8"?>
     <Prim>Вибри</Prim>
   </Sportsman>
 </UOFData>`;
+const emptyIndividualXml = `<?xml version="1.0" encoding="utf-8"?>
+<ResultList>
+  <Event>
+    <StartTime>
+      <Date>2026-05-21</Date>
+    </StartTime>
+  </Event>
+  <ClassResult>
+    <Class>
+      <Name>Ж</Name>
+    </Class>
+  </ClassResult>
+</ResultList>`;
 
 function expectInOrder(text: string, fragments: string[]): void {
   let previousIndex = -1;
@@ -126,6 +139,16 @@ describe("generateMilitaryIndividualReportHtml", () => {
     expect(report.viewHtml).not.toContain("Командні результати");
     expect(report.pdfHtml).toContain("Командні результати");
     expect(report.pdfHtml).toContain("@page");
+  });
+
+  it("builds an empty military individual report when there are no participants yet", () => {
+    const report = generateMilitaryIndividualReportHtml(emptyIndividualXml);
+
+    expect(report.reportType).toBe("military-individual");
+    expect(report.itemCount).toBe(0);
+    expect(report.viewHtml).toContain("Довга дистанція");
+    expect(report.pdfHtml).toContain("Довга дистанція");
+    expect(report.viewHtml).not.toContain("<tbody>");
   });
 
   it("separates military individual team results by ВВНЗ and ЗСУ groups", () => {

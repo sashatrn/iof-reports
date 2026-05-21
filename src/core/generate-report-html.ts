@@ -68,11 +68,12 @@ function parseParticipantsXml(
   xml: string,
   logger?: Logger,
   pointsCalculator: PointsCalculator = pointsFromPosition,
+  allowEmpty = false,
 ) {
   const parsed = parseIof(xml);
   const eventDate = normalizeEventDate(parsed.eventDate, logger);
 
-  if (parsed.participants.length === 0) {
+  if (parsed.participants.length === 0 && !allowEmpty) {
     throw new Error(
       "No individual athlete results found in IOF XML. If this is a rogaining TeamResult export, use reportType=rogaining.",
     );
@@ -152,7 +153,12 @@ export function generateMilitaryIndividualReportHtml(
   options: GenerateReportOptions = {},
 ): GeneratedReport {
   const { logger } = options;
-  const { participants, eventDate } = parseParticipantsXml(xml, logger);
+  const { participants, eventDate } = parseParticipantsXml(
+    xml,
+    logger,
+    pointsFromPosition,
+    true,
+  );
   const config = loadConfig();
   applyMilitaryIndividualPoints(
     participants,
@@ -200,7 +206,12 @@ export function generateMilitaryTeamReportHtml(
     throw new Error("military-team report requires a relay/team IOF XML file.");
   }
 
-  const { participants, eventDate } = parseParticipantsXml(individualXml, logger);
+  const { participants, eventDate } = parseParticipantsXml(
+    individualXml,
+    logger,
+    pointsFromPosition,
+    true,
+  );
   const config = loadConfig();
   applyMilitaryIndividualPoints(
     participants,
