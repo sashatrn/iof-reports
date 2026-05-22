@@ -10,7 +10,7 @@ import {
   buildMilitaryRelayClasses,
   buildMilitaryRelayHtml,
   buildMilitaryTeamHtml,
-  buildMilitaryTeamStandings,
+  buildMilitaryTeamStandingGroups,
 } from "../reports/military-report";
 import {
   buildRogainingAwardsHtml,
@@ -219,6 +219,7 @@ export function generateMilitaryTeamReportHtml(
     config.military.classFilterRegex,
   );
   const { teams: relayTeams, eventName } = parseRelayXml(relayXml, logger, true);
+  const standingGroups = buildMilitaryTeamStandingGroups(participants, relayTeams);
   const html = buildMilitaryTeamHtml(participants, relayTeams, eventDate);
 
   return {
@@ -228,7 +229,7 @@ export function generateMilitaryTeamReportHtml(
     supportsView: false,
     eventName,
     eventDate: toIsoDate(eventDate),
-    itemCount: buildMilitaryTeamStandings(participants, relayTeams).length,
+    itemCount: standingGroups.reduce((count, group) => count + group.standings.length, 0),
   };
 }
 

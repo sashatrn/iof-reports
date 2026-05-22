@@ -2,27 +2,33 @@
 
 {% block content %}
 
-<table>
-  <thead>
-    <tr>
-      <th>Місце</th>
-      <th>Команда</th>
-      <th>Індивідуальні очки</th>
-      <th>Естафетні очки</th>
-      <th>Сума</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for standing in standings %}
-    <tr>
-      <td><strong>{{ standing.place }}</strong></td>
-      <td>{{ standing.organisation }}</td>
-      <td>{{ standing.individualPoints }}</td>
-      <td>{{ standing.relayPoints }}</td>
-      <td><strong>{{ standing.totalPoints }}</strong></td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+{% for group in standingGroups %}
+<div class="class-block">
+  <h3>{{ group.name }}</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Місце</th>
+        <th>Команда</th>
+        <th>Індивідуальні очки</th>
+        <th>Естафетні очки</th>
+        <th>Сума</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for standing in group.standings %}
+      <tr>
+        <td><strong>{{ standing.place }}</strong></td>
+        <td>{{ standing.organisation }}</td>
+        <td>{{ standing.individualPoints }}</td>
+        <td>{{ standing.relayPoints }}</td>
+        <td><strong>{{ standing.totalPoints }}</strong></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endfor %}
 
 {% endblock %}

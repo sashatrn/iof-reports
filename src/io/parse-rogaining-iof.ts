@@ -227,7 +227,7 @@ function getRelayMemberProblemStatus(memberResults: RogainingMember[]): string |
       (status): status is string => status !== undefined && status !== "OK",
     );
     const problemStatus = statuses.find(
-      (status) => status !== "Inactive" && status !== "Unknown",
+      (status) => status !== "Active" && status !== "Inactive" && status !== "Unknown",
     );
 
     if (problemStatus) {

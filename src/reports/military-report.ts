@@ -41,6 +41,11 @@ type MilitaryTeamStanding = {
   totalPoints: number;
 };
 
+type MilitaryTeamStandingGroup = {
+  name: string;
+  standings: MilitaryTeamStanding[];
+};
+
 type MilitaryIndividualTeamResult = {
   place: number;
   organisation: string;
@@ -88,6 +93,10 @@ function formatTimeBehind(sec?: number): string {
 }
 
 function formatRelayStage(timeSec: number | undefined, status: string | undefined): string {
+  if (status === "Active") {
+    return "";
+  }
+
   if (status !== undefined && status !== "OK") {
     return formatResultStatus(status);
   }
@@ -112,6 +121,29 @@ function buildClassGroupMatchers(
   });
 }
 
+function getMilitaryTeamGroupName(
+  className: string,
+  groupMatchers: Array<MilitaryIndividualTeamGroupConfig & { regex: RegExp }>,
+): string {
+  return groupMatchers.find((group) => group.regex.test(className))?.name ?? "Загальний залік";
+}
+
+function compareConfiguredGroupNames(
+  leftGroup: string,
+  rightGroup: string,
+  teamGroups: MilitaryIndividualTeamGroupConfig[],
+): number {
+  const leftIndex = teamGroups.findIndex((group) => group.name === leftGroup);
+  const rightIndex = teamGroups.findIndex((group) => group.name === rightGroup);
+
+  if (leftIndex !== -1 || rightIndex !== -1) {
+    return (leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex) -
+      (rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex);
+  }
+
+  return leftGroup.localeCompare(rightGroup, "uk");
+}
+
 function getClassGroupIndex(
   className: string,
   groupMatchers: Array<MilitaryIndividualTeamGroupConfig & { regex: RegExp }>,
@@ -132,6 +164,44 @@ function compareMilitaryClassNames(
   }
 
   return left.localeCompare(right, "uk");
+}
+
+function rankMilitaryTeamStandings(
+  pointsByOrganisation: Map<
+    string,
+    {
+      individualPoints: number;
+      relayPoints: number;
+    }
+  >,
+): MilitaryTeamStanding[] {
+  return [...pointsByOrganisation.entries()]
+    .map(([organisation, points]) => ({
+      place: 0,
+      organisation,
+      individualPoints: points.individualPoints,
+      relayPoints: points.relayPoints,
+      totalPoints: points.individualPoints + points.relayPoints,
+    }))
+    .sort((left, right) => {
+      if (left.totalPoints !== right.totalPoints) {
+        return right.totalPoints - left.totalPoints;
+      }
+
+      if (left.individualPoints !== right.individualPoints) {
+        return right.individualPoints - left.individualPoints;
+      }
+
+      if (left.relayPoints !== right.relayPoints) {
+        return right.relayPoints - left.relayPoints;
+      }
+
+      return left.organisation.localeCompare(right.organisation, "uk");
+    })
+    .map((standing, index) => ({
+      ...standing,
+      place: index + 1,
+    }));
 }
 
 function buildMilitaryEvent(eventDate: Date, reportTitle: string) {
@@ -417,32 +487,98 @@ export function buildMilitaryTeamStandings(
     getEntry(organisation).relayPoints += relayEntry.points;
   }
 
-  return [...byOrganisation.entries()]
-    .map(([organisation, points]) => ({
-      place: 0,
+  return rankMilitaryTeamStandings(byOrganisation);
+}
+
+export function buildMilitaryTeamStandingGroups(
+  participants: Participant[],
+  relayTeams: RogainingTeam[],
+): MilitaryTeamStandingGroup[] {
+  const config = loadConfig();
+  const classFilter = buildMilitaryClassFilter(config.military.classFilterRegex);
+  const teamFilter = buildMilitaryTeamFilter(config.military.teamFilterRegex);
+  const groupMatchers = buildClassGroupMatchers(config.military.individualTeamGroups);
+  const pointsByGroup = new Map<
+    string,
+    Map<
+      string,
+      {
+        individualPoints: number;
+        relayPoints: number;
+      }
+    >
+  >();
+
+  const getEntry = (groupName: string, organisation: string) => {
+    const groupPoints = pointsByGroup.get(groupName) ?? new Map<
+      string,
+      {
+        individualPoints: number;
+        relayPoints: number;
+      }
+    >();
+    const key = normalizeMilitaryOrganisation(organisation);
+    const existing = groupPoints.get(key);
+
+    if (existing) {
+      pointsByGroup.set(groupName, groupPoints);
+      return existing;
+    }
+
+    const created = {
+      individualPoints: 0,
+      relayPoints: 0,
+    };
+    groupPoints.set(key, created);
+    pointsByGroup.set(groupName, groupPoints);
+    return created;
+  };
+
+  for (const participant of participants) {
+    const organisation = normalizeMilitaryOrganisation(participant.club);
+
+    if (
+      participant.pointsLabel === MILITARY_OUT_OF_COMPETITION_POINTS ||
+      !teamFilter.test(organisation) ||
+      !classFilter.test(participant.className)
+    ) {
+      continue;
+    }
+
+    getEntry(
+      getMilitaryTeamGroupName(participant.className, groupMatchers),
       organisation,
-      individualPoints: points.individualPoints,
-      relayPoints: points.relayPoints,
-      totalPoints: points.individualPoints + points.relayPoints,
-    }))
-    .sort((left, right) => {
-      if (left.totalPoints !== right.totalPoints) {
-        return right.totalPoints - left.totalPoints;
+    ).individualPoints += participant.points;
+  }
+
+  for (const classGroup of buildMilitaryRelayClasses(
+    relayTeams,
+    config.military.classFilterRegex,
+  )) {
+    if (!classFilter.test(classGroup.name)) {
+      continue;
+    }
+
+    const groupName = getMilitaryTeamGroupName(classGroup.name, groupMatchers);
+
+    for (const relayEntry of classGroup.teams) {
+      const organisation = normalizeMilitaryOrganisation(relayEntry.organisation);
+
+      if (!teamFilter.test(organisation)) {
+        continue;
       }
 
-      if (left.individualPoints !== right.individualPoints) {
-        return right.individualPoints - left.individualPoints;
-      }
+      getEntry(groupName, organisation).relayPoints += relayEntry.points;
+    }
+  }
 
-      if (left.relayPoints !== right.relayPoints) {
-        return right.relayPoints - left.relayPoints;
-      }
-
-      return left.organisation.localeCompare(right.organisation, "uk");
-    })
-    .map((standing, index) => ({
-      ...standing,
-      place: index + 1,
+  return [...pointsByGroup.entries()]
+    .sort(([leftGroup], [rightGroup]) =>
+      compareConfiguredGroupNames(leftGroup, rightGroup, config.military.individualTeamGroups),
+    )
+    .map(([name, pointsByOrganisation]) => ({
+      name,
+      standings: rankMilitaryTeamStandings(pointsByOrganisation),
     }));
 }
 
@@ -655,6 +791,6 @@ export function buildMilitaryTeamHtml(
 ): string {
   return renderTemplate("military-team-pdf.njk", {
     ...buildMilitaryEvent(eventDate, "Командний підсумок"),
-    standings: buildMilitaryTeamStandings(participants, relayTeams),
+    standingGroups: buildMilitaryTeamStandingGroups(participants, relayTeams),
   });
 }

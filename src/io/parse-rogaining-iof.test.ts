@@ -285,6 +285,75 @@ describe("parseRogainingIof", () => {
     expect(parsed.teams[0].memberTimeSecs).toEqual([2919, undefined]);
   });
 
+  it("treats active relay members as an incomplete team, not as a problem status", () => {
+    const parsed = parseRogainingIof(`
+      <ResultList>
+        <ClassResult>
+          <Class>
+            <Name>Ч ЗСУ</Name>
+          </Class>
+          <TeamResult>
+            <Name>СВ - 1</Name>
+            <Organisation>
+              <Name>СВ</Name>
+            </Organisation>
+            <TeamMemberResult>
+              <Person>
+                <Name>
+                  <Family>Тарас</Family>
+                  <Given>Мельник</Given>
+                </Name>
+              </Person>
+              <Result>
+                <Leg>1</Leg>
+                <Time>873</Time>
+                <Status>OK</Status>
+                <OverallResult>
+                  <Time>873</Time>
+                  <Status>OK</Status>
+                </OverallResult>
+              </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+              <Person>
+                <Name>
+                  <Family>Дмитро</Family>
+                  <Given>Курочкін</Given>
+                </Name>
+              </Person>
+              <Result>
+                <Leg>2</Leg>
+                <Status>Active</Status>
+                <OverallResult>
+                  <Status>Active</Status>
+                </OverallResult>
+              </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+              <Person>
+                <Name>
+                  <Family>Максим</Family>
+                  <Given>Бабич</Given>
+                </Name>
+              </Person>
+              <Result>
+                <Leg>3</Leg>
+                <Status>Inactive</Status>
+                <OverallResult>
+                  <Status>Inactive</Status>
+                </OverallResult>
+              </Result>
+            </TeamMemberResult>
+          </TeamResult>
+        </ClassResult>
+      </ResultList>
+    `);
+
+    expect(parsed.teams[0].status).toBe("DidNotFinish");
+    expect(parsed.teams[0].memberStatuses).toEqual(["OK", "Active", "Inactive"]);
+    expect(parsed.teams[0].memberTimeSecs).toEqual([873, undefined, undefined]);
+  });
+
   it("keeps relay team problem status from a member result", () => {
     const parsed = parseRogainingIof(`
       <ResultList>

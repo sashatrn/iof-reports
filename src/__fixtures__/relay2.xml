@@ -1,0 +1,4426 @@
+    <?xml version="1.0" encoding="UTF-8"?>
+<ResultList xmlns="http://www.orienteering.org/datastandard/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" iofVersion="3.0" createTime="2026-05-22T10:28:22" creator="MeOS 5.0.1782" status="Snapshot">
+    <Event>
+        <Id></Id>
+        <Name>Кубок Командувача СВ ЗСУ</Name>
+        <StartTime>
+            <Date>2026-05-22</Date>
+            <Time>09:00:00+03:00</Time>
+        </StartTime>
+        <Race>
+            <RaceNumber>1</RaceNumber>
+            <Name>Кубок Командувача СВ ЗСУ</Name>
+            <StartTime>
+                <Date>2026-05-22</Date>
+                <Time>09:00:00+03:00</Time>
+            </StartTime>
+        </Race>
+    </Event>
+    <ClassResult>
+        <Class>
+            <Id>653</Id>
+            <Name>Ч ВВНЗ</Name>
+        </Class>
+        <TeamResult>
+            <EntryId type="MeOS">11</EntryId>
+            <Name>ХНУПС - 2</Name>
+            <Organisation>
+                <Name>ХНУПС</Name>
+            </Organisation>
+            <BibNumber>10</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">596</Id>
+                    <Name>
+                        <Family>Богдан</Family>
+                        <Given>Лисєєв</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>10</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <FinishTime>2026-05-22T10:26:05+03:00</FinishTime>
+                    <Time>965</Time>
+                    <TimeBehind type="Leg">88</TimeBehind>
+                    <Status>MissingPunch</Status>
+                    <OverallResult>
+                        <Time>965</Time>
+                        <Status>MissingPunch</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1362</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CACB</Name>
+                        <Length>2490</Length>
+                    </Course>
+                    <SplitTime>
+                        <ControlCode>34</ControlCode>
+                        <Time>116</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>35</ControlCode>
+                        <Time>199</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>50</ControlCode>
+                        <Time>262</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>39</ControlCode>
+                        <Time>352</Time>
+                    </SplitTime>
+                    <SplitTime status="Missing">
+                        <ControlCode>36</ControlCode>
+                    </SplitTime>
+                    <SplitTime status="Missing">
+                        <ControlCode>51</ControlCode>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>40</ControlCode>
+                        <Time>438</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>43</ControlCode>
+                        <Time>492</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>31</ControlCode>
+                        <Time>566</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>44</ControlCode>
+                        <Time>606</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>46</ControlCode>
+                        <Time>673</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>48</ControlCode>
+                        <Time>764</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>49</ControlCode>
+                        <Time>893</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>100</ControlCode>
+                        <Time>950</Time>
+                    </SplitTime>
+                    <ControlCard>1060758</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">597</Id>
+                    <Name>
+                        <Family>Дмитро</Family>
+                        <Given>Лаврук</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>10</BibNumber>
+                    <StartTime>2026-05-22T10:26:05+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1349</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BCBA</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>1060755</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">598</Id>
+                    <Name>
+                        <Family>Микола</Family>
+                        <Given>Сухачов</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>10</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1312</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ABAC</Name>
+                        <Length>2430</Length>
+                    </Course>
+                    <ControlCard>1060759</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">2</EntryId>
+            <Name>ЖВІ - 1</Name>
+            <Organisation>
+                <Name>ЖВІ</Name>
+            </Organisation>
+            <BibNumber>1</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">569</Id>
+                    <Name>
+                        <Family>Денис</Family>
+                        <Given>Метельський</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ЖВІ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>1</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1316</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ABCA</Name>
+                        <Length>2440</Length>
+                    </Course>
+                    <ControlCard>1008003</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">570</Id>
+                    <Name>
+                        <Family>Борис</Family>
+                        <Given>Кузьменко</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ЖВІ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>1</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1347</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BCAB</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1008002</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">571</Id>
+                    <Name>
+                        <Family>Максим</Family>
+                        <Given>Хоменко</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ЖВІ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>1</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1360</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CABC</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>1008001</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">3</EntryId>
+            <Name>НАСВ - 1</Name>
+            <Organisation>
+                <Name>НАСВ</Name>
+            </Organisation>
+            <BibNumber>2</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">572</Id>
+                    <Name>
+                        <Family>Олександр</Family>
+                        <Given>Кульбіт</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>2</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <FinishTime>2026-05-22T10:26:08+03:00</FinishTime>
+                    <Time>968</Time>
+                    <TimeBehind type="Leg">91</TimeBehind>
+                    <TimeBehind type="Course">0</TimeBehind>
+                    <Position type="Leg">2</Position>
+                    <Position type="Course">1</Position>
+                    <Status>OK</Status>
+                    <OverallResult>
+                        <Time>968</Time>
+                        <TimeBehind>91</TimeBehind>
+                        <Position>2</Position>
+                        <Status>OK</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1347</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BCAB</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <SplitTime>
+                        <ControlCode>32</ControlCode>
+                        <Time>94</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>35</ControlCode>
+                        <Time>158</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>50</ControlCode>
+                        <Time>217</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>37</ControlCode>
+                        <Time>401</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>36</ControlCode>
+                        <Time>460</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>51</ControlCode>
+                        <Time>486</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>40</ControlCode>
+                        <Time>569</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>42</ControlCode>
+                        <Time>635</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>31</ControlCode>
+                        <Time>675</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>44</ControlCode>
+                        <Time>708</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>46</ControlCode>
+                        <Time>766</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>48</ControlCode>
+                        <Time>839</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>49</ControlCode>
+                        <Time>903</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>100</ControlCode>
+                        <Time>951</Time>
+                    </SplitTime>
+                    <ControlCard>1115992</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">573</Id>
+                    <Name>
+                        <Family>Василь</Family>
+                        <Given>Тернопільський</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>2</BibNumber>
+                    <StartTime>2026-05-22T10:26:08+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1360</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CABC</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>1115975</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">574</Id>
+                    <Name>
+                        <Family>Іван</Family>
+                        <Given>Томко</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>2</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1316</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ABCA</Name>
+                        <Length>2440</Length>
+                    </Course>
+                    <ControlCard>1115984</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">4</EntryId>
+            <Name>ХНУПС - 1</Name>
+            <Organisation>
+                <Name>ХНУПС</Name>
+            </Organisation>
+            <BibNumber>3</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">575</Id>
+                    <Name>
+                        <Family>Роман</Family>
+                        <Given>Ковтонюк</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>3</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <FinishTime>2026-05-22T10:26:19+03:00</FinishTime>
+                    <Time>979</Time>
+                    <TimeBehind type="Leg">102</TimeBehind>
+                    <TimeBehind type="Course">0</TimeBehind>
+                    <Position type="Leg">3</Position>
+                    <Position type="Course">1</Position>
+                    <Status>OK</Status>
+                    <OverallResult>
+                        <Time>979</Time>
+                        <TimeBehind>102</TimeBehind>
+                        <Position>3</Position>
+                        <Status>OK</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1360</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CABC</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <SplitTime>
+                        <ControlCode>34</ControlCode>
+                        <Time>121</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>35</ControlCode>
+                        <Time>195</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>50</ControlCode>
+                        <Time>261</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>39</ControlCode>
+                        <Time>329</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>36</ControlCode>
+                        <Time>422</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>51</ControlCode>
+                        <Time>450</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>40</ControlCode>
+                        <Time>542</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>41</ControlCode>
+                        <Time>625</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>31</ControlCode>
+                        <Time>654</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>44</ControlCode>
+                        <Time>688</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>47</ControlCode>
+                        <Time>757</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>48</ControlCode>
+                        <Time>833</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>49</ControlCode>
+                        <Time>910</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>100</ControlCode>
+                        <Time>964</Time>
+                    </SplitTime>
+                    <ControlCard>1060749</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">576</Id>
+                    <Name>
+                        <Family>Денис</Family>
+                        <Given>Зарубін</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>3</BibNumber>
+                    <StartTime>2026-05-22T10:26:19+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1316</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ABCA</Name>
+                        <Length>2440</Length>
+                    </Course>
+                    <ControlCard>1060753</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">577</Id>
+                    <Name>
+                        <Family>Кирило</Family>
+                        <Given>Рожовецький</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>3</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1347</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BCAB</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1060754</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">5</EntryId>
+            <Name>ВІТВ - 1</Name>
+            <Organisation>
+                <Name>ВІТВ</Name>
+            </Organisation>
+            <BibNumber>4</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">578</Id>
+                    <Name>
+                        <Family>Ярослав</Family>
+                        <Given>Матвєєв</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІТВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>4</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1335</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BACB</Name>
+                        <Length>2470</Length>
+                    </Course>
+                    <ControlCard>1008014</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">579</Id>
+                    <Name>
+                        <Family>Віталій</Family>
+                        <Given>Зінов’єв</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІТВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>4</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1322</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ACBA</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>2006058</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">580</Id>
+                    <Name>
+                        <Family>Сергій</Family>
+                        <Given>Солонинко</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІТВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>4</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1366</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CBAC</Name>
+                        <Length>2450</Length>
+                    </Course>
+                    <ControlCard>1008016</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">6</EntryId>
+            <Name>ВІКНУ - 1</Name>
+            <Organisation>
+                <Name>ВІКНУ</Name>
+            </Organisation>
+            <BibNumber>5</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">581</Id>
+                    <Name>
+                        <Family>Дмитро</Family>
+                        <Given>Голда</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІКНУ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>5</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1366</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CBAC</Name>
+                        <Length>2450</Length>
+                    </Course>
+                    <ControlCard>1408834</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">582</Id>
+                    <Name>
+                        <Family>Руслан</Family>
+                        <Given>Коцура</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІКНУ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>5</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1335</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BACB</Name>
+                        <Length>2470</Length>
+                    </Course>
+                    <ControlCard>1408830</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">583</Id>
+                    <Name>
+                        <Family>Артем</Family>
+                        <Given>Чашка</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІКНУ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>5</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1322</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ACBA</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>8031387</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">7</EntryId>
+            <Name>ІВМС - 1</Name>
+            <Organisation>
+                <Name>ІВМС</Name>
+            </Organisation>
+            <BibNumber>6</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">584</Id>
+                    <Name>
+                        <Family>Данило</Family>
+                        <Given>Смаглій</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ІВМС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>6</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1322</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ACBA</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>1147602</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">585</Id>
+                    <Name>
+                        <Family>Владислав</Family>
+                        <Given>Пасічник</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ІВМС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>6</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1366</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CBAC</Name>
+                        <Length>2450</Length>
+                    </Course>
+                    <ControlCard>1502063</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">586</Id>
+                    <Name>
+                        <Family>Владислав</Family>
+                        <Given>Садовничий</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ІВМС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>6</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1335</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BACB</Name>
+                        <Length>2470</Length>
+                    </Course>
+                    <ControlCard>1008046</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">8</EntryId>
+            <Name>ВА м.Одеса -1</Name>
+            <Organisation>
+                <Name>ВА м.Одеса</Name>
+            </Organisation>
+            <BibNumber>7</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">587</Id>
+                    <Name>
+                        <Family>Денис</Family>
+                        <Given>Гоцуляк</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВА м.Одеса</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>7</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1343</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BBCA</Name>
+                        <Length>2440</Length>
+                    </Course>
+                    <ControlCard>1504055</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">588</Id>
+                    <Name>
+                        <Family>Олег</Family>
+                        <Given>Мельник</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВА м.Одеса</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>7</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1374</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CCAB</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>1503179</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">589</Id>
+                    <Name>
+                        <Family>Олександр</Family>
+                        <Given>Каратай</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВА м.Одеса</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>7</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1306</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_AABC</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1503128</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">9</EntryId>
+            <Name>ЖВІ - 2</Name>
+            <Organisation>
+                <Name>ЖВІ</Name>
+            </Organisation>
+            <BibNumber>8</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">590</Id>
+                    <Name>
+                        <Family>Петро</Family>
+                        <Given>Дідикало</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ЖВІ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>8</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <FinishTime>2026-05-22T10:27:22+03:00</FinishTime>
+                    <Time>1042</Time>
+                    <TimeBehind type="Leg">165</TimeBehind>
+                    <TimeBehind type="Course">0</TimeBehind>
+                    <Position type="Leg">4</Position>
+                    <Position type="Course">1</Position>
+                    <Status>OK</Status>
+                    <OverallResult>
+                        <Time>1042</Time>
+                        <TimeBehind>165</TimeBehind>
+                        <Position>4</Position>
+                        <Status>OK</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1374</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CCAB</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <SplitTime>
+                        <ControlCode>34</ControlCode>
+                        <Time>122</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>35</ControlCode>
+                        <Time>203</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>50</ControlCode>
+                        <Time>266</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>37</ControlCode>
+                        <Time>397</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>36</ControlCode>
+                        <Time>453</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>51</ControlCode>
+                        <Time>507</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>40</ControlCode>
+                        <Time>589</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>42</ControlCode>
+                        <Time>667</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>31</ControlCode>
+                        <Time>713</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>44</ControlCode>
+                        <Time>750</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>46</ControlCode>
+                        <Time>815</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>48</ControlCode>
+                        <Time>900</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>49</ControlCode>
+                        <Time>970</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>100</ControlCode>
+                        <Time>1023</Time>
+                    </SplitTime>
+                    <ControlCard>1008004</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">591</Id>
+                    <Name>
+                        <Family>Євгеній</Family>
+                        <Given>Хоронжук</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ЖВІ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>8</BibNumber>
+                    <StartTime>2026-05-22T10:27:22+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1306</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_AABC</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1003051</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">592</Id>
+                    <Name>
+                        <Family>Олександр</Family>
+                        <Given>Стельмах</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ЖВІ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>8</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1343</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BBCA</Name>
+                        <Length>2440</Length>
+                    </Course>
+                    <ControlCard>1504093</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">10</EntryId>
+            <Name>НАСВ - 2</Name>
+            <Organisation>
+                <Name>НАСВ</Name>
+            </Organisation>
+            <BibNumber>9</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">593</Id>
+                    <Name>
+                        <Family>Юрій</Family>
+                        <Given>Семенюк</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>9</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <FinishTime>2026-05-22T10:24:37+03:00</FinishTime>
+                    <Time>877</Time>
+                    <TimeBehind type="Leg">0</TimeBehind>
+                    <TimeBehind type="Course">0</TimeBehind>
+                    <Position type="Leg">1</Position>
+                    <Position type="Course">1</Position>
+                    <Status>OK</Status>
+                    <OverallResult>
+                        <Time>877</Time>
+                        <TimeBehind>0</TimeBehind>
+                        <Position>1</Position>
+                        <Status>OK</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1333</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BABC</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <SplitTime>
+                        <ControlCode>32</ControlCode>
+                        <Time>100</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>35</ControlCode>
+                        <Time>160</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>50</ControlCode>
+                        <Time>219</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>39</ControlCode>
+                        <Time>287</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>36</ControlCode>
+                        <Time>374</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>51</ControlCode>
+                        <Time>402</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>40</ControlCode>
+                        <Time>470</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>41</ControlCode>
+                        <Time>557</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>31</ControlCode>
+                        <Time>588</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>44</ControlCode>
+                        <Time>624</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>47</ControlCode>
+                        <Time>685</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>48</ControlCode>
+                        <Time>754</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>49</ControlCode>
+                        <Time>817</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>100</ControlCode>
+                        <Time>862</Time>
+                    </SplitTime>
+                    <ControlCard>1115985</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">594</Id>
+                    <Name>
+                        <Family>Олександр</Family>
+                        <Given>Хвалінський</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>9</BibNumber>
+                    <StartTime>2026-05-22T10:24:37+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1316</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ABCA</Name>
+                        <Length>2440</Length>
+                    </Course>
+                    <ControlCard>1115971</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">595</Id>
+                    <Name>
+                        <Family>Богдан</Family>
+                        <Given>Чегорко</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>9</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1374</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CCAB</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>1115982</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">12</EntryId>
+            <Name>ВІТВ - 2</Name>
+            <Organisation>
+                <Name>ВІТВ</Name>
+            </Organisation>
+            <BibNumber>11</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">599</Id>
+                    <Name>
+                        <Family>Павло</Family>
+                        <Given>Романюк</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІТВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>11</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1312</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ABAC</Name>
+                        <Length>2430</Length>
+                    </Course>
+                    <ControlCard>1008015</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">600</Id>
+                    <Name>
+                        <Family>Андрій</Family>
+                        <Given>Негрейко</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІТВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>11</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1362</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CACB</Name>
+                        <Length>2490</Length>
+                    </Course>
+                    <ControlCard>1008013</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">601</Id>
+                    <Name>
+                        <Family>Богдан</Family>
+                        <Given>Бабчаннік</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІТВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>11</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1349</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BCBA</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>1008010</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">13</EntryId>
+            <Name>ВІКНУ - 2</Name>
+            <Organisation>
+                <Name>ВІКНУ</Name>
+            </Organisation>
+            <BibNumber>12</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">602</Id>
+                    <Name>
+                        <Family>Нікіта</Family>
+                        <Given>Шило</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІКНУ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>12</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1322</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ACBA</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>1408847</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">603</Id>
+                    <Name>
+                        <Family>Владислав</Family>
+                        <Given>Шуман</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІКНУ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>12</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1339</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BBAC</Name>
+                        <Length>2430</Length>
+                    </Course>
+                    <ControlCard>1408857</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">604</Id>
+                    <Name>
+                        <Family>Тимофій</Family>
+                        <Given>Клаупік</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІКНУ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>12</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1362</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CACB</Name>
+                        <Length>2490</Length>
+                    </Course>
+                    <ControlCard>1408813</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">14</EntryId>
+            <Name>ІВМС - 2</Name>
+            <Organisation>
+                <Name>ІВМС</Name>
+            </Organisation>
+            <BibNumber>13</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">605</Id>
+                    <Name>
+                        <Family>Олег</Family>
+                        <Given>Пустовойт</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ІВМС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>13</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1370</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CBCA</Name>
+                        <Length>2460</Length>
+                    </Course>
+                    <ControlCard>1502066</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">606</Id>
+                    <Name>
+                        <Family>Артем</Family>
+                        <Given>Мазурок</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ІВМС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>13</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1320</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ACAB</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1115979</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">607</Id>
+                    <Name>
+                        <Family>Святослав</Family>
+                        <Given>Хомич</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ІВМС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>13</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1333</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BABC</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1502064</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">15</EntryId>
+            <Name>ВА м.Одеса -2</Name>
+            <Organisation>
+                <Name>ВА м.Одеса</Name>
+            </Organisation>
+            <BibNumber>14</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">608</Id>
+                    <Name>
+                        <Family>Володимимр</Family>
+                        <Given>Відов</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВА м.Одеса</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>14</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1347</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BCAB</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1427132</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">609</Id>
+                    <Name>
+                        <Family>Владислав</Family>
+                        <Given>Поливко</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВА м.Одеса</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>14</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1306</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_AABC</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1427139</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">610</Id>
+                    <Name>
+                        <Family>Віктор</Family>
+                        <Given>Павельченко</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВА м.Одеса</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>14</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1370</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CBCA</Name>
+                        <Length>2460</Length>
+                    </Course>
+                    <ControlCard>1427134</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+    </ClassResult>
+    <ClassResult>
+        <Class>
+            <Id>657</Id>
+            <Name>Ч ВВНЗ (п/к)</Name>
+        </Class>
+        <TeamResult>
+            <EntryId type="MeOS">25</EntryId>
+            <Name>MIX - 1</Name>
+            <Organisation>
+                <Name>ЖВІ</Name>
+            </Organisation>
+            <BibNumber>15</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">662</Id>
+                    <Name>
+                        <Family>Максим</Family>
+                        <Given>Бурчак</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ІВМС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>15</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1360</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CABC</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>1427133</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">663</Id>
+                    <Name>
+                        <Family>Дмитро</Family>
+                        <Given>Сашко</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ІВМС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>15</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1343</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BBCA</Name>
+                        <Length>2440</Length>
+                    </Course>
+                    <ControlCard>1427157</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">664</Id>
+                    <Name>
+                        <Family>Альона</Family>
+                        <Given>Собко</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ІВМС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>15</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1320</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ACAB</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1008009</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">26</EntryId>
+            <Name>НАСВ - 4</Name>
+            <Organisation>
+                <Name>НАСВ</Name>
+            </Organisation>
+            <BibNumber>16</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">665</Id>
+                    <Name>
+                        <Family>Дмитро</Family>
+                        <Given>Ковальчук</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВА м.Одеса</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>16</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1308</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_AACB</Name>
+                        <Length>2470</Length>
+                    </Course>
+                    <ControlCard>8543230</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">666</Id>
+                    <Name>
+                        <Family>Назарій</Family>
+                        <Given>Пересунько</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВА м.Одеса</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>16</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1376</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CCBA</Name>
+                        <Length>2520</Length>
+                    </Course>
+                    <ControlCard>1115976</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">667</Id>
+                    <Name>
+                        <Family>Денис</Family>
+                        <Given>Колесніков</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВА м.Одеса</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>16</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1339</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BBAC</Name>
+                        <Length>2430</Length>
+                    </Course>
+                    <ControlCard>1115973</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">37</EntryId>
+            <Name>MIX - 6</Name>
+            <Organisation>
+                <Name>No club</Name>
+            </Organisation>
+            <BibNumber>17</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">668</Id>
+                    <Name>
+                        <Family>Володимир</Family>
+                        <Given>Янков</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>17</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1312</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ABAC</Name>
+                        <Length>2430</Length>
+                    </Course>
+                    <ControlCard>8653771</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">669</Id>
+                    <Name>
+                        <Family>Станіслав</Family>
+                        <Given>Прокопенко</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>17</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1335</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BACB</Name>
+                        <Length>2470</Length>
+                    </Course>
+                    <ControlCard>1418235</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">670</Id>
+                    <Name>
+                        <Family>Катерина</Family>
+                        <Given>Тіхонова</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>17</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1376</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CCBA</Name>
+                        <Length>2520</Length>
+                    </Course>
+                    <ControlCard>1504061</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">38</EntryId>
+            <Name>ВІТВ - 4</Name>
+            <Organisation>
+                <Name>ВІТВ</Name>
+            </Organisation>
+            <BibNumber>18</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">671</Id>
+                    <Name>
+                        <Family>Богдан</Family>
+                        <Given>Шевелєв</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>18</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1349</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BCBA</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>1427154</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">672</Id>
+                    <Name>
+                        <Family>Василь</Family>
+                        <Given>Воскобойник</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>18</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1366</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CBAC</Name>
+                        <Length>2450</Length>
+                    </Course>
+                    <ControlCard>1427151</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">673</Id>
+                    <Name>
+                        <Family>Сергій</Family>
+                        <Given>Джексон</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>18</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1308</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_AACB</Name>
+                        <Length>2470</Length>
+                    </Course>
+                    <ControlCard>1008012</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">39</EntryId>
+            <Name>ЖВІ - 4</Name>
+            <Organisation>
+                <Name>ЖВІ</Name>
+            </Organisation>
+            <BibNumber>19</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">674</Id>
+                    <Name>
+                        <Family>Віталій</Family>
+                        <Given>Корольчук</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>19</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1343</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BBCA</Name>
+                        <Length>2440</Length>
+                    </Course>
+                    <ControlCard>1427155</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">675</Id>
+                    <Name>
+                        <Family>Ростислав</Family>
+                        <Given>Куленюк</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>19</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1320</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ACAB</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1427138</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">676</Id>
+                    <Name>
+                        <Family>Сергій</Family>
+                        <Given>Панчук</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>19</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1360</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CABC</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>1427136</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">16</EntryId>
+            <Name>НАСВ - 5</Name>
+            <Organisation>
+                <Name>НАСВ</Name>
+            </Organisation>
+            <BibNumber>20</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">635</Id>
+                    <Name>
+                        <Family>Назар</Family>
+                        <Given>Черниш</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>СВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>20</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1374</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CCAB</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>1141846</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">636</Id>
+                    <Name>
+                        <Family>Олександр</Family>
+                        <Given>Андрієнко</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>СВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>20</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1333</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BABC</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1141860</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">637</Id>
+                    <Name>
+                        <Family>Віталій</Family>
+                        <Given>Дмітрієв</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>СВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>20</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1316</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ABCA</Name>
+                        <Length>2440</Length>
+                    </Course>
+                    <ControlCard>1141853</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">17</EntryId>
+            <Name>MIX - 2</Name>
+            <Organisation>
+                <Name>No club</Name>
+            </Organisation>
+            <BibNumber>21</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">638</Id>
+                    <Name>
+                        <Family>Дмитро</Family>
+                        <Given>Єрема</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>21</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1306</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_AABC</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1060756</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">639</Id>
+                    <Name>
+                        <Family>Олег</Family>
+                        <Given>Зімніков</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>21</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1370</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CBCA</Name>
+                        <Length>2460</Length>
+                    </Course>
+                    <ControlCard>1141849</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">640</Id>
+                    <Name>
+                        <Family>Богдан</Family>
+                        <Given>Дячук</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>21</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1347</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BCAB</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1504037</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">18</EntryId>
+            <Name>MIX - 3</Name>
+            <Organisation>
+                <Name>НАСВ</Name>
+            </Organisation>
+            <BibNumber>22</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">641</Id>
+                    <Name>
+                        <Family>Тетяна</Family>
+                        <Given>Прозорова</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>СВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>22</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1308</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_AACB</Name>
+                        <Length>2470</Length>
+                    </Course>
+                    <ControlCard>1580581</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">642</Id>
+                    <Name>
+                        <Family>Софія</Family>
+                        <Given>Кушнір</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>СВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>22</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1349</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BCBA</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>1008029</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">643</Id>
+                    <Name>
+                        <Family></Family>
+                        <Given>Х</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>СВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>22</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1366</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CBAC</Name>
+                        <Length>2450</Length>
+                    </Course>
+                    <AssignedFee>
+                        <Fee type="Normal">
+                            <Name>Entry fee</Name>
+                            <Amount>90</Amount>
+                        </Fee>
+                    </AssignedFee>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">42</EntryId>
+            <Name>ХНУПС - 5</Name>
+            <BibNumber>23</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">689</Id>
+                    <Name>
+                        <Family>Ілля</Family>
+                        <Given>Бардецький</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>23</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1339</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BBAC</Name>
+                        <Length>2430</Length>
+                    </Course>
+                    <ControlCard>1060769</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">690</Id>
+                    <Name>
+                        <Family>Женя</Family>
+                        <Given>Отрак</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>23</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1362</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CACB</Name>
+                        <Length>2490</Length>
+                    </Course>
+                    <ControlCard>1060760</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">691</Id>
+                    <Name>
+                        <Family>Артем</Family>
+                        <Given>Латишев</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>23</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1322</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ACBA</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>1060761</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">44</EntryId>
+            <Name>ХНУПС - 6</Name>
+            <BibNumber>24</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">692</Id>
+                    <Name>
+                        <Family>Максим</Family>
+                        <Given>Чечельницький</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>24</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1376</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CCBA</Name>
+                        <Length>2520</Length>
+                    </Course>
+                    <ControlCard>1060767</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">693</Id>
+                    <Name>
+                        <Family>Владислав</Family>
+                        <Given>Танц</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>24</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1312</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_ABAC</Name>
+                        <Length>2430</Length>
+                    </Course>
+                    <ControlCard>1060768</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">694</Id>
+                    <Name>
+                        <Family>Олександр</Family>
+                        <Given>Іллєнко</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>24</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1335</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BACB</Name>
+                        <Length>2470</Length>
+                    </Course>
+                    <ControlCard>1060762</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">45</EntryId>
+            <Name>НАСВ - 8</Name>
+            <BibNumber>25</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">695</Id>
+                    <Name>
+                        <Family>Сергій</Family>
+                        <Given>Сердюк</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>25</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1370</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_CBCA</Name>
+                        <Length>2460</Length>
+                    </Course>
+                    <ControlCard>1115994</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">696</Id>
+                    <Name>
+                        <Family>Михайло</Family>
+                        <Given>Складаний</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>25</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1347</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_BCAB</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1115981</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">697</Id>
+                    <Name>
+                        <Family>Олександр</Family>
+                        <Given>Зубков</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>25</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1306</Id>
+                        <Name>Ч ВВНЗ:Ч ВВНЗ_AABC</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1115981</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+    </ClassResult>
+    <ClassResult>
+        <Class>
+            <Id>654</Id>
+            <Name>Ж ВВНЗ</Name>
+        </Class>
+        <TeamResult>
+            <EntryId type="MeOS">33</EntryId>
+            <Name>ЖВІ - 3</Name>
+            <Organisation>
+                <Name>НАСВ</Name>
+            </Organisation>
+            <BibNumber>26</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">623</Id>
+                    <Name>
+                        <Family>Ірина</Family>
+                        <Given>Рой</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ЖВІ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>26</BibNumber>
+                    <StartTime>2026-05-22T10:15:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1482</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_ACAB</Name>
+                        <Length>2220</Length>
+                    </Course>
+                    <ControlCard>1008008</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">624</Id>
+                    <Name>
+                        <Family>Валерія</Family>
+                        <Given>Грузд</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ЖВІ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>26</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1522</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_CABC</Name>
+                        <Length>2240</Length>
+                    </Course>
+                    <ControlCard>1008006</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">625</Id>
+                    <Name>
+                        <Family>Ірина</Family>
+                        <Given>Сергіюк</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ЖВІ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>26</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1505</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_BBCA</Name>
+                        <Length>2120</Length>
+                    </Course>
+                    <ControlCard>1008007</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">34</EntryId>
+            <Name>НАСВ - 3</Name>
+            <Organisation>
+                <Name>НАСВ</Name>
+            </Organisation>
+            <BibNumber>27</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">626</Id>
+                    <Name>
+                        <Family>Юлія</Family>
+                        <Given>Навроцька</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>27</BibNumber>
+                    <StartTime>2026-05-22T10:15:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1468</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_AABC</Name>
+                        <Length>2220</Length>
+                    </Course>
+                    <ControlCard>1115986</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">627</Id>
+                    <Name>
+                        <Family>Вероніка</Family>
+                        <Given>Кошмела</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>27</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1505</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_BBCA</Name>
+                        <Length>2120</Length>
+                    </Course>
+                    <ControlCard>1115987</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">628</Id>
+                    <Name>
+                        <Family>Аліна</Family>
+                        <Given>Бужанська</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>27</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1536</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_CCAB</Name>
+                        <Length>2250</Length>
+                    </Course>
+                    <ControlCard>1115978</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">35</EntryId>
+            <Name>ХНУПС - 3</Name>
+            <Organisation>
+                <Name>НАСВ</Name>
+            </Organisation>
+            <BibNumber>28</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">629</Id>
+                    <Name>
+                        <Family>Яна</Family>
+                        <Given>Войтків</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>28</BibNumber>
+                    <StartTime>2026-05-22T10:15:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1497</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_BACB</Name>
+                        <Length>2230</Length>
+                    </Course>
+                    <ControlCard>1060766</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">630</Id>
+                    <Name>
+                        <Family>Дарія</Family>
+                        <Given>Щаслива</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>28</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1538</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_CCBA</Name>
+                        <Length>2250</Length>
+                    </Course>
+                    <ControlCard>1060764</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">631</Id>
+                    <Name>
+                        <Family>Валентина</Family>
+                        <Given>Мараєва</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>28</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1474</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_ABAC</Name>
+                        <Length>2110</Length>
+                    </Course>
+                    <ControlCard>1060763</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">36</EntryId>
+            <Name>ВІТВ - 3</Name>
+            <Organisation>
+                <Name>НАСВ</Name>
+            </Organisation>
+            <BibNumber>29</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">632</Id>
+                    <Name>
+                        <Family>Дарина</Family>
+                        <Given>Козир</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>29</BibNumber>
+                    <StartTime>2026-05-22T10:15:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1528</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_CBAC</Name>
+                        <Length>2130</Length>
+                    </Course>
+                    <ControlCard>1008045</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">633</Id>
+                    <Name>
+                        <Family>Катерина</Family>
+                        <Given>Ромась</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>29</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1470</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_AACB</Name>
+                        <Length>2230</Length>
+                    </Course>
+                    <ControlCard>1008030</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">634</Id>
+                    <Name>
+                        <Family>Анастасія</Family>
+                        <Given>Моргунова</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>29</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1511</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_BCBA</Name>
+                        <Length>2220</Length>
+                    </Course>
+                    <ControlCard>1008044</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">20</EntryId>
+            <Name>ВІКНУ - 3</Name>
+            <Organisation>
+                <Name>НАСВ</Name>
+            </Organisation>
+            <BibNumber>30</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">647</Id>
+                    <Name>
+                        <Family>Анна</Family>
+                        <Given>Зяброва</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ЖВІ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>30</BibNumber>
+                    <StartTime>2026-05-22T10:15:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1511</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_BCBA</Name>
+                        <Length>2220</Length>
+                    </Course>
+                    <ControlCard>1427131</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">648</Id>
+                    <Name>
+                        <Family>Анастасія</Family>
+                        <Given>Купріянова</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ЖВІ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>30</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1474</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_ABAC</Name>
+                        <Length>2110</Length>
+                    </Course>
+                    <ControlCard>1408876</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">649</Id>
+                    <Name>
+                        <Family>Анастасія</Family>
+                        <Given>Токарюк</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ЖВІ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>30</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1524</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_CACB</Name>
+                        <Length>2250</Length>
+                    </Course>
+                    <ControlCard>1427106</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">21</EntryId>
+            <Name>ІВМС - 3</Name>
+            <Organisation>
+                <Name>НАСВ</Name>
+            </Organisation>
+            <BibNumber>31</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">650</Id>
+                    <Name>
+                        <Family>Дар’я</Family>
+                        <Given>Лапчинська</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>31</BibNumber>
+                    <StartTime>2026-05-22T10:15:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1478</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_ABCA</Name>
+                        <Length>2120</Length>
+                    </Course>
+                    <ControlCard>1580590</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">651</Id>
+                    <Name>
+                        <Family>Марина</Family>
+                        <Given>Гапусенко</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>31</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1536</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_CCAB</Name>
+                        <Length>2250</Length>
+                    </Course>
+                    <ControlCard>1503176</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">652</Id>
+                    <Name>
+                        <Family>Дарина</Family>
+                        <Given>Бочина</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>31</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1495</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_BABC</Name>
+                        <Length>2210</Length>
+                    </Course>
+                    <ControlCard>1502386</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">22</EntryId>
+            <Name>ВА м.Одеса - 3</Name>
+            <Organisation>
+                <Name>НАСВ</Name>
+            </Organisation>
+            <BibNumber>32</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">653</Id>
+                    <Name>
+                        <Family>Ірина</Family>
+                        <Given>Вторнікова</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>32</BibNumber>
+                    <StartTime>2026-05-22T10:15:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1482</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_ACAB</Name>
+                        <Length>2220</Length>
+                    </Course>
+                    <ControlCard>1083467</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">654</Id>
+                    <Name>
+                        <Family>Вікторія</Family>
+                        <Given>Колбасюк</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>32</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1495</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_BABC</Name>
+                        <Length>2210</Length>
+                    </Course>
+                    <ControlCard>1504009</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">655</Id>
+                    <Name>
+                        <Family>Яна</Family>
+                        <Given>Азізова</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>32</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1532</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_CBCA</Name>
+                        <Length>2140</Length>
+                    </Course>
+                    <ControlCard>1408832</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+    </ClassResult>
+    <ClassResult>
+        <Class>
+            <Id>658</Id>
+            <Name>Ж ВВНЗ (п/к)</Name>
+        </Class>
+        <TeamResult>
+            <EntryId type="MeOS">19</EntryId>
+            <Name>MIX - 4</Name>
+            <Organisation>
+                <Name>No club</Name>
+            </Organisation>
+            <BibNumber>33</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">644</Id>
+                    <Name>
+                        <Family>В</Family>
+                        <Given>Решетнікова</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>33</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1495</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_BABC</Name>
+                        <Length>2210</Length>
+                    </Course>
+                    <ControlCard>1060746</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">645</Id>
+                    <Name>
+                        <Family>Вікторія</Family>
+                        <Given>Гринчишин</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>33</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1532</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_CBCA</Name>
+                        <Length>2140</Length>
+                    </Course>
+                    <ControlCard>1504038</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">646</Id>
+                    <Name>
+                        <Family></Family>
+                        <Given>Х</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>33</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1482</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_ACAB</Name>
+                        <Length>2220</Length>
+                    </Course>
+                    <AssignedFee>
+                        <Fee type="Normal">
+                            <Name>Entry fee</Name>
+                            <Amount>90</Amount>
+                        </Fee>
+                    </AssignedFee>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">27</EntryId>
+            <Name>НАСВ - 6</Name>
+            <Organisation>
+                <Name>НАСВ</Name>
+            </Organisation>
+            <BibNumber>34</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">680</Id>
+                    <Name>
+                        <Family>Анна</Family>
+                        <Given>Сулим</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>СВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>34</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1524</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_CACB</Name>
+                        <Length>2250</Length>
+                    </Course>
+                    <ControlCard>1115980</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">681</Id>
+                    <Name>
+                        <Family>Софія</Family>
+                        <Given>Гуль</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>СВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>34</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1484</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_ACBA</Name>
+                        <Length>2220</Length>
+                    </Course>
+                    <ControlCard>1115972</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">682</Id>
+                    <Name>
+                        <Family>Юлія</Family>
+                        <Given>Подоляко</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>СВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>34</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1501</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_BBAC</Name>
+                        <Length>2100</Length>
+                    </Course>
+                    <ControlCard>1141726</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">28</EntryId>
+            <Name>НАСВ - 7</Name>
+            <Organisation>
+                <Name>НАСВ</Name>
+            </Organisation>
+            <BibNumber>35</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">677</Id>
+                    <Name>
+                        <Family>Софія</Family>
+                        <Given>Приймачук</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>35</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1501</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_BBAC</Name>
+                        <Length>2100</Length>
+                    </Course>
+                    <ControlCard>1115974</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">678</Id>
+                    <Name>
+                        <Family>Тетяна</Family>
+                        <Given>Щеглова</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>35</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1470</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_AACB</Name>
+                        <Length>2230</Length>
+                    </Course>
+                    <ControlCard>1115993</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">679</Id>
+                    <Name>
+                        <Family>Марія</Family>
+                        <Given>Малахова</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>35</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1538</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_CCBA</Name>
+                        <Length>2250</Length>
+                    </Course>
+                    <ControlCard>1115991</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">41</EntryId>
+            <Name>ХНУПС - 4</Name>
+            <Organisation>
+                <Name>ХНУПС</Name>
+            </Organisation>
+            <BibNumber>36</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">686</Id>
+                    <Name>
+                        <Family>Олександра</Family>
+                        <Given>Юричканич</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>36</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1538</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_CCBA</Name>
+                        <Length>2250</Length>
+                    </Course>
+                    <ControlCard>1060765</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">687</Id>
+                    <Name>
+                        <Family>Маргарита</Family>
+                        <Given>Масюк</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>36</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1501</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_BBAC</Name>
+                        <Length>2100</Length>
+                    </Course>
+                    <ControlCard>1060741</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">688</Id>
+                    <Name>
+                        <Family>Лілія</Family>
+                        <Given>Стоян</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>36</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1470</Id>
+                        <Name>Ж ВВНЗ:Ж ВВНЗ_AACB</Name>
+                        <Length>2230</Length>
+                    </Course>
+                    <ControlCard>1060750</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+    </ClassResult>
+    <ClassResult>
+        <Class>
+            <Id>655</Id>
+            <Name>Ч ЗСУ</Name>
+        </Class>
+        <TeamResult>
+            <EntryId type="MeOS">29</EntryId>
+            <Name>СВ - 1</Name>
+            <Organisation>
+                <Name>СВ</Name>
+            </Organisation>
+            <BibNumber>37</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">611</Id>
+                    <Name>
+                        <Family>Тарас</Family>
+                        <Given>Мельник</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ЖВІ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>37</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <FinishTime>2026-05-22T10:24:33+03:00</FinishTime>
+                    <Time>873</Time>
+                    <TimeBehind type="Leg">0</TimeBehind>
+                    <TimeBehind type="Course">0</TimeBehind>
+                    <Position type="Leg">1</Position>
+                    <Position type="Course">1</Position>
+                    <Status>OK</Status>
+                    <OverallResult>
+                        <Time>873</Time>
+                        <TimeBehind>0</TimeBehind>
+                        <Position>1</Position>
+                        <Status>OK</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1406</Id>
+                        <Name>Ч ЗСУ:Ч ЗСУ_ACCA</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <SplitTime>
+                        <ControlCode>33</ControlCode>
+                        <Time>82</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>35</ControlCode>
+                        <Time>137</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>50</ControlCode>
+                        <Time>197</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>37</ControlCode>
+                        <Time>279</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>36</ControlCode>
+                        <Time>329</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>51</ControlCode>
+                        <Time>357</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>40</ControlCode>
+                        <Time>433</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>43</ControlCode>
+                        <Time>494</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>31</ControlCode>
+                        <Time>560</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>44</ControlCode>
+                        <Time>598</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>45</ControlCode>
+                        <Time>675</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>48</ControlCode>
+                        <Time>748</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>49</ControlCode>
+                        <Time>809</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>100</ControlCode>
+                        <Time>858</Time>
+                    </SplitTime>
+                    <ControlCard>8099104</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">612</Id>
+                    <Name>
+                        <Family>Дмитро</Family>
+                        <Given>Курочкін</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ЖВІ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>37</BibNumber>
+                    <StartTime>2026-05-22T10:24:33+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1410</Id>
+                        <Name>Ч ЗСУ:Ч ЗСУ_BAAB</Name>
+                        <Length>2470</Length>
+                    </Course>
+                    <ControlCard>8099102</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">613</Id>
+                    <Name>
+                        <Family>Максим</Family>
+                        <Given>Бабич</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ЖВІ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>37</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1450</Id>
+                        <Name>Ч ЗСУ:Ч ЗСУ_CBBC</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>8500003</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">30</EntryId>
+            <Name>ПС - 1</Name>
+            <Organisation>
+                <Name>ПС</Name>
+            </Organisation>
+            <BibNumber>38</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">614</Id>
+                    <Name>
+                        <Family>Д</Family>
+                        <Given>Кметюк</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>38</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <FinishTime>2026-05-22T10:26:04+03:00</FinishTime>
+                    <Time>964</Time>
+                    <TimeBehind type="Leg">91</TimeBehind>
+                    <TimeBehind type="Course">0</TimeBehind>
+                    <Position type="Leg">2</Position>
+                    <Position type="Course">1</Position>
+                    <Status>OK</Status>
+                    <OverallResult>
+                        <Time>964</Time>
+                        <TimeBehind>91</TimeBehind>
+                        <Position>2</Position>
+                        <Status>OK</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1410</Id>
+                        <Name>Ч ЗСУ:Ч ЗСУ_BAAB</Name>
+                        <Length>2470</Length>
+                    </Course>
+                    <SplitTime>
+                        <ControlCode>32</ControlCode>
+                        <Time>102</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>35</ControlCode>
+                        <Time>198</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>50</ControlCode>
+                        <Time>253</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>39</ControlCode>
+                        <Time>355</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>36</ControlCode>
+                        <Time>475</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>51</ControlCode>
+                        <Time>500</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>40</ControlCode>
+                        <Time>577</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>42</ControlCode>
+                        <Time>644</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>31</ControlCode>
+                        <Time>684</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>44</ControlCode>
+                        <Time>716</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>46</ControlCode>
+                        <Time>771</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>48</ControlCode>
+                        <Time>843</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>49</ControlCode>
+                        <Time>900</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>100</ControlCode>
+                        <Time>948</Time>
+                    </SplitTime>
+                    <ControlCard>1060734</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">615</Id>
+                    <Name>
+                        <Family>В</Family>
+                        <Given>Рудь</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>38</BibNumber>
+                    <StartTime>2026-05-22T10:26:04+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1450</Id>
+                        <Name>Ч ЗСУ:Ч ЗСУ_CBBC</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1060751</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">616</Id>
+                    <Name>
+                        <Family>А</Family>
+                        <Given>Литвин</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>НАСВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>38</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1406</Id>
+                        <Name>Ч ЗСУ:Ч ЗСУ_ACCA</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1038143</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">31</EntryId>
+            <Name>СВ - 2</Name>
+            <Organisation>
+                <Name>СВ</Name>
+            </Organisation>
+            <BibNumber>39</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">617</Id>
+                    <Name>
+                        <Family>Олег</Family>
+                        <Given>Багрій</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>39</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1441</Id>
+                        <Name>Ч ЗСУ:Ч ЗСУ_CABC</Name>
+                        <Length>2500</Length>
+                    </Course>
+                    <ControlCard>1141723</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">618</Id>
+                    <Name>
+                        <Family>Олександр</Family>
+                        <Given>Литвин</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>39</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1406</Id>
+                        <Name>Ч ЗСУ:Ч ЗСУ_ACCA</Name>
+                        <Length>2480</Length>
+                    </Course>
+                    <ControlCard>1141728</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">619</Id>
+                    <Name>
+                        <Family>Роман</Family>
+                        <Given>Бойко</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ХНУПС</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>39</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1419</Id>
+                        <Name>Ч ЗСУ:Ч ЗСУ_BBAB</Name>
+                        <Length>2440</Length>
+                    </Course>
+                    <ControlCard>1141852</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">32</EntryId>
+            <Name>ПС - 2</Name>
+            <Organisation>
+                <Name>ПС</Name>
+            </Organisation>
+            <BibNumber>40</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">620</Id>
+                    <Name>
+                        <Family>Я</Family>
+                        <Given>Васюта</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІТВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>40</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <FinishTime>2026-05-22T10:27:17+03:00</FinishTime>
+                    <Time>1037</Time>
+                    <TimeBehind type="Leg">164</TimeBehind>
+                    <TimeBehind type="Course">0</TimeBehind>
+                    <Position type="Leg">3</Position>
+                    <Position type="Course">1</Position>
+                    <Status>OK</Status>
+                    <OverallResult>
+                        <Time>1037</Time>
+                        <TimeBehind>164</TimeBehind>
+                        <Position>3</Position>
+                        <Status>OK</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1425</Id>
+                        <Name>Ч ЗСУ:Ч ЗСУ_BBCB</Name>
+                        <Length>2450</Length>
+                    </Course>
+                    <SplitTime>
+                        <ControlCode>32</ControlCode>
+                        <Time>105</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>35</ControlCode>
+                        <Time>197</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>50</ControlCode>
+                        <Time>257</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>38</ControlCode>
+                        <Time>424</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>36</ControlCode>
+                        <Time>458</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>51</ControlCode>
+                        <Time>488</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>40</ControlCode>
+                        <Time>583</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>43</ControlCode>
+                        <Time>643</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>31</ControlCode>
+                        <Time>719</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>44</ControlCode>
+                        <Time>757</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>46</ControlCode>
+                        <Time>824</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>48</ControlCode>
+                        <Time>907</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>49</ControlCode>
+                        <Time>977</Time>
+                    </SplitTime>
+                    <SplitTime>
+                        <ControlCode>100</ControlCode>
+                        <Time>1021</Time>
+                    </SplitTime>
+                    <ControlCard>1060737</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">621</Id>
+                    <Name>
+                        <Family>О</Family>
+                        <Given>Шпрінгер</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІТВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>40</BibNumber>
+                    <StartTime>2026-05-22T10:27:17+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1385</Id>
+                        <Name>Ч ЗСУ:Ч ЗСУ_AABA</Name>
+                        <Length>2490</Length>
+                    </Course>
+                    <ControlCard>1060752</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">622</Id>
+                    <Name>
+                        <Family>Д</Family>
+                        <Given>Гнойовий</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІТВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>40</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1456</Id>
+                        <Name>Ч ЗСУ:Ч ЗСУ_CCAC</Name>
+                        <Length>2490</Length>
+                    </Course>
+                    <ControlCard>1060742</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">40</EntryId>
+            <Name>ССО - 1</Name>
+            <BibNumber>41</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">683</Id>
+                    <Name>
+                        <Family>Микола</Family>
+                        <Given>Бондарчук</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>41</BibNumber>
+                    <StartTime>2026-05-22T10:10:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1456</Id>
+                        <Name>Ч ЗСУ:Ч ЗСУ_CCAC</Name>
+                        <Length>2490</Length>
+                    </Course>
+                    <ControlCard>1504049</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">684</Id>
+                    <Name>
+                        <Family>Олександр</Family>
+                        <Given>Хелик</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>41</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1425</Id>
+                        <Name>Ч ЗСУ:Ч ЗСУ_BBCB</Name>
+                        <Length>2450</Length>
+                    </Course>
+                    <ControlCard>1504050</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">685</Id>
+                    <Name>
+                        <Family>Віталій</Family>
+                        <Given>Шунькевич</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>41</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1385</Id>
+                        <Name>Ч ЗСУ:Ч ЗСУ_AABA</Name>
+                        <Length>2490</Length>
+                    </Course>
+                    <ControlCard>1504051</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+    </ClassResult>
+    <ClassResult>
+        <Class>
+            <Id>656</Id>
+            <Name>Ж ЗСУ</Name>
+        </Class>
+        <TeamResult>
+            <EntryId type="MeOS">23</EntryId>
+            <Name>СВ - 3</Name>
+            <Organisation>
+                <Name>СВ</Name>
+            </Organisation>
+            <BibNumber>42</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">656</Id>
+                    <Name>
+                        <Family>Ангеліна</Family>
+                        <Given>Медведева</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІТВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>42</BibNumber>
+                    <StartTime>2026-05-22T10:15:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1556</Id>
+                        <Name>Ж ЗСУ:Ж ЗСУ_ABBA</Name>
+                        <Length>2150</Length>
+                    </Course>
+                    <ControlCard>1141718</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">657</Id>
+                    <Name>
+                        <Family>Ірина</Family>
+                        <Given>Крисюк</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІТВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>42</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1618</Id>
+                        <Name>Ж ЗСУ:Ж ЗСУ_CCAC</Name>
+                        <Length>2210</Length>
+                    </Course>
+                    <ControlCard>1141873</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">658</Id>
+                    <Name>
+                        <Family>Наталя</Family>
+                        <Given>Боговик</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІТВ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>42</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1578</Id>
+                        <Name>Ж ЗСУ:Ж ЗСУ_BACB</Name>
+                        <Length>2230</Length>
+                    </Course>
+                    <ControlCard>1141856</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">24</EntryId>
+            <Name>ПС - 3</Name>
+            <Organisation>
+                <Name>ПС</Name>
+            </Organisation>
+            <BibNumber>43</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">659</Id>
+                    <Name>
+                        <Family>Т</Family>
+                        <Given>Явдощук</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІКНУ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>43</BibNumber>
+                    <StartTime>2026-05-22T10:15:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1595</Id>
+                        <Name>Ж ЗСУ:Ж ЗСУ_BCCA</Name>
+                        <Length>2200</Length>
+                    </Course>
+                    <ControlCard>1300770</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">660</Id>
+                    <Name>
+                        <Family>Я</Family>
+                        <Given>Кметюк</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІКНУ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>43</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1599</Id>
+                        <Name>Ж ЗСУ:Ж ЗСУ_CAAB</Name>
+                        <Length>2250</Length>
+                    </Course>
+                    <ControlCard>1060738</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">661</Id>
+                    <Name>
+                        <Family>П</Family>
+                        <Given>Левченко</Given>
+                    </Name>
+                </Person>
+                <Organisation>
+                    <Name>ВІКНУ</Name>
+                </Organisation>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>43</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1558</Id>
+                        <Name>Ж ЗСУ:Ж ЗСУ_ABBC</Name>
+                        <Length>2130</Length>
+                    </Course>
+                    <ControlCard>1060745</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+    </ClassResult>
+    <ClassResult>
+        <Class>
+            <Id>659</Id>
+            <Name>Ж ЗСУ (п/к)</Name>
+        </Class>
+        <TeamResult>
+            <EntryId type="MeOS">47</EntryId>
+            <Name>MIX - 5</Name>
+            <BibNumber>44</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">701</Id>
+                    <Name>
+                        <Family>Артур</Family>
+                        <Given>Дідківський</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>44</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1599</Id>
+                        <Name>Ж ЗСУ:Ж ЗСУ_CAAB</Name>
+                        <Length>2250</Length>
+                    </Course>
+                    <ControlCard>1427135</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">702</Id>
+                    <Name>
+                        <Family>Іванка</Family>
+                        <Given>Ліщинська</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>44</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1558</Id>
+                        <Name>Ж ЗСУ:Ж ЗСУ_ABBC</Name>
+                        <Length>2130</Length>
+                    </Course>
+                    <ControlCard>1427158</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">703</Id>
+                    <Name>
+                        <Family>Кирило</Family>
+                        <Given>Цоєв</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>44</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1595</Id>
+                        <Name>Ж ЗСУ:Ж ЗСУ_BCCA</Name>
+                        <Length>2200</Length>
+                    </Course>
+                    <ControlCard>1427140</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+        <TeamResult>
+            <EntryId type="MeOS">46</EntryId>
+            <Name>НАСВ - 9</Name>
+            <BibNumber>45</BibNumber>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">698</Id>
+                    <Name>
+                        <Family>Анастасія</Family>
+                        <Given>Піддубна</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>1</Leg>
+                    <BibNumber>45</BibNumber>
+                    <StartTime>2026-05-22T10:20:00+03:00</StartTime>
+                    <Status>Active</Status>
+                    <OverallResult>
+                        <Status>Active</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1576</Id>
+                        <Name>Ж ЗСУ:Ж ЗСУ_BABC</Name>
+                        <Length>2210</Length>
+                    </Course>
+                    <ControlCard>1141854</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">699</Id>
+                    <Name>
+                        <Family>Андрій</Family>
+                        <Given>Токарський</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>2</Leg>
+                    <BibNumber>45</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1568</Id>
+                        <Name>Ж ЗСУ:Ж ЗСУ_ACCA</Name>
+                        <Length>2200</Length>
+                    </Course>
+                    <ControlCard>1115983</ControlCard>
+                </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+                <Person>
+                    <Id type="MeOS">700</Id>
+                    <Name>
+                        <Family>Ангеліна</Family>
+                        <Given>Ковальова</Given>
+                    </Name>
+                </Person>
+                <Result raceNumber="1">
+                    <Leg>3</Leg>
+                    <BibNumber>45</BibNumber>
+                    <Status>Inactive</Status>
+                    <OverallResult>
+                        <Status>Inactive</Status>
+                    </OverallResult>
+                    <Course>
+                        <Id>1608</Id>
+                        <Name>Ж ЗСУ:Ж ЗСУ_CBAB</Name>
+                        <Length>2170</Length>
+                    </Course>
+                    <ControlCard>1141857</ControlCard>
+                </Result>
+            </TeamMemberResult>
+        </TeamResult>
+    </ClassResult>
+</ResultList>

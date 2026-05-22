@@ -234,14 +234,16 @@ describe("generateMilitaryRelayReportHtml", () => {
 
 describe("generateMilitaryTeamReportHtml", () => {
   it("builds military team summary html from individual and relay XML files", () => {
-    const report = generateMilitaryTeamReportHtml(sampleXml, {
-      relayXml: rogainingXml,
+    const report = generateMilitaryTeamReportHtml(militaryLongXml, {
+      relayXml: militaryRelayXml,
     });
 
     expect(report.reportType).toBe("military-team");
     expect(report.supportsView).toBe(false);
     expect(report.itemCount).toBeGreaterThan(0);
     expect(report.pdfHtml).toContain("Командний підсумок");
+    expect(report.pdfHtml).toContain("<h3>ВВНЗ</h3>");
+    expect(report.pdfHtml).toContain("<h3>ЗСУ</h3>");
     expect(report.pdfHtml).toContain("<th>Індивідуальні очки</th>");
     expect(report.pdfHtml).toContain("<th>Естафетні очки</th>");
   });
@@ -260,8 +262,7 @@ describe("generateMilitaryTeamReportHtml", () => {
     expect(report.reportType).toBe("military-team");
     expect(report.itemCount).toBe(0);
     expect(report.pdfHtml).toContain("Командний підсумок");
-    expect(report.pdfHtml).toContain("<th>Сума</th>");
-    expect(report.pdfHtml).toContain("<tbody>");
+    expect(report.pdfHtml).not.toContain("<tbody>");
     expect(report.pdfHtml).not.toContain("<td><strong>1</strong></td>");
   });
 });

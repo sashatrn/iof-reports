@@ -9,6 +9,7 @@ import {
   buildMilitaryIndividualTeamResults,
   buildMilitaryRelayClasses,
   buildMilitaryRelayTeamResults,
+  buildMilitaryTeamStandingGroups,
   buildMilitaryTeamStandings,
 } from "./military-report";
 
@@ -280,6 +281,22 @@ describe("buildMilitaryRelayClasses", () => {
     });
   });
 
+  it("leaves active relay stages empty", () => {
+    const classes = buildMilitaryRelayClasses([
+      makeRelayTeam("Ч ЗСУ", "СВ - 1", "СВ", 873, false, [
+        873,
+        undefined,
+        undefined,
+      ], "DidNotFinish", ["OK", "Active", "Inactive"]),
+    ]);
+
+    expect(classes[0].teams[0]).toMatchObject({
+      teamName: "СВ - 1",
+      stageTimes: ["14:33", "", "Неактивний"],
+      status: "DidNotFinish",
+    });
+  });
+
   it("puts relay teams with a problem status after unfinished teams", () => {
     const classes = buildMilitaryRelayClasses([
       makeRelayTeam("Ч ВВНЗ", "MissingPunch", "ІВМС", 2600, false, [
@@ -449,6 +466,57 @@ describe("buildMilitaryTeamStandings", () => {
         individualPoints: 42,
         relayPoints: 0,
         totalPoints: 42,
+      },
+    ]);
+  });
+});
+
+describe("buildMilitaryTeamStandingGroups", () => {
+  it("splits overall military team standings by configured class groups", () => {
+    const configPath = writeTempConfig({
+      military: {
+        teamFilterRegex: ".*",
+        classFilterRegex: ".*",
+        individualTeamGroups: teamGroups,
+      },
+    });
+    setConfigPath(configPath);
+
+    const groups = buildMilitaryTeamStandingGroups(
+      [
+        makeParticipant("ЖВІ", 45, "Ч ВВНЗ"),
+        makeParticipant("СВ", 42, "Ч ЗСУ"),
+      ],
+      [
+        makeRelayTeam("Ч ВВНЗ", "ЖВІ - 1", "ЖВІ", 3000, true, [1000, 1000, 1000]),
+        makeRelayTeam("Ч ЗСУ", "СВ - 1", "СВ", 3100, true, [1000, 1000, 1100]),
+      ],
+    );
+
+    expect(groups).toEqual([
+      {
+        name: "ВВНЗ",
+        standings: [
+          {
+            place: 1,
+            organisation: "ЖВІ",
+            individualPoints: 45,
+            relayPoints: 126,
+            totalPoints: 171,
+          },
+        ],
+      },
+      {
+        name: "ЗСУ",
+        standings: [
+          {
+            place: 1,
+            organisation: "СВ",
+            individualPoints: 42,
+            relayPoints: 126,
+            totalPoints: 168,
+          },
+        ],
       },
     ]);
   });
