@@ -94,11 +94,11 @@ function parseParticipantsXml(
   };
 }
 
-function parseRelayXml(xml: string, logger?: Logger) {
+function parseRelayXml(xml: string, logger?: Logger, allowEmpty = false) {
   const parsed = parseRogainingIof(xml);
   const eventDate = normalizeEventDate(parsed.eventDate, logger);
 
-  if (parsed.teams.length === 0) {
+  if (parsed.teams.length === 0 && !allowEmpty) {
     throw new Error("No team results found in IOF XML.");
   }
 
@@ -181,7 +181,7 @@ export function generateMilitaryRelayReportHtml(
 ): GeneratedReport {
   const { logger } = options;
   const config = loadConfig();
-  const { teams, eventDate, eventName } = parseRelayXml(xml, logger);
+  const { teams, eventDate, eventName } = parseRelayXml(xml, logger, true);
 
   return {
     reportType: "military-relay",
@@ -218,7 +218,7 @@ export function generateMilitaryTeamReportHtml(
     config.military.teamFilterRegex,
     config.military.classFilterRegex,
   );
-  const { teams: relayTeams, eventName } = parseRelayXml(relayXml, logger);
+  const { teams: relayTeams, eventName } = parseRelayXml(relayXml, logger, true);
   const html = buildMilitaryTeamHtml(participants, relayTeams, eventDate);
 
   return {
