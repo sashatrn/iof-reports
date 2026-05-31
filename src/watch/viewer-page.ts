@@ -1,10 +1,8 @@
 import { renderTemplate } from "../render/template-engine";
-import { SingleReportType } from "../report-types";
-
 type ViewerPageData = {
   title: string;
   sourceFileName: string;
-  reportType: SingleReportType;
+  reportType: string;
   updatedAt: string;
 };
 

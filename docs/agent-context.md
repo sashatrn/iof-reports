@@ -91,6 +91,8 @@ CLI validations require:
 
 Watch mode is started with `iof-reports watch ...`.
 
+Watch accepts `--report side-by-side-individual` for the regular individual Пліч-о-пліч generator. This report supports an IOF XML with classes but no participants yet, matching the empty-input behavior of `military-individual`. The old `--report individual` name is not a watch-mode option.
+
 Key files:
 
 - [src/watch/cli.ts](/Users/atrukhny/projects/my/iof-reports/src/watch/cli.ts): watch args.

@@ -51,7 +51,8 @@ export async function runWatchMode(argv: string[]): Promise<void> {
     {
       inputDir: options.inputDir,
       outputDir: options.outputDir,
-      report: options.reportType,
+      report: options.requestedReportType,
+      generationReport: options.reportType,
       pollMs: options.pollMs,
       settleMs: options.settleMs,
       port: options.port,
@@ -113,7 +114,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
           {
             sourceFilePath: latestFile.path,
             sourceFileName: latestFile.name,
-            reportType: generatedReport.reportType,
+            reportType: options.requestedReportType,
             eventName: generatedReport.eventName,
             eventDate: generatedReport.eventDate,
             itemCount: generatedReport.itemCount,
@@ -128,9 +129,9 @@ export async function runWatchMode(argv: string[]): Promise<void> {
         renderViewerPage({
           title:
             generatedReport.eventName ??
-            `${generatedReport.reportType} report`,
+            `${options.requestedReportType} report`,
           sourceFileName: latestFile.name,
-          reportType: generatedReport.reportType,
+          reportType: options.requestedReportType,
           updatedAt,
         }),
       );
@@ -146,7 +147,8 @@ export async function runWatchMode(argv: string[]): Promise<void> {
       logger.info(
         {
           file: latestFile.path,
-          reportType: generatedReport.reportType,
+          reportType: options.requestedReportType,
+          generationReportType: generatedReport.reportType,
           outputDir: options.outputDir,
           viewerUrl: `http://127.0.0.1:${options.port}/viewer`,
           reportUrl: `http://127.0.0.1:${options.port}/report`,

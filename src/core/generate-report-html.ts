@@ -119,7 +119,12 @@ export function generateSideBySideIndividualReportHtml(
   options: GenerateReportOptions = {},
 ): GeneratedReport {
   const { logger } = options;
-  const { participants, eventDate } = parseParticipantsXml(xml, logger);
+  const { participants, eventDate } = parseParticipantsXml(
+    xml,
+    logger,
+    pointsFromPosition,
+    true,
+  );
 
   return {
     reportType: "individual",

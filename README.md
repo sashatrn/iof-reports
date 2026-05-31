@@ -126,7 +126,7 @@ iof-reports results-long.xml --report military-team --relay results-relay.xml
 iof-reports watch \
   --input-dir ./incoming \
   --output-dir ./out \
-  --report rogaining-awards \
+  --report side-by-side-individual \
   --port 4173
 ```
 
@@ -150,6 +150,7 @@ iof-reports watch \
 - `--poll-ms 3000` - інтервал перевірки папки
 - `--settle-ms 1000` - пауза для перевірки, що latest XML уже не дописується
 - `--port 4173` - порт локального HTTP-сервера
+- `--report side-by-side-individual` - індивідуальний протокол Пліч-о-пліч для live-перегляду; звіт коректно працює з XML без учасників
 - `--diploma-template off|on` - чи вкладати фон диплома в `rogaining-diplomas`
 - `--courses courses.xml` - файл `CourseData` для `rogaining-splits`
 - `--baza baza.xml` - файл бази УФО для `rogaining-results`; з нього беруться поточні кваліфікації, дати народження, регіони та тренери

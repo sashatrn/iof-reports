@@ -124,6 +124,16 @@ describe("generateSideBySideIndividualReportHtml", () => {
     expect(report.viewHtml).toContain('class="page"');
     expect(report.pdfHtml).toContain("@page");
   });
+
+  it("builds an empty individual report when there are no participants yet", () => {
+    const report = generateSideBySideIndividualReportHtml(emptyIndividualXml);
+
+    expect(report.reportType).toBe("individual");
+    expect(report.itemCount).toBe(0);
+    expect(report.viewHtml).toContain("Індивідуальний протокол");
+    expect(report.pdfHtml).toContain("Індивідуальний протокол");
+    expect(report.viewHtml).not.toContain("<tbody>");
+  });
 });
 
 describe("generateSideBySideTeamReportHtml", () => {

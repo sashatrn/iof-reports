@@ -3,12 +3,15 @@ import path from "path";
 import { Logger } from "pino";
 import { isSingleReportType, SingleReportType } from "../report-types";
 
+export type WatchReportType = Exclude<SingleReportType, "individual"> | "side-by-side-individual";
+
 export type WatchOptions = {
   inputDir: string;
   outputDir: string;
   configPath?: string;
   courseDataPath?: string;
   reportType: SingleReportType;
+  requestedReportType: WatchReportType;
   pollMs: number;
   settleMs: number;
   port: number;
@@ -17,8 +20,16 @@ export type WatchOptions = {
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-splits|military-individual|military-relay> [--config config.json] [--courses courses.xml] [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
+    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <side-by-side-individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-splits|military-individual|military-relay> [--config config.json] [--courses courses.xml] [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
   );
+}
+
+function isWatchReportType(value: string): value is WatchReportType {
+  return value === "side-by-side-individual" || (isSingleReportType(value) && value !== "individual");
+}
+
+function normalizeWatchReportType(value: WatchReportType): SingleReportType {
+  return value === "side-by-side-individual" ? "individual" : value;
 }
 
 export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
@@ -27,6 +38,7 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
   let configPath: string | undefined;
   let courseDataPath: string | undefined;
   let reportType: SingleReportType | undefined;
+  let requestedReportType: WatchReportType | undefined;
   let pollMs = 3000;
   let settleMs = 1000;
   let port = 4173;
@@ -61,26 +73,29 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
     }
 
     if (arg === "--report") {
-      if (!value || !isSingleReportType(value)) {
+      if (!value || !isWatchReportType(value)) {
         logger.error(
           { report: value },
-          "Invalid watch report type. Expected one of: individual, team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-splits, military-individual, military-relay.",
+          "Invalid watch report type. Expected one of: side-by-side-individual, team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-splits, military-individual, military-relay.",
         );
         printUsage(logger);
         process.exit(1);
       }
 
+      const normalizedReportType = normalizeWatchReportType(value);
+
       if (
-        value === "rogaining-results" ||
-        value === "rogaining-results-score" ||
-        value === "military-team"
+        normalizedReportType === "rogaining-results" ||
+        normalizedReportType === "rogaining-results-score" ||
+        normalizedReportType === "military-team"
       ) {
         logger.error(`${value} is not supported in watch mode yet. Use the regular CLI with the required companion XML file.`);
         printUsage(logger);
         process.exit(1);
       }
 
-      reportType = value;
+      reportType = normalizedReportType;
+      requestedReportType = value;
       i += 1;
       continue;
     }
@@ -135,7 +150,7 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
     process.exit(1);
   }
 
-  if (!inputDir || !outputDir || !reportType) {
+  if (!inputDir || !outputDir || !reportType || !requestedReportType) {
     logger.error("Missing required watch arguments.");
     printUsage(logger);
     process.exit(1);
@@ -183,6 +198,7 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
     configPath,
     courseDataPath,
     reportType,
+    requestedReportType,
     pollMs,
     settleMs,
     port,
