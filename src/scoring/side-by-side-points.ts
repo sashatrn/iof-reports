@@ -8,7 +8,8 @@ export function pointsFromPosition(
   if (position === 2) return 95;
   if (position === 3) return 90;
   if (position === 4) return 85;
+  if (position === 5) return 80;
 
-  const p = 85 - (position - 4);
+  const p = 80 - (position - 5);
   return p > 1 ? p : 1;
 }

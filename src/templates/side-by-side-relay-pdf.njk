@@ -1,0 +1,71 @@
+{% extends "base-pdf.njk" %}
+
+{% block content %}
+
+{% for class in classes %}
+<div class="class-block">
+  <h3>{{ class.name }}</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Місце</th>
+        <th>Команда</th>
+        <th>Учасники</th>
+        <th>Заклад освіти</th>
+        <th>Етап 1</th>
+        <th>Етап 2</th>
+        <th>Етап 3</th>
+        <th>Час</th>
+        <th>Відст.</th>
+        <th>Очки</th>
+        <th>Статус</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for team in class.teams %}
+      <tr>
+        <td><strong>{{ team.place }}</strong></td>
+        <td><strong>{{ team.teamName }}</strong></td>
+        <td>{{ team.membersLine }}</td>
+        <td>{{ team.organisation }}</td>
+        <td>{{ team.stageTimes[0] }}</td>
+        <td>{{ team.stageTimes[1] }}</td>
+        <td>{{ team.stageTimes[2] }}</td>
+        <td>{{ team.formattedTime }}</td>
+        <td>{{ team.timeBehind }}</td>
+        <td><strong>{{ team.points }}</strong></td>
+        <td>{{ team.status | statusLabel }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endfor %}
+
+{% if teamResults and teamResults.length %}
+<div class="class-block">
+  <h3>Командний результат</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Місце</th>
+        <th>Команда</th>
+        <th>Очки</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for team in teamResults %}
+      <tr>
+        <td><strong>{{ team.place }}</strong></td>
+        <td>{{ team.organisation }}</td>
+        <td><strong>{{ team.points }}</strong></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% endblock %}

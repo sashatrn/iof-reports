@@ -14,6 +14,7 @@ import {
   generateRogainingScoreReportHtml,
   generateRogainingSplitsReportHtml,
   generateSideBySideIndividualReportHtml,
+  generateSideBySideRelayReportHtml,
   generateSideBySideTeamReportHtml,
 } from "./generate-report-html";
 
@@ -147,6 +148,32 @@ describe("generateSideBySideTeamReportHtml", () => {
     expect(report.pdfHtml).toContain("Командний протокол");
     expect(report.viewHtml).toContain('class="page"');
     expect(report.pdfHtml).toContain("@page");
+  });
+});
+
+describe("generateSideBySideRelayReportHtml", () => {
+  it("builds side-by-side relay report html from TeamResult IOF XML", () => {
+    const report = generateSideBySideRelayReportHtml(rogainingXml);
+
+    expect(report.reportType).toBe("side-by-side-relay");
+    expect(report.itemCount).toBeGreaterThan(0);
+    expect(report.viewHtml).toContain("Естафета");
+    expect(report.viewHtml).toContain("<th>Учасники</th>");
+    expect(report.viewHtml).toContain("<th>Відст.</th>");
+    expect(report.viewHtml).not.toContain("Командний результат");
+    expect(report.pdfHtml).toContain("Командний результат");
+    expect(report.pdfHtml).toContain("@page");
+  });
+
+  it("builds an empty side-by-side relay report when there are no teams yet", () => {
+    const report = generateSideBySideRelayReportHtml(emptyRelayXml);
+
+    expect(report.reportType).toBe("side-by-side-relay");
+    expect(report.itemCount).toBe(0);
+    expect(report.eventName).toBe("Естафета");
+    expect(report.viewHtml).toContain("Естафета");
+    expect(report.pdfHtml).toContain("Естафета");
+    expect(report.viewHtml).not.toContain("<tbody>");
   });
 });
 
@@ -402,6 +429,13 @@ describe("generateReportHtml", () => {
     expect(report.reportType).toBe("individual");
     expect(report.viewHtml).toContain("Індивідуальний протокол");
     expect(report.pdfHtml).toContain("Індивідуальний протокол");
+  });
+
+  it("dispatches to side-by-side relay report generator", () => {
+    const report = generateReportHtml(rogainingXml, "side-by-side-relay");
+
+    expect(report.reportType).toBe("side-by-side-relay");
+    expect(report.viewHtml).toContain("Естафета");
   });
 
   it("dispatches to rogaining awards report generator", () => {

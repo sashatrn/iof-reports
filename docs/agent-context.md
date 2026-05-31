@@ -9,6 +9,7 @@ Quick recovery notes for future Codex sessions in this repository.
 Main user-facing reports:
 
 - `individual` and `team`
+- `side-by-side-relay`
 - `rogaining`
 - `rogaining-awards`
 - `rogaining-diplomas`
@@ -91,7 +92,7 @@ CLI validations require:
 
 Watch mode is started with `iof-reports watch ...`.
 
-Watch accepts `--report side-by-side-individual` for the regular individual Пліч-о-пліч generator. This report supports an IOF XML with classes but no participants yet, matching the empty-input behavior of `military-individual`. The old `--report individual` name is not a watch-mode option.
+Watch accepts `--report side-by-side-individual` for the regular individual Пліч-о-пліч generator. This report supports an IOF XML with classes but no participants yet, matching the empty-input behavior of `military-individual`. The old `--report individual` name is not a watch-mode option. Watch also accepts `side-by-side-relay`.
 
 Key files:
 
@@ -155,7 +156,7 @@ Other local directories seen in this workspace include `incoming`, `out`, `data`
 - Keep changes scoped to source, templates, config, docs, or tests relevant to the requested behavior.
 - Prefer existing report builder and template patterns over new abstractions.
 - When adding a report type, update `REPORT_TYPES`, CLI usage/validation, `generateReportHtml`, README, tests, and any watch-mode restrictions if applicable.
-- Keep regular Пліч-о-пліч individual/team internals under the `side-by-side-*` module/template prefix while preserving existing CLI report values unless the external interface is intentionally changed.
+- Keep regular Пліч-о-пліч individual/team/relay internals under the `side-by-side-*` module/template prefix while preserving existing CLI report values unless the external interface is intentionally changed.
 - For user-visible Ukrainian text, match existing Ukrainian wording and typography.
 - Use structured XML parsing via `fast-xml-parser`; avoid ad hoc string parsing.
 - Before editing generated/compiled files under `dist`, check whether the project expects source-only changes plus `npm run build`.

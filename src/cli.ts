@@ -22,7 +22,7 @@ const DIPLOMA_TEMPLATE_VALUES = new Set<string>(["off", "on"]);
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-results|rogaining-results-score|rogaining-splits|military-individual|military-relay|military-team] [--format pdf|docx] [--courses courses.xml] [--baza baza.xml] [--relay relay.xml] [--html none|view|pdf] [--diploma-template off|on]",
+    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|team|side-by-side-relay|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-results|rogaining-results-score|rogaining-splits|military-individual|military-relay|military-team] [--format pdf|docx] [--courses courses.xml] [--baza baza.xml] [--relay relay.xml] [--html none|view|pdf] [--diploma-template off|on]",
   );
 }
 
@@ -77,7 +77,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       if (!value || !REPORT_VALUES.has(value)) {
         logger.error(
           { report: value },
-          "Invalid report type. Expected one of: all, individual, team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-results, rogaining-results-score, rogaining-splits, military-individual, military-relay, military-team.",
+          "Invalid report type. Expected one of: all, individual, team, side-by-side-relay, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-results, rogaining-results-score, rogaining-splits, military-individual, military-relay, military-team.",
         );
         printUsage(logger);
         process.exit(1);
