@@ -4,7 +4,7 @@ import { parseCourseData } from "../io/parse-course-data";
 import { parseIof } from "../io/parse-iof";
 import { parseRogainingIof } from "../io/parse-rogaining-iof";
 import { parseUofBaza } from "../io/parse-uof-baza";
-import { buildIndividualHtml } from "../reports/individual-report";
+import { buildSideBySideIndividualHtml } from "../reports/side-by-side-individual-report";
 import {
   buildMilitaryIndividualHtml,
   buildMilitaryRelayClasses,
@@ -24,10 +24,10 @@ import {
   buildRogainingSplitTeamEntries,
   buildRogainingSplitsHtml,
 } from "../reports/rogaining-report";
-import { buildTeamHtml } from "../reports/team-report";
+import { buildSideBySideTeamHtml } from "../reports/side-by-side-team-report";
 import { applyMilitaryIndividualPoints } from "../scoring/military-individual-points";
-import { pointsFromPosition } from "../scoring/points";
-import { computeTeamResults } from "../scoring/team";
+import { pointsFromPosition } from "../scoring/side-by-side-points";
+import { computeTeamResults } from "../scoring/side-by-side-team";
 import { ReportType, SingleReportType } from "../report-types";
 
 export type GeneratedReport = {
@@ -114,7 +114,7 @@ function parseRelayXml(xml: string, logger?: Logger, allowEmpty = false) {
   };
 }
 
-export function generateIndividualReportHtml(
+export function generateSideBySideIndividualReportHtml(
   xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
@@ -123,14 +123,14 @@ export function generateIndividualReportHtml(
 
   return {
     reportType: "individual",
-    viewHtml: buildIndividualHtml(participants, eventDate, "view"),
-    pdfHtml: buildIndividualHtml(participants, eventDate, "pdf"),
+    viewHtml: buildSideBySideIndividualHtml(participants, eventDate, "view"),
+    pdfHtml: buildSideBySideIndividualHtml(participants, eventDate, "pdf"),
     eventDate: toIsoDate(eventDate),
     itemCount: participants.length,
   };
 }
 
-export function generateTeamReportHtml(
+export function generateSideBySideTeamReportHtml(
   xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
@@ -141,8 +141,8 @@ export function generateTeamReportHtml(
 
   return {
     reportType: "team",
-    viewHtml: buildTeamHtml(teamResults, eventDate, "view"),
-    pdfHtml: buildTeamHtml(teamResults, eventDate, "pdf"),
+    viewHtml: buildSideBySideTeamHtml(teamResults, eventDate, "view"),
+    pdfHtml: buildSideBySideTeamHtml(teamResults, eventDate, "pdf"),
     eventDate: toIsoDate(eventDate),
     itemCount: teamResults.men.length + teamResults.women.length,
   };
@@ -424,9 +424,9 @@ export function generateReportHtml(
 ): GeneratedReport {
   switch (reportType) {
     case "individual":
-      return generateIndividualReportHtml(xml, options);
+      return generateSideBySideIndividualReportHtml(xml, options);
     case "team":
-      return generateTeamReportHtml(xml, options);
+      return generateSideBySideTeamReportHtml(xml, options);
     case "rogaining":
       return generateRogainingReportHtml(xml, options);
     case "rogaining-awards":
@@ -457,8 +457,8 @@ export function generateReportsHtml(
 ): GeneratedReport[] {
   if (reportType === "all") {
     return [
-      generateIndividualReportHtml(xml, options),
-      generateTeamReportHtml(xml, options),
+      generateSideBySideIndividualReportHtml(xml, options),
+      generateSideBySideTeamReportHtml(xml, options),
     ];
   }
 

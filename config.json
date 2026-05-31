@@ -3,6 +3,12 @@
     "level": "info"
   },
   "ignoredStatuses": ["DidNotEnter"],
+  "side-by-side": {
+    "teamRules": {
+      "menCount": 3,
+      "womenCount": 3
+    }
+  },
   "rogaining": {
     "controlGateRule": {
       "enabled": true,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildTeamHtml } from "./team-report";
+import { buildSideBySideTeamHtml } from "./side-by-side-team-report";
 
 function expectInOrder(text: string, fragments: string[]): void {
   let previousIndex = -1;
@@ -29,9 +29,9 @@ function getSectionAfterHeader(html: string, headerText: string): string {
   return html.slice(start, end);
 }
 
-describe("buildTeamHtml", () => {
+describe("buildSideBySideTeamHtml", () => {
   it("renders men and women team tables with ranking positions", () => {
-    const html = buildTeamHtml(
+    const html = buildSideBySideTeamHtml(
       {
         men: [
           { club: "Ліцей 1", points: 42 },

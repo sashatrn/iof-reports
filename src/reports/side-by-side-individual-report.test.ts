@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Participant } from "../io/parse-iof";
-import { buildIndividualHtml } from "./individual-report";
+import { buildSideBySideIndividualHtml } from "./side-by-side-individual-report";
 
 function expectInOrder(text: string, fragments: string[]): void {
   let previousIndex = -1;
@@ -30,7 +30,7 @@ function getClassSection(html: string, className: string): string {
   return html.slice(start, end);
 }
 
-describe("buildIndividualHtml", () => {
+describe("buildSideBySideIndividualHtml", () => {
   it("groups participants by class and sorts them by position", () => {
     const participants: Participant[] = [
       {
@@ -62,7 +62,7 @@ describe("buildIndividualHtml", () => {
       },
     ];
 
-    const html = buildIndividualHtml(participants, new Date(2026, 3, 11));
+    const html = buildSideBySideIndividualHtml(participants, new Date(2026, 3, 11));
 
     expectInOrder(html, [
       "<h3>Ч 5-6</h3>",

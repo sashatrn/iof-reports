@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 import { describe, expect, it } from "vitest";
 import {
-  generateIndividualReportHtml,
   generateMilitaryIndividualReportHtml,
   generateMilitaryRelayReportHtml,
   generateMilitaryTeamReportHtml,
@@ -14,7 +13,8 @@ import {
   generateRogainingResultsReportHtml,
   generateRogainingScoreReportHtml,
   generateRogainingSplitsReportHtml,
-  generateTeamReportHtml,
+  generateSideBySideIndividualReportHtml,
+  generateSideBySideTeamReportHtml,
 } from "./generate-report-html";
 
 const sampleXml = fs.readFileSync(
@@ -112,9 +112,9 @@ function expectRowContaining(text: string, rowFragment: string): string {
   return text.slice(rowStart, rowEnd + "</tr>".length);
 }
 
-describe("generateIndividualReportHtml", () => {
+describe("generateSideBySideIndividualReportHtml", () => {
   it("builds individual report html from IOF XML", () => {
-    const report = generateIndividualReportHtml(sampleXml);
+    const report = generateSideBySideIndividualReportHtml(sampleXml);
 
     expect(report.reportType).toBe("individual");
     expect(report.itemCount).toBeGreaterThan(0);
@@ -126,9 +126,9 @@ describe("generateIndividualReportHtml", () => {
   });
 });
 
-describe("generateTeamReportHtml", () => {
+describe("generateSideBySideTeamReportHtml", () => {
   it("builds team report html from IOF XML", () => {
-    const report = generateTeamReportHtml(sampleXml);
+    const report = generateSideBySideTeamReportHtml(sampleXml);
 
     expect(report.reportType).toBe("team");
     expect(report.itemCount).toBeGreaterThan(0);

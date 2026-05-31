@@ -21,6 +21,7 @@ export function computeTeamResults(
 } {
   const menClasses = new Set<string>();
   const womenClasses = new Set<string>();
+  const teamRules = config["side-by-side"].teamRules;
 
   for (const p of participants) {
     if (matchesPrefix(p.className, config.genderMapping.menPrefixes)) {
@@ -34,12 +35,18 @@ export function computeTeamResults(
   logger?.info({ menClasses: [...menClasses] }, "Detected men classes");
   logger?.info({ womenClasses: [...womenClasses] }, "Detected women classes");
 
-  if (menClasses.size !== 3) {
-    logger?.error({ count: menClasses.size }, "Expected exactly 3 men classes");
+  if (menClasses.size !== teamRules.menCount) {
+    logger?.error(
+      { count: menClasses.size, expected: teamRules.menCount },
+      `Expected exactly ${teamRules.menCount} men classes`,
+    );
   }
 
-  if (womenClasses.size !== 3) {
-    logger?.error({ count: womenClasses.size }, "Expected exactly 3 women classes");
+  if (womenClasses.size !== teamRules.womenCount) {
+    logger?.error(
+      { count: womenClasses.size, expected: teamRules.womenCount },
+      `Expected exactly ${teamRules.womenCount} women classes`,
+    );
   }
 
   const byClub = new Map<string, Participant[]>();

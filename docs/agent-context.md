@@ -47,7 +47,7 @@ Important behavior in `generateReportsHtml`: `--report all` currently generates 
 
 - Parsing lives in [src/io](/Users/atrukhny/projects/my/iof-reports/src/io).
 - Scoring lives in [src/scoring](/Users/atrukhny/projects/my/iof-reports/src/scoring).
-- Report builders live in [src/reports](/Users/atrukhny/projects/my/iof-reports/src/reports).
+- Report builders live in [src/reports](/Users/atrukhny/projects/my/iof-reports/src/reports). Regular Пліч-о-пліч report modules use the `side-by-side-*` prefix.
 - Nunjucks templates live in [src/templates](/Users/atrukhny/projects/my/iof-reports/src/templates).
 - Rendering helpers live in [src/render](/Users/atrukhny/projects/my/iof-reports/src/render).
 - Watch mode lives in [src/watch](/Users/atrukhny/projects/my/iof-reports/src/watch).
@@ -68,7 +68,7 @@ Notable config areas:
 
 - `ignoredStatuses` controls result statuses skipped by parsers.
 - `genderMapping` maps class prefixes.
-- `teamRules` controls regular team report composition.
+- `side-by-side.teamRules` controls regular team report composition.
 - `military` controls military point filters and grouping.
 - `rogaining.controlGateRule`, `rogaining.scorePoints`, `rogaining.scoreReport`, and `rogaining.resultsReport` control rogaining-specific reports.
 
@@ -153,6 +153,7 @@ Other local directories seen in this workspace include `incoming`, `out`, `data`
 - Keep changes scoped to source, templates, config, docs, or tests relevant to the requested behavior.
 - Prefer existing report builder and template patterns over new abstractions.
 - When adding a report type, update `REPORT_TYPES`, CLI usage/validation, `generateReportHtml`, README, tests, and any watch-mode restrictions if applicable.
+- Keep regular Пліч-о-пліч individual/team internals under the `side-by-side-*` module/template prefix while preserving existing CLI report values unless the external interface is intentionally changed.
 - For user-visible Ukrainian text, match existing Ukrainian wording and typography.
 - Use structured XML parsing via `fast-xml-parser`; avoid ad hoc string parsing.
 - Before editing generated/compiled files under `dist`, check whether the project expects source-only changes plus `npm run build`.

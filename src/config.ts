@@ -13,11 +13,19 @@ export type MilitaryIndividualTeamGroupConfig = {
   classRegex: string;
 };
 
+type SideBySideConfig = {
+  teamRules: {
+    menCount: number;
+    womenCount: number;
+  };
+};
+
 export type AppConfig = {
   logging: {
     level: string;
   };
   ignoredStatuses: string[];
+  "side-by-side": SideBySideConfig;
   military: {
     teamFilterRegex: string;
     classFilterRegex: string;
@@ -74,10 +82,6 @@ export type AppConfig = {
     womenPrefixes: string[];
     mixPrefixes: string[];
   };
-  teamRules: {
-    menCount: number;
-    womenCount: number;
-  };
   reportHeader: {
     title?: string;
     stage: string;
@@ -98,6 +102,12 @@ const defaultConfig: AppConfig = {
     level: "debug",
   },
   ignoredStatuses: ["DidNotEnter"],
+  "side-by-side": {
+    teamRules: {
+      menCount: 3,
+      womenCount: 3,
+    },
+  },
   military: {
     teamFilterRegex: ".*",
     classFilterRegex: ".*",
@@ -258,10 +268,6 @@ const defaultConfig: AppConfig = {
     womenPrefixes: ["W", "Ж", "Д"],
     mixPrefixes: ["Mix", "Мікс", "Мікси"],
   },
-  teamRules: {
-    menCount: 3,
-    womenCount: 3,
-  },
   reportHeader: {
     stage: "ІІІ Етап",
     region_of: "Житомирського району",
@@ -383,9 +389,14 @@ export function loadConfig(configPath?: string): AppConfig {
       ...defaultConfig.genderMapping,
       ...parsed.genderMapping,
     },
-    teamRules: {
-      ...defaultConfig.teamRules,
-      ...parsed.teamRules,
+    "side-by-side": {
+      ...defaultConfig["side-by-side"],
+      ...parsed["side-by-side"],
+      teamRules: {
+        ...defaultConfig["side-by-side"].teamRules,
+        ...parsed.teamRules,
+        ...parsed["side-by-side"]?.teamRules,
+      },
     },
     reportHeader: {
       ...defaultConfig.reportHeader,
