@@ -1,6 +1,8 @@
 import fs from "fs";
+import os from "os";
 import path from "path";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
+import { setConfigPath } from "../config";
 import {
   generateMilitaryIndividualReportHtml,
   generateMilitaryRelayReportHtml,
@@ -11,12 +13,22 @@ import {
   generateRogainingDiplomasReportHtml,
   generateRogainingReportHtml,
   generateRogainingResultsReportHtml,
+  generateRogainingResultsScoreReportHtml,
   generateRogainingScoreReportHtml,
   generateRogainingSplitsReportHtml,
   generateSideBySideIndividualReportHtml,
   generateSideBySideRelayReportHtml,
   generateSideBySideTeamReportHtml,
 } from "./generate-report-html";
+
+const tempConfigDirs: string[] = [];
+
+afterEach(() => {
+  setConfigPath(undefined);
+  for (const tempDir of tempConfigDirs.splice(0)) {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});
 
 const sampleXml = fs.readFileSync(
   path.resolve(__dirname, "../__fixtures__/sample.xml"),
@@ -113,6 +125,57 @@ function expectRowContaining(text: string, rowFragment: string): string {
   return text.slice(rowStart, rowEnd + "</tr>".length);
 }
 
+function useOfficialSignatureConfig(): void {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-reports-signature-"));
+  const signaturePath = path.join(tempDir, "signature.png");
+  const configPath = path.join(tempDir, "config.json");
+
+  tempConfigDirs.push(tempDir);
+  fs.copyFileSync(path.resolve(__dirname, "../assets/logo1.png"), signaturePath);
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      officials: {
+        chiefJudge: {
+          name: "Суддя з підписом",
+          signatureFile: "signature.png",
+        },
+        chiefSecretary: {
+          name: "Секретар з підписом",
+          signatureFile: "signature.png",
+        },
+        joury1: {
+          name: "Суддя журі з підписом",
+          signatureFile: "signature.png",
+        },
+        joury2: {
+          name: "Член журі з підписом",
+          signatureFile: "signature.png",
+        },
+        departmentHead: {
+          name: "Керівник з підписом",
+          signatureFile: "signature.png",
+        },
+        sportResponsible: {
+          name: "Відповідальний з підписом",
+          signatureFile: "signature.png",
+        },
+      },
+    }),
+  );
+  setConfigPath(configPath);
+}
+
+function expectOfficialSignatureImage(pdfHtml: string): void {
+  expect(pdfHtml).toContain('class="official-signature-image"');
+  expect(pdfHtml).toContain("data:image/png;base64,");
+  expect(pdfHtml).toContain("Суддя з підписом");
+}
+
+function countOfficialSignatureImages(pdfHtml: string): number {
+  return pdfHtml.match(/class="official-signature-image"/g)?.length ?? 0;
+}
+
 describe("generateSideBySideIndividualReportHtml", () => {
   it("builds individual report html from IOF XML", () => {
     const report = generateSideBySideIndividualReportHtml(sampleXml);
@@ -148,6 +211,14 @@ describe("generateSideBySideTeamReportHtml", () => {
     expect(report.pdfHtml).toContain("Командний протокол");
     expect(report.viewHtml).toContain('class="page"');
     expect(report.pdfHtml).toContain("@page");
+  });
+
+  it("embeds configured official signature images in PDF html", () => {
+    useOfficialSignatureConfig();
+
+    const report = generateSideBySideTeamReportHtml(sampleXml);
+
+    expectOfficialSignatureImage(report.pdfHtml);
   });
 });
 
@@ -407,6 +478,55 @@ describe("generateRogainingSplitsReportHtml", () => {
     expect(() => generateRogainingSplitsReportHtml(rogainingXml)).toThrow(
       "CourseData XML",
     );
+  });
+});
+
+describe("configured PDF signatures", () => {
+  it("uses signature images in protocols that render the default PDF footer", () => {
+    useOfficialSignatureConfig();
+
+    const reports = [
+      generateSideBySideIndividualReportHtml(sampleXml),
+      generateSideBySideRelayReportHtml(rogainingXml),
+      generateMilitaryIndividualReportHtml(sampleXml),
+      generateMilitaryRelayReportHtml(rogainingXml),
+      generateMilitaryTeamReportHtml(militaryLongXml, { relayXml: militaryRelayXml }),
+      generateRogainingReportHtml(rogainingXml),
+      generateRogainingAwardsReportHtml(rogainingXml),
+      generateRogainingSplitsReportHtml(rogainingXml, { courseDataXml: coursesXml }),
+    ];
+
+    for (const report of reports) {
+      expectOfficialSignatureImage(report.pdfHtml);
+      expect(countOfficialSignatureImages(report.pdfHtml)).toBe(2);
+    }
+  });
+
+  it("uses signature images in protocols with custom PDF signature blocks", () => {
+    useOfficialSignatureConfig();
+
+    const scoreReport = generateRogainingScoreReportHtml(rogainingXml);
+    const resultsReport = generateRogainingResultsReportHtml(rogainingXml, { bazaXml });
+    const resultsScoreReport = generateRogainingResultsScoreReportHtml(rogainingXml, {
+      bazaXml,
+    });
+
+    expectOfficialSignatureImage(scoreReport.pdfHtml);
+    expect(countOfficialSignatureImages(scoreReport.pdfHtml)).toBe(3);
+    expect(scoreReport.pdfHtml).toContain("Керівник з підписом");
+    expect(scoreReport.pdfHtml).toContain("Відповідальний з підписом");
+
+    expectOfficialSignatureImage(resultsReport.pdfHtml);
+    expect(countOfficialSignatureImages(resultsReport.pdfHtml)).toBe(4);
+    expect(resultsReport.pdfHtml).toContain("Секретар з підписом");
+    expect(resultsReport.pdfHtml).toContain("Суддя журі з підписом");
+    expect(resultsReport.pdfHtml).toContain("Член журі з підписом");
+
+    expectOfficialSignatureImage(resultsScoreReport.pdfHtml);
+    expect(countOfficialSignatureImages(resultsScoreReport.pdfHtml)).toBe(4);
+    expect(resultsScoreReport.pdfHtml).toContain("Секретар з підписом");
+    expect(resultsScoreReport.pdfHtml).toContain("Суддя журі з підписом");
+    expect(resultsScoreReport.pdfHtml).toContain("Член журі з підписом");
   });
 });
 

@@ -2038,11 +2038,11 @@ export function buildRogainingAwardsDocx(
     },
     {
       type: "paragraph",
-      text: `Головний суддя    ${config.officials.chiefJudge}`,
+      text: `Головний суддя    ${config.officials.chiefJudge.name}`,
     },
     {
       type: "paragraph",
-      text: `Головний секретар    ${config.officials.chiefSecretary}`,
+      text: `Головний секретар    ${config.officials.chiefSecretary.name}`,
     },
   );
 

@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { imageToBase64 } from "./utils/image";
 
 type RogainingScorePoints = {
   youthUnder18?: Record<string, number>;
@@ -18,6 +19,42 @@ type SideBySideConfig = {
     menCount: number;
     womenCount: number;
   };
+};
+
+type OfficialPersonConfig = {
+  name: string;
+  signatureFile?: string;
+  signatureImage?: string;
+};
+
+type OfficialsConfig = {
+  chiefJudge: OfficialPersonConfig;
+  chiefSecretary: OfficialPersonConfig;
+  joury1?: OfficialPersonConfig;
+  joury2?: OfficialPersonConfig;
+  joury3?: OfficialPersonConfig;
+  departmentHead?: OfficialPersonConfig;
+  sportResponsible?: OfficialPersonConfig;
+};
+
+type OfficialRole = keyof OfficialsConfig;
+
+type OfficialPersonInput =
+  | string
+  | {
+      name?: string;
+      signatureFile?: string;
+      signatureImage?: string;
+    };
+
+type RawOfficialsConfig = Partial<Record<OfficialRole, OfficialPersonInput>> & {
+  chiefJudgeSignatureFile?: string;
+  chiefSecretarySignatureFile?: string;
+  joury1SignatureFile?: string;
+  joury2SignatureFile?: string;
+  joury3SignatureFile?: string;
+  departmentHeadSignatureFile?: string;
+  sportResponsibleSignatureFile?: string;
 };
 
 export type AppConfig = {
@@ -88,13 +125,7 @@ export type AppConfig = {
     region_of: string;
     location: string;
   };
-  officials: {
-    chiefJudge: string;
-    chiefSecretary: string;
-    joury1?: string;
-    joury2?: string;
-    joury3?: string;
-  };
+  officials: OfficialsConfig;
 };
 
 const defaultConfig: AppConfig = {
@@ -274,12 +305,36 @@ const defaultConfig: AppConfig = {
     location: "м. Житомир",
   },
   officials: {
-    chiefJudge: "Іваненко І.В.",
-    chiefSecretary: "Петренко О.А.",
+    chiefJudge: {
+      name: "Іваненко І.В.",
+    },
+    chiefSecretary: {
+      name: "Петренко О.А.",
+    },
   },
 };
 
 let activeConfigPath: string | undefined;
+
+const officialRoles = [
+  "chiefJudge",
+  "chiefSecretary",
+  "joury1",
+  "joury2",
+  "joury3",
+  "departmentHead",
+  "sportResponsible",
+] as const satisfies readonly OfficialRole[];
+
+const legacySignatureFileFields: Record<OfficialRole, keyof RawOfficialsConfig> = {
+  chiefJudge: "chiefJudgeSignatureFile",
+  chiefSecretary: "chiefSecretarySignatureFile",
+  joury1: "joury1SignatureFile",
+  joury2: "joury2SignatureFile",
+  joury3: "joury3SignatureFile",
+  departmentHead: "departmentHeadSignatureFile",
+  sportResponsible: "sportResponsibleSignatureFile",
+};
 
 export function setConfigPath(configPath?: string): void {
   activeConfigPath = configPath;
@@ -314,6 +369,107 @@ function mergeScorePoints(
   }
 
   return scorePoints;
+}
+
+function resolveConfigAssetPath(assetPath: string, configFilePath: string): string {
+  return path.isAbsolute(assetPath)
+    ? assetPath
+    : path.resolve(path.dirname(configFilePath), assetPath);
+}
+
+function normalizeOfficialPerson(
+  rawOfficial: OfficialPersonInput | undefined,
+  defaultOfficial?: OfficialPersonConfig,
+  legacySignatureFile?: string,
+): OfficialPersonConfig | undefined {
+  if (rawOfficial === undefined && defaultOfficial === undefined && !legacySignatureFile) {
+    return undefined;
+  }
+
+  const normalized: OfficialPersonConfig = {
+    ...(defaultOfficial ?? { name: "" }),
+  };
+
+  if (typeof rawOfficial === "string") {
+    normalized.name = rawOfficial;
+  } else if (rawOfficial) {
+    Object.assign(normalized, rawOfficial);
+    normalized.name = rawOfficial.name ?? normalized.name;
+  }
+
+  if (legacySignatureFile !== undefined) {
+    normalized.signatureFile = legacySignatureFile;
+  }
+
+  return normalized;
+}
+
+function normalizeOfficials(parsedOfficials?: RawOfficialsConfig): OfficialsConfig {
+  const officials: OfficialsConfig = {
+    chiefJudge: normalizeOfficialPerson(
+      parsedOfficials?.chiefJudge,
+      defaultConfig.officials.chiefJudge,
+      parsedOfficials?.chiefJudgeSignatureFile,
+    )!,
+    chiefSecretary: normalizeOfficialPerson(
+      parsedOfficials?.chiefSecretary,
+      defaultConfig.officials.chiefSecretary,
+      parsedOfficials?.chiefSecretarySignatureFile,
+    )!,
+  };
+
+  for (const role of officialRoles) {
+    if (role === "chiefJudge" || role === "chiefSecretary") {
+      continue;
+    }
+
+    const person = normalizeOfficialPerson(
+      parsedOfficials?.[role],
+      defaultConfig.officials[role],
+      parsedOfficials?.[legacySignatureFileFields[role]] as string | undefined,
+    );
+
+    if (person && (person.name || person.signatureFile || person.signatureImage)) {
+      officials[role] = person;
+    }
+  }
+
+  return officials;
+}
+
+function embedOfficialSignatureImages(
+  officials: OfficialsConfig,
+  configFilePath: string,
+): OfficialsConfig {
+  const resolvedOfficials: OfficialsConfig = {
+    ...officials,
+    chiefJudge: { ...officials.chiefJudge },
+    chiefSecretary: { ...officials.chiefSecretary },
+  };
+
+  for (const role of officialRoles) {
+    const official = resolvedOfficials[role];
+    const signatureFile = official?.signatureFile;
+
+    if (!signatureFile) {
+      continue;
+    }
+
+    if (signatureFile.startsWith("data:image/")) {
+      official.signatureImage = signatureFile;
+      continue;
+    }
+
+    const signaturePath = resolveConfigAssetPath(signatureFile, configFilePath);
+
+    if (!fs.existsSync(signaturePath)) {
+      throw new Error(`Signature image not found at ${signaturePath}.`);
+    }
+
+    official.signatureImage = imageToBase64(signaturePath);
+  }
+
+  return resolvedOfficials;
 }
 
 export function loadConfig(configPath?: string): AppConfig {
@@ -402,9 +558,6 @@ export function loadConfig(configPath?: string): AppConfig {
       ...defaultConfig.reportHeader,
       ...parsed.reportHeader,
     },
-    officials: {
-      ...defaultConfig.officials,
-      ...parsed.officials,
-    },
+    officials: embedOfficialSignatureImages(normalizeOfficials(parsed.officials), filePath),
   };
 }

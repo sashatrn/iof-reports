@@ -1,6 +1,7 @@
 {% extends "base-pdf.njk" %}
 
 {% block content %}
+{% import "official-signature.njk" as officialSignature %}
 
 <h1 class="score-doc-title">Звіт</h1>
 <div class="score-doc-subtitle">про проведення змагань</div>
@@ -171,15 +172,15 @@
 <div class="score-doc-signatures">
   <div class="score-doc-signature-row">
     <div>{{ scoreReport.signatures.chiefJudgeTitle }}</div>
-    <div>_________________ {{ officials.chiefJudge }}</div>
+    {{ officialSignature.render(officials.chiefJudge, "", true) }}
   </div>
   <div class="score-doc-signature-row">
     <div>{{ scoreReport.signatures.departmentHeadTitle }}</div>
-    <div>_________________</div>
+    {{ officialSignature.render(officials.departmentHead, "", true) }}
   </div>
   <div class="score-doc-signature-row">
     <div>{{ scoreReport.signatures.sportResponsibleTitle }}</div>
-    <div>_________________</div>
+    {{ officialSignature.render(officials.sportResponsible, "", true) }}
   </div>
   <div class="score-doc-footer-date">{{ scoreReport.signatures.footerDateText }}</div>
 </div>

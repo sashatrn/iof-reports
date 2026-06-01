@@ -1,0 +1,14 @@
+{% macro render(person, fallbackName, showPlaceholder) %}
+<div class="official-signature">
+  {% if person and person.signatureImage %}
+  <img class="official-signature-image" src="{{ person.signatureImage }}" alt="" />
+  {% elif showPlaceholder %}
+  <span class="official-signature-placeholder"></span>
+  {% endif %}
+  {% if person and person.name %}
+  <span class="official-signature-name">{{ person.name }}</span>
+  {% elif fallbackName %}
+  <span class="official-signature-name">{{ fallbackName }}</span>
+  {% endif %}
+</div>
+{% endmacro %}

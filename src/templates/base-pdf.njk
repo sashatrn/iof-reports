@@ -1,3 +1,4 @@
+{% import "official-signature.njk" as officialSignature %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -154,11 +155,54 @@
 
     .official-row {
       display: grid;
-      grid-template-columns: 90mm 1fr;
+      grid-template-columns: 60mm 1fr;
       align-items: center;
       margin-bottom: 4mm;
       break-inside: avoid;
       page-break-inside: avoid;
+    }
+
+    .official-signature {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      min-width: 0;
+      padding-left: 32mm;
+      text-align: left;
+    }
+
+    .official-signature:has(.official-signature-image),
+    .official-signature:has(.official-signature-placeholder) {
+      min-height: 12mm;
+    }
+
+    .official-signature-image {
+      position: absolute;
+      left: -15mm;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 35mm;
+      max-height: 14mm;
+      object-fit: contain;
+      object-position: center;
+      pointer-events: none;
+    }
+
+    .official-signature-placeholder {
+      position: absolute;
+      left: -15mm;
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-block;
+      width: 35mm;
+      height: 5mm;
+      border-bottom: 0.25mm solid #111;
+    }
+
+    .official-signature-name {
+      position: relative;
+      z-index: 1;
     }
 
     h3 {
@@ -310,12 +354,12 @@
 <div class="footer">
   <div class="official-row">
     <div>Головний суддя</div>
-    <div>{{ officials.chiefJudge }}</div>
+    {{ officialSignature.render(officials.chiefJudge) }}
   </div>
 
   <div class="official-row">
     <div>Головний секретар</div>
-    <div>{{ officials.chiefSecretary }}</div>
+    {{ officialSignature.render(officials.chiefSecretary) }}
   </div>
 </div>
 {% endif %}
