@@ -79,6 +79,8 @@
       width: 100%;
       border-collapse: collapse;
       margin: 0 0 4mm 0;
+      break-before: avoid;
+      page-break-before: avoid;
     }
 
     thead {
@@ -96,9 +98,58 @@
       background: #eee;
     }
 
+    h3,
+    h4,
+    .score-doc-section-title,
+    .score-doc-results-title,
+    .results-class-meta,
+    .results-course-meta {
+      break-after: avoid;
+      break-inside: avoid;
+      page-break-after: avoid;
+      page-break-inside: avoid;
+    }
+
+    table:has(+ .footer),
+    table:has(+ [class$="-signatures"]),
+    table:has(+ [class*="-signatures "]),
+    .class-block:has(+ .footer),
+    .class-block:has(+ [class$="-signatures"]),
+    .class-block:has(+ [class*="-signatures "]),
+    .results-class:has(+ [class$="-signatures"]),
+    .results-class:has(+ [class*="-signatures "]),
+    .results-class:has(+ [class$="-signatures"]) table,
+    .results-class:has(+ [class*="-signatures "]) table {
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
+    tr {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    [class$="-signatures"],
+    [class*="-signatures "] {
+      break-before: avoid;
+      break-inside: avoid;
+      page-break-before: avoid;
+      page-break-inside: avoid;
+    }
+
+    [class$="-signature-row"],
+    [class*="-signature-row "] {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
     .footer {
       margin: 10mm auto 0 auto;
       width: 130mm;
+      break-before: avoid;
+      break-inside: avoid;
+      page-break-before: avoid;
+      page-break-inside: avoid;
     }
 
     .official-row {
@@ -106,6 +157,8 @@
       grid-template-columns: 90mm 1fr;
       align-items: center;
       margin-bottom: 4mm;
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     h3 {
