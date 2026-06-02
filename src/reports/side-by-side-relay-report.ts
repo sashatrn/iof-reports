@@ -1,12 +1,11 @@
-import path from "path";
 import { loadConfig } from "../config";
 import { RogainingTeam } from "../io/parse-rogaining-iof";
 import { renderTemplate } from "../render/template-engine";
 import { pointsFromPosition } from "../scoring/side-by-side-points";
 import { isPdfVisibleRelayTeam } from "./pdf-status-filter";
 import { formatDate } from "../utils/date";
-import { imageToBase64 } from "../utils/image";
 import { formatResultStatus } from "../utils/result-status";
+import { getLeftLogo, getRightLogo } from "./report-logos";
 
 type HtmlVariant = "view" | "pdf";
 
@@ -307,8 +306,6 @@ export function buildSideBySideRelayTeamResults(
 
 function buildSideBySideEvent(eventDate: Date, reportTitle: string) {
   const config = loadConfig();
-  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
-  const logo2Path = path.resolve(__dirname, "../assets/logo2.png");
 
   return {
     reportTitle,
@@ -323,8 +320,8 @@ function buildSideBySideEvent(eventDate: Date, reportTitle: string) {
         ${config.reportHeader.region_of}, ${formatDate(eventDate, "yyyy")} р.`,
       location: config.reportHeader.location,
       date: formatDate(eventDate),
-      logo1: imageToBase64(logo1Path),
-      logo2: imageToBase64(logo2Path),
+      logo1: getLeftLogo(config, "logo1.png"),
+      logo2: getRightLogo(config, "logo2.png"),
     },
     officials: config.officials,
   };

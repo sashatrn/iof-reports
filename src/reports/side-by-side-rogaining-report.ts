@@ -1,11 +1,10 @@
-import path from "path";
 import { loadConfig } from "../config";
 import { Participant } from "../io/parse-iof";
 import { renderTemplate } from "../render/template-engine";
 import { pointsFromPosition } from "../scoring/side-by-side-points";
 import { isPdfVisibleParticipant } from "./pdf-status-filter";
 import { formatDate } from "../utils/date";
-import { imageToBase64 } from "../utils/image";
+import { getLeftLogo, getRightLogo } from "./report-logos";
 
 type HtmlVariant = "view" | "pdf";
 
@@ -195,8 +194,6 @@ export function buildSideBySideRogainingTeamResults(
 
 function buildSideBySideEvent(eventDate: Date) {
   const config = loadConfig();
-  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
-  const logo2Path = path.resolve(__dirname, "../assets/logo2.png");
 
   return {
     reportTitle: 'Дистанція "За вибором"',
@@ -211,8 +208,8 @@ function buildSideBySideEvent(eventDate: Date) {
         ${config.reportHeader.region_of}, ${formatDate(eventDate, "yyyy")} р.`,
       location: config.reportHeader.location,
       date: formatDate(eventDate),
-      logo1: imageToBase64(logo1Path),
-      logo2: imageToBase64(logo2Path),
+      logo1: getLeftLogo(config, "logo1.png"),
+      logo2: getRightLogo(config, "logo2.png"),
     },
     officials: config.officials,
   };

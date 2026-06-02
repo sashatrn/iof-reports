@@ -3,6 +3,8 @@
     "level": "info"
   },
   "ignoredStatuses": ["DidNotEnter"],
+  "leftLogo": "",
+  "rightLogo": "",
   "side-by-side": {
     "teamRules": {
       "menCount": 3,

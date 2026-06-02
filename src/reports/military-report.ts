@@ -1,4 +1,3 @@
-import path from "path";
 import { loadConfig, type MilitaryIndividualTeamGroupConfig } from "../config";
 import { Participant } from "../io/parse-iof";
 import { RogainingTeam } from "../io/parse-rogaining-iof";
@@ -14,8 +13,8 @@ import {
 } from "../scoring/military-individual-points";
 import { militaryRelayPointsFromPlace } from "../scoring/military-relay-points";
 import { formatDate } from "../utils/date";
-import { imageToBase64 } from "../utils/image";
 import { formatResultStatus } from "../utils/result-status";
+import { getLeftLogo, getRightLogo } from "./report-logos";
 
 type HtmlVariant = "view" | "pdf";
 
@@ -210,8 +209,6 @@ function rankMilitaryTeamStandings(
 
 function buildMilitaryEvent(eventDate: Date, reportTitle: string) {
   const config = loadConfig();
-  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
-  const logo2Path = path.resolve(__dirname, "../assets/zhvi-logo.png");
 
   return {
     reportTitle,
@@ -221,8 +218,8 @@ function buildMilitaryEvent(eventDate: Date, reportTitle: string) {
         `Відкритий Кубок Командувача Сухопутних військ ЗСУ<br/>зі спортивного орієнтування (бігом)`,
       location: config.reportHeader.location,
       date: formatDate(eventDate),
-      logo1: imageToBase64(logo1Path),
-      logo2: imageToBase64(logo2Path),
+      logo1: getLeftLogo(config, "logo1.png"),
+      logo2: getRightLogo(config, "zhvi-logo.png"),
     },
     officials: config.officials,
   };

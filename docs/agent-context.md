@@ -69,6 +69,7 @@ Configuration is loaded by [src/config.ts](/Users/atrukhny/projects/my/iof-repor
 Notable config areas:
 
 - `ignoredStatuses` controls result statuses skipped by parsers.
+- `leftLogo` and `rightLogo` optionally override PDF header logos; relative paths are resolved from the config file directory.
 - `genderMapping` maps class prefixes.
 - `side-by-side.teamRules` controls regular team report composition.
 - `military` controls military point filters and grouping.

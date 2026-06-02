@@ -8,6 +8,7 @@ import { renderTemplate } from "../render/template-engine";
 import { isPdfVisibleTeam } from "./pdf-status-filter";
 import { formatDate } from "../utils/date";
 import { imageToBase64 } from "../utils/image";
+import { getLeftLogo, getRightLogo } from "./report-logos";
 
 type HtmlVariant = "view" | "pdf";
 
@@ -1703,8 +1704,6 @@ export function buildRogainingHtml(
   const reportTeams = variant === "pdf"
     ? normalizedTeams.filter(isPdfVisibleTeam)
     : normalizedTeams;
-  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
-  const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
 
   const classes = buildRogainingClasses(reportTeams, config).filter((classGroup) => {
     return variant === "view" || classGroup.name !== AGGREGATE_OPEN_CLASS;
@@ -1721,8 +1720,8 @@ export function buildRogainingHtml(
       // "Ранжування: очки мінус штраф; при рівності вище команда з ранішим фінішем. Команди автоматично входять у всі вікові класи, для яких вони придатні.",
       location: config.reportHeader.location,
       date: formatDate(eventDate),
-      logo1: imageToBase64(logo1Path),
-      logo2: imageToBase64(logo2Path),
+      logo1: getLeftLogo(config, "logo1.png"),
+      logo2: getRightLogo(config, "irf-logo.png"),
     },
     officials: config.officials,
     classes,
@@ -1774,16 +1773,14 @@ export function buildRogainingResultsHtml(
   const config = loadConfig();
   const normalizedTeams = applyRogainingRules(teams, config);
   const resultsReport = config.rogaining.resultsReport;
-  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
-  const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
   void variant;
 
   return renderTemplate("rogaining-results-pdf.njk", {
     reportTitle: "Протокол результатів змагань з орієнтування",
     showDefaultHeader: false,
     showDefaultFooter: false,
-    logo1: imageToBase64(logo1Path),
-    logo2: imageToBase64(logo2Path),
+    logo1: getLeftLogo(config, "logo1.png"),
+    logo2: getRightLogo(config, "irf-logo.png"),
     header: {
       lines: resultsReport.headerLines,
       competitionName:
@@ -1882,16 +1879,14 @@ export function buildRogainingResultsScoreHtml(
   const config = loadConfig();
   const normalizedTeams = applyRogainingRules(teams, config);
   const resultsReport = config.rogaining.resultsReport;
-  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
-  const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
   void variant;
 
   return renderTemplate("rogaining-results-score-pdf.njk", {
     reportTitle: "Протокол результатів змагань з орієнтування",
     showDefaultHeader: false,
     showDefaultFooter: false,
-    logo1: imageToBase64(logo1Path),
-    logo2: imageToBase64(logo2Path),
+    logo1: getLeftLogo(config, "logo1.png"),
+    logo2: getRightLogo(config, "irf-logo.png"),
     header: {
       lines: resultsReport.headerLines,
       competitionName:
@@ -1919,8 +1914,6 @@ export function buildRogainingSplitsHtml(
 ): string {
   const config = loadConfig();
   const normalizedTeams = applyRogainingRules(teams, config);
-  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
-  const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
   const splitTeams = buildRogainingSplitTeamEntries(normalizedTeams, courseData);
   void variant;
 
@@ -1934,8 +1927,8 @@ export function buildRogainingSplitsHtml(
       subtitle: "",
       location: config.reportHeader.location,
       date: formatDate(eventDate),
-      logo1: imageToBase64(logo1Path),
-      logo2: imageToBase64(logo2Path),
+      logo1: getLeftLogo(config, "logo1.png"),
+      logo2: getRightLogo(config, "irf-logo.png"),
     },
     officials: config.officials,
     teams: splitTeams,
@@ -1950,8 +1943,6 @@ export function buildRogainingAwardsHtml(
 ): string {
   const config = loadConfig();
   const normalizedTeams = applyRogainingRules(teams, config);
-  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
-  const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
   void variant;
   const classes = buildAwardsClasses(normalizedTeams, config);
 
@@ -1965,8 +1956,8 @@ export function buildRogainingAwardsHtml(
       subtitle: "",
       location: config.reportHeader.location,
       date: formatDate(eventDate),
-      logo1: imageToBase64(logo1Path),
-      logo2: imageToBase64(logo2Path),
+      logo1: getLeftLogo(config, "logo1.png"),
+      logo2: getRightLogo(config, "irf-logo.png"),
     },
     officials: config.officials,
     classes,

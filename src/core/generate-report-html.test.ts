@@ -3,6 +3,7 @@ import os from "os";
 import path from "path";
 import { afterEach, describe, expect, it } from "vitest";
 import { setConfigPath } from "../config";
+import { imageToBase64 } from "../utils/image";
 import {
   generateMilitaryIndividualReportHtml,
   generateMilitaryRelayReportHtml,
@@ -171,6 +172,30 @@ function useOfficialSignatureConfig(): void {
   setConfigPath(configPath);
 }
 
+function useConfiguredLogoConfig(): { leftLogo: string; rightLogo: string } {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-reports-logos-"));
+  const leftLogoPath = path.join(tempDir, "left-logo.png");
+  const rightLogoPath = path.join(tempDir, "right-logo.png");
+  const configPath = path.join(tempDir, "config.json");
+
+  tempConfigDirs.push(tempDir);
+  fs.copyFileSync(path.resolve(__dirname, "../assets/logo2.png"), leftLogoPath);
+  fs.copyFileSync(path.resolve(__dirname, "../assets/zhvi-logo.png"), rightLogoPath);
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      leftLogo: "left-logo.png",
+      rightLogo: "right-logo.png",
+    }),
+  );
+  setConfigPath(configPath);
+
+  return {
+    leftLogo: imageToBase64(leftLogoPath),
+    rightLogo: imageToBase64(rightLogoPath),
+  };
+}
+
 function expectOfficialSignatureImage(pdfHtml: string): void {
   expect(pdfHtml).toContain('class="official-signature-image"');
   expect(pdfHtml).toContain("data:image/png;base64,");
@@ -206,6 +231,15 @@ describe("generateSideBySideIndividualReportHtml", () => {
     expect(report.viewHtml).toContain("Індивідуальний протокол");
     expect(report.pdfHtml).toContain("Індивідуальний протокол");
     expect(report.viewHtml).not.toContain("<tbody>");
+  });
+
+  it("embeds configured report logos from paths relative to config.json", () => {
+    const logos = useConfiguredLogoConfig();
+
+    const report = generateSideBySideIndividualReportHtml(sampleXml);
+
+    expect(report.pdfHtml).toContain(logos.leftLogo);
+    expect(report.pdfHtml).toContain(logos.rightLogo);
   });
 });
 

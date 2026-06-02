@@ -62,6 +62,8 @@ export type AppConfig = {
     level: string;
   };
   ignoredStatuses: string[];
+  leftLogo?: string;
+  rightLogo?: string;
   "side-by-side": SideBySideConfig;
   military: {
     teamFilterRegex: string;
@@ -121,6 +123,8 @@ export type AppConfig = {
   };
   reportHeader: {
     title?: string;
+    leftLogo?: string;
+    rightLogo?: string;
     stage: string;
     region_of: string;
     location: string;
@@ -472,6 +476,42 @@ function embedOfficialSignatureImages(
   return resolvedOfficials;
 }
 
+function embedConfigImage(
+  imagePath: string | undefined,
+  configFilePath: string,
+  label: string,
+): string | undefined {
+  const normalizedImagePath = imagePath?.trim();
+
+  if (!normalizedImagePath) {
+    return undefined;
+  }
+
+  if (normalizedImagePath.startsWith("data:image/")) {
+    return normalizedImagePath;
+  }
+
+  const resolvedPath = resolveConfigAssetPath(normalizedImagePath, configFilePath);
+
+  if (!fs.existsSync(resolvedPath)) {
+    throw new Error(`${label} image not found at ${resolvedPath}.`);
+  }
+
+  return imageToBase64(resolvedPath);
+}
+
+function firstConfigImagePath(...imagePaths: Array<string | undefined>): string | undefined {
+  for (const imagePath of imagePaths) {
+    const normalizedImagePath = imagePath?.trim();
+
+    if (normalizedImagePath) {
+      return normalizedImagePath;
+    }
+  }
+
+  return undefined;
+}
+
 export function loadConfig(configPath?: string): AppConfig {
   const filePath = configPath ?? activeConfigPath ?? path.resolve(process.cwd(), "config.json");
 
@@ -490,6 +530,16 @@ export function loadConfig(configPath?: string): AppConfig {
   return {
     ...defaultConfig,
     ...parsed,
+    leftLogo: embedConfigImage(
+      firstConfigImagePath(parsed.leftLogo, parsed.reportHeader?.leftLogo),
+      filePath,
+      "Left logo",
+    ),
+    rightLogo: embedConfigImage(
+      firstConfigImagePath(parsed.rightLogo, parsed.reportHeader?.rightLogo),
+      filePath,
+      "Right logo",
+    ),
     ignoredStatuses: parsed.ignoredStatuses ?? defaultConfig.ignoredStatuses,
     rogaining: {
       ...defaultConfig.rogaining,

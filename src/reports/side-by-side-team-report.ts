@@ -1,9 +1,8 @@
-import path from "path";
 import { renderTemplate } from "../render/template-engine";
 import { GenderTeamResult } from "../scoring/side-by-side-team";
 import { loadConfig } from "../config";
 import { formatDate } from "../utils/date";
-import { imageToBase64 } from "../utils/image";
+import { getLeftLogo, getRightLogo } from "./report-logos";
 
 type HtmlVariant = "view" | "pdf";
 
@@ -16,8 +15,6 @@ export function buildSideBySideTeamHtml(
   variant: HtmlVariant = "pdf",
 ): string {
   const config = loadConfig();
-  const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
-  const logo2Path = path.resolve(__dirname, "../assets/logo2.png");
 
   return renderTemplate(`side-by-side-team-${variant}.njk`, {
     reportTitle: "Командний протокол",
@@ -32,8 +29,8 @@ export function buildSideBySideTeamHtml(
         ${config.reportHeader.region_of}, ${formatDate(eventDate, "yyyy")} р.`,
       location: config.reportHeader.location,
       date: formatDate(eventDate),
-      logo1: imageToBase64(logo1Path),
-      logo2: imageToBase64(logo2Path),
+      logo1: getLeftLogo(config, "logo1.png"),
+      logo2: getRightLogo(config, "logo2.png"),
     },
     officials: config.officials,
     men: teamResults.men,
