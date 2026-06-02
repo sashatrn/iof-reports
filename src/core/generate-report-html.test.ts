@@ -259,7 +259,7 @@ describe("generateSideBySideRogainingReportHtml", () => {
 
     expect(report.reportType).toBe("side-by-side-rogaining");
     expect(report.itemCount).toBeGreaterThan(0);
-    expect(report.viewHtml).toContain("Вибір");
+    expect(report.viewHtml).toContain("За вибором");
     expect(report.viewHtml).toContain("<th>Кількість КП</th>");
     expect(report.viewHtml).toContain("<th>Бал</th>");
     expect(report.pdfHtml).toContain("@page");
@@ -583,7 +583,7 @@ describe("generateReportHtml", () => {
     );
 
     expect(report.reportType).toBe("side-by-side-rogaining");
-    expect(report.viewHtml).toContain("Вибір");
+    expect(report.viewHtml).toContain('Дистанція "За вибором"');
   });
 
   it("dispatches to rogaining awards report generator", () => {

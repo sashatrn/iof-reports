@@ -166,7 +166,8 @@
       <button id="toggle">Pause</button>
       <button id="direction">Down</button>
       <div class="toolbar-controls">
-        <label><input id="activeToggle" type="checkbox" /> Show Active</label>
+        <label><input id="activeToggle" type="checkbox" /> Show active</label>
+        <label><input id="inactiveToggle" type="checkbox" /> Show inactive</label>
         <label><input id="openClassToggle" type="checkbox" checked /> Show ALL</label>
         <label><input id="clubToggle" type="checkbox" checked /> Show Club</label>
         <label><input id="participantsToggle" type="checkbox" checked /> Show participants</label>
@@ -191,6 +192,7 @@
     const toggleButton = document.getElementById("toggle");
     const directionButton = document.getElementById("direction");
     const activeToggle = document.getElementById("activeToggle");
+    const inactiveToggle = document.getElementById("inactiveToggle");
     const openClassToggle = document.getElementById("openClassToggle");
     const clubToggle = document.getElementById("clubToggle");
     const participantsToggle = document.getElementById("participantsToggle");
@@ -218,6 +220,7 @@
     let isReloading = false;
     let toolbarHidden = false;
     let showActive = false;
+    let showInactive = false;
     let showOpenClass = true;
     let showClub = true;
     let showParticipants = true;
@@ -256,6 +259,19 @@
 
       for (const row of activeRows) {
         row.style.display = showActive ? "" : "none";
+      }
+    }
+
+    function applyInactiveVisibility(targetFrame = activeFrame) {
+      const doc = targetFrame.contentDocument;
+      if (!doc) {
+        return;
+      }
+
+      const inactiveRows = doc.querySelectorAll("tr[data-status='Inactive']");
+
+      for (const row of inactiveRows) {
+        row.style.display = showInactive ? "" : "none";
       }
     }
 
@@ -392,6 +408,7 @@
 
     function applyRestoredScroll(targetFrame) {
       applyActiveVisibility(targetFrame);
+      applyInactiveVisibility(targetFrame);
       applyOpenClassVisibility(targetFrame);
       applyClubVisibility(targetFrame);
       applyParticipantsVisibility(targetFrame);
@@ -522,6 +539,14 @@
       showActive = activeToggle.checked;
       applyActiveVisibility(activeFrame);
       applyActiveVisibility(standbyFrame);
+      applyEmptyClassVisibility(activeFrame);
+      applyEmptyClassVisibility(standbyFrame);
+    });
+
+    inactiveToggle.addEventListener("change", () => {
+      showInactive = inactiveToggle.checked;
+      applyInactiveVisibility(activeFrame);
+      applyInactiveVisibility(standbyFrame);
       applyEmptyClassVisibility(activeFrame);
       applyEmptyClassVisibility(standbyFrame);
     });

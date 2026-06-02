@@ -184,14 +184,14 @@ function buildSideBySideEvent(eventDate: Date) {
   const logo2Path = path.resolve(__dirname, "../assets/logo2.png");
 
   return {
-    reportTitle: "Вибір",
+    reportTitle: "Дистанція \"За вибором\"",
     event: {
       title:
         config.reportHeader.title ??
-        `Всеукраїнські змагання "Пліч-о-пліч всеукраїнські шкільні ліги зі<br/>
-        спортивного орієнтування" серед учнів закладів загальної середньої<br/>
-        освіти "РАЗОМ ПЕРЕМОЖЕМО"`,
-      subtitle: `ЗАГАЛЬНОКОМАНДНИХ РЕЗУЛЬТАТІВ ЗМАГАНЬ<br/>
+        `Всеукраїнські змагання<br/>
+        "Пліч-о-пліч всеукраїнські шкільні ліги зі спортивного орієнтування"<br/>
+        серед учнів закладів загальної середньої освіти "РАЗОМ ПЕРЕМОЖЕМО"`,
+      subtitle: `Протокол загальнокомандних результатів змагань<br/>
         зі спортивного орієнтування ${config.reportHeader.stage} Пліч-о-пліч, Всеукраїнських шкільних ліг<br/>
         ${config.reportHeader.region_of}, ${formatDate(eventDate, "yyyy")} р.`,
       location: config.reportHeader.location,
