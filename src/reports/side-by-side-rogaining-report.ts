@@ -81,49 +81,15 @@ function compareRankedParticipants(left: RankedParticipant, right: RankedPartici
   return left.name.localeCompare(right.name, "uk");
 }
 
-function buildTimeBehindByControlCount(
-  participants: RankedParticipant[],
-): Map<number, number> {
-  const bestTimeByControlCount = new Map<number, number>();
-
-  for (const participant of participants) {
-    if (
-      participant.rankGroup !== 1 ||
-      participant.controlCount === undefined ||
-      participant.timeSec === undefined
-    ) {
-      continue;
-    }
-
-    const bestTime = bestTimeByControlCount.get(participant.controlCount);
-
-    if (bestTime === undefined || participant.timeSec < bestTime) {
-      bestTimeByControlCount.set(participant.controlCount, participant.timeSec);
-    }
-  }
-
-  return bestTimeByControlCount;
-}
-
 function getTimeBehind(
   participant: RankedParticipant,
-  bestOkTime: number | undefined,
-  bestTimeByControlCount: Map<number, number>,
+  firstPlaceTime: number | undefined,
 ): number | undefined {
-  if (participant.timeSec === undefined) {
+  if (participant.timeSec === undefined || firstPlaceTime === undefined) {
     return undefined;
   }
 
-  if (participant.rankGroup === 0) {
-    return bestOkTime === undefined ? undefined : participant.timeSec - bestOkTime;
-  }
-
-  if (participant.rankGroup === 1 && participant.controlCount !== undefined) {
-    const bestTime = bestTimeByControlCount.get(participant.controlCount);
-    return bestTime === undefined ? undefined : participant.timeSec - bestTime;
-  }
-
-  return undefined;
+  return participant.timeSec - firstPlaceTime;
 }
 
 function buildClassParticipants(
@@ -135,8 +101,9 @@ function buildClassParticipants(
       rankGroup: getRankGroup(participant),
     }))
     .sort(compareRankedParticipants);
-  const bestOkTime = rankedParticipants.find((participant) => participant.rankGroup === 0)?.timeSec;
-  const bestTimeByControlCount = buildTimeBehindByControlCount(rankedParticipants);
+  const firstPlaceTime = rankedParticipants.find(
+    (participant) => participant.rankGroup <= 1,
+  )?.timeSec;
   let nextPlace = 1;
 
   return rankedParticipants.map((participant) => {
@@ -152,9 +119,7 @@ function buildClassParticipants(
       organisation: participant.club,
       controlCount: participant.controlCount === undefined ? "" : String(participant.controlCount),
       time: formatTime(participant.timeSec),
-      timeBehind: formatTimeBehind(
-        getTimeBehind(participant, bestOkTime, bestTimeByControlCount),
-      ),
+      timeBehind: formatTimeBehind(getTimeBehind(participant, firstPlaceTime)),
       points: pointsFromPosition(place, participant.status),
       status: participant.status,
     };

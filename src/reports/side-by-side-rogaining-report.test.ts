@@ -47,19 +47,21 @@ describe("buildSideBySideRogainingClasses", () => {
         name: "Більше КП швидко",
         controlCount: "8",
         points: 1,
+        timeBehind: "-16:40",
       },
       {
         position: "3",
         name: "Більше КП повільно",
         controlCount: "8",
         points: 1,
-        timeBehind: "+3:20",
+        timeBehind: "-13:20",
       },
       {
         position: "4",
         name: "Менше КП",
         controlCount: "4",
         points: 1,
+        timeBehind: "-18:20",
       },
     ]);
   });
