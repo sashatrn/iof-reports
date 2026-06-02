@@ -73,6 +73,10 @@ function getRankGroup(participant: Participant): number {
   return 2;
 }
 
+function getScoringStatus(participant: Participant): string {
+  return participant.status === "MissingPunch" ? "OK" : participant.status;
+}
+
 function compareRankedParticipants(left: RankedParticipant, right: RankedParticipant): number {
   if (left.rankGroup !== right.rankGroup) {
     return left.rankGroup - right.rankGroup;
@@ -131,7 +135,7 @@ function buildClassParticipants(
       controlCount: participant.controlCount === undefined ? "" : String(participant.controlCount),
       time: formatTime(participant.timeSec),
       timeBehind: formatTimeBehind(getTimeBehind(participant, firstPlaceTime)),
-      points: pointsFromPosition(place, participant.status),
+      points: pointsFromPosition(place, getScoringStatus(participant)),
       status: participant.status,
     };
   });
