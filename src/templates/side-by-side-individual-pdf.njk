@@ -31,4 +31,56 @@
 </div>
 {% endfor %}
 
+{% if teamResults and (teamResults.men.length or teamResults.women.length) %}
+<div class="class-block">
+  <h3>Командні результати</h3>
+
+  {% if teamResults.men.length %}
+  <h4>Чоловіки</h4>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Місце</th>
+        <th>Команда</th>
+        <th>Бал</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for team in teamResults.men %}
+      <tr>
+        <td><strong>{{ loop.index }}</strong></td>
+        <td>{{ team.club }}</td>
+        <td><strong>{{ team.points }}</strong></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  {% if teamResults.women.length %}
+  <h4>Жінки</h4>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Місце</th>
+        <th>Команда</th>
+        <th>Бал</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for team in teamResults.women %}
+      <tr>
+        <td><strong>{{ loop.index }}</strong></td>
+        <td>{{ team.club }}</td>
+        <td><strong>{{ team.points }}</strong></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+{% endif %}
+
 {% endblock %}

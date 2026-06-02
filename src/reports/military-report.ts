@@ -4,6 +4,10 @@ import { Participant } from "../io/parse-iof";
 import { RogainingTeam } from "../io/parse-rogaining-iof";
 import { renderTemplate } from "../render/template-engine";
 import {
+  isPdfVisibleParticipant,
+  isPdfVisibleRelayTeam,
+} from "./pdf-status-filter";
+import {
   buildMilitaryClassFilter,
   buildMilitaryTeamFilter,
   MILITARY_OUT_OF_COMPETITION_POINTS,
@@ -724,9 +728,11 @@ export function buildMilitaryIndividualHtml(
 ): string {
   const config = loadConfig();
   const groupMatchers = buildClassGroupMatchers(config.military.individualTeamGroups);
+  const reportParticipants =
+    variant === "pdf" ? participants.filter(isPdfVisibleParticipant) : participants;
   const byClass = new Map<string, Participant[]>();
 
-  for (const participant of participants) {
+  for (const participant of reportParticipants) {
     const classParticipants = byClass.get(participant.className) ?? [];
     classParticipants.push(participant);
     byClass.set(participant.className, classParticipants);
@@ -756,7 +762,7 @@ export function buildMilitaryIndividualHtml(
     ...buildMilitaryEvent(eventDate, "Довга дистанція"),
     classes,
     teamResults: buildMilitaryIndividualTeamResults(
-      participants,
+      reportParticipants,
       config.military.teamFilterRegex,
       config.military.classFilterRegex,
       config.military.individualTeamGroups,
@@ -770,7 +776,8 @@ export function buildMilitaryRelayHtml(
   variant: HtmlVariant = "pdf",
 ): string {
   const config = loadConfig();
-  const classes = buildMilitaryRelayClasses(teams, config.military.classFilterRegex);
+  const reportTeams = variant === "pdf" ? teams.filter(isPdfVisibleRelayTeam) : teams;
+  const classes = buildMilitaryRelayClasses(reportTeams, config.military.classFilterRegex);
 
   return renderTemplate(`military-relay-${variant}.njk`, {
     ...buildMilitaryEvent(eventDate, "Естафета"),

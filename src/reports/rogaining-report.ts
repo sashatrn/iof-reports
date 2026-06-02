@@ -5,6 +5,7 @@ import { RogainingSplit, RogainingTeam } from "../io/parse-rogaining-iof";
 import { ParsedUofBaza, UofBazaSportsman } from "../io/parse-uof-baza";
 import { DocxBlock, renderDocx } from "../render/docx";
 import { renderTemplate } from "../render/template-engine";
+import { isPdfVisibleTeam } from "./pdf-status-filter";
 import { formatDate } from "../utils/date";
 import { imageToBase64 } from "../utils/image";
 
@@ -1699,10 +1700,13 @@ export function buildRogainingHtml(
 ): string {
   const config = loadConfig();
   const normalizedTeams = applyRogainingRules(teams, config);
+  const reportTeams = variant === "pdf"
+    ? normalizedTeams.filter(isPdfVisibleTeam)
+    : normalizedTeams;
   const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
   const logo2Path = path.resolve(__dirname, "../assets/irf-logo.png");
 
-  const classes = buildRogainingClasses(normalizedTeams, config).filter((classGroup) => {
+  const classes = buildRogainingClasses(reportTeams, config).filter((classGroup) => {
     return variant === "view" || classGroup.name !== AGGREGATE_OPEN_CLASS;
   });
 

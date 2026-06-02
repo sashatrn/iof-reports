@@ -3,6 +3,7 @@ import { loadConfig } from "../config";
 import { RogainingTeam } from "../io/parse-rogaining-iof";
 import { renderTemplate } from "../render/template-engine";
 import { pointsFromPosition } from "../scoring/side-by-side-points";
+import { isPdfVisibleRelayTeam } from "./pdf-status-filter";
 import { formatDate } from "../utils/date";
 import { imageToBase64 } from "../utils/image";
 import { formatResultStatus } from "../utils/result-status";
@@ -334,7 +335,8 @@ export function buildSideBySideRelayHtml(
   eventDate: Date,
   variant: HtmlVariant = "pdf",
 ): string {
-  const classes = buildSideBySideRelayClasses(teams);
+  const reportTeams = variant === "pdf" ? teams.filter(isPdfVisibleRelayTeam) : teams;
+  const classes = buildSideBySideRelayClasses(reportTeams);
 
   return renderTemplate(`side-by-side-relay-${variant}.njk`, {
     ...buildSideBySideEvent(eventDate, "Естафета"),

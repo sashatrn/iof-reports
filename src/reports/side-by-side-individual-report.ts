@@ -1,11 +1,17 @@
 import { Participant } from "../io/parse-iof";
 import { renderTemplate } from "../render/template-engine";
+import { isPdfVisibleParticipant } from "./pdf-status-filter";
+import { GenderTeamResult } from "../scoring/side-by-side-team";
 import { formatDate } from "../utils/date";
 import { imageToBase64 } from "../utils/image";
 import { loadConfig } from "../config";
 import path from "path";
 
 type HtmlVariant = "view" | "pdf";
+type SideBySideTeamResults = {
+  men: GenderTeamResult[];
+  women: GenderTeamResult[];
+};
 
 function formatTime(sec?: number) {
   if (!sec) return "";
@@ -21,10 +27,13 @@ export function buildSideBySideIndividualHtml(
   participants: Participant[],
   eventDate: Date,
   variant: HtmlVariant = "pdf",
+  teamResults?: SideBySideTeamResults,
 ): string {
+  const reportParticipants =
+    variant === "pdf" ? participants.filter(isPdfVisibleParticipant) : participants;
   const byClass = new Map<string, Participant[]>();
 
-  for (const p of participants) {
+  for (const p of reportParticipants) {
     if (!byClass.has(p.className)) {
       byClass.set(p.className, []);
     }
@@ -67,5 +76,6 @@ export function buildSideBySideIndividualHtml(
     },
     officials: config.officials,
     classes,
+    teamResults,
   });
 }

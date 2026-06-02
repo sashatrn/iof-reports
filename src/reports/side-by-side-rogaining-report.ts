@@ -3,6 +3,7 @@ import { loadConfig } from "../config";
 import { Participant } from "../io/parse-iof";
 import { renderTemplate } from "../render/template-engine";
 import { pointsFromPosition } from "../scoring/side-by-side-points";
+import { isPdfVisibleParticipant } from "./pdf-status-filter";
 import { formatDate } from "../utils/date";
 import { imageToBase64 } from "../utils/image";
 
@@ -173,8 +174,11 @@ export function buildSideBySideRogainingHtml(
   eventDate: Date,
   variant: HtmlVariant = "pdf",
 ): string {
+  const reportParticipants =
+    variant === "pdf" ? participants.filter(isPdfVisibleParticipant) : participants;
+
   return renderTemplate(`side-by-side-rogaining-${variant}.njk`, {
     ...buildSideBySideEvent(eventDate),
-    classes: buildSideBySideRogainingClasses(participants),
+    classes: buildSideBySideRogainingClasses(reportParticipants),
   });
 }

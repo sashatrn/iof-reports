@@ -8,6 +8,7 @@ import { type RogainingTeam } from "../io/parse-rogaining-iof";
 import {
   buildMilitaryIndividualTeamResults,
   buildMilitaryRelayClasses,
+  buildMilitaryRelayHtml,
   buildMilitaryRelayTeamResults,
   buildMilitaryTeamStandingGroups,
   buildMilitaryTeamStandings,
@@ -295,6 +296,24 @@ describe("buildMilitaryRelayClasses", () => {
       stageTimes: ["14:33", "", "Неактивний"],
       status: "DidNotFinish",
     });
+  });
+
+  it("keeps active relay teams in view html but removes them from pdf html", () => {
+    const teams = [
+      makeRelayTeam("Ч ЗСУ", "Фініш", "СВ", 3000, true, [1000, 1000, 1000]),
+      makeRelayTeam("Ч ЗСУ", "На дистанції", "СВ", 1000, false, [
+        1000,
+        undefined,
+        undefined,
+      ], "DidNotFinish", ["OK", "Active", "Inactive"]),
+    ];
+
+    const viewHtml = buildMilitaryRelayHtml(teams, new Date(2026, 3, 11), "view");
+    const pdfHtml = buildMilitaryRelayHtml(teams, new Date(2026, 3, 11), "pdf");
+
+    expect(viewHtml).toContain("На дистанції");
+    expect(pdfHtml).not.toContain("На дистанції");
+    expect(pdfHtml).not.toContain("Неактивний");
   });
 
   it("puts relay teams with a problem status after unfinished teams", () => {

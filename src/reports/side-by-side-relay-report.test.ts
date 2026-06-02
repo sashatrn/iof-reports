@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { type RogainingTeam } from "../io/parse-rogaining-iof";
 import {
   buildSideBySideRelayClasses,
+  buildSideBySideRelayHtml,
   buildSideBySideRelayTeamResults,
 } from "./side-by-side-relay-report";
 
@@ -53,6 +54,24 @@ describe("buildSideBySideRelayClasses", () => {
         timeBehind: "",
       },
     ]);
+  });
+
+  it("keeps active relay teams in view html but removes them from pdf html", () => {
+    const teams = [
+      makeRelayTeam("Ж 7-8", "Фініш", "Гімназія", 3000, true, [1000, 1000, 1000]),
+      makeRelayTeam("Ж 7-8", "На дистанції", "Ліцей", 1000, false, [
+        1000,
+        undefined,
+        undefined,
+      ], "OK", ["OK", "Active", "Inactive"]),
+    ];
+
+    const viewHtml = buildSideBySideRelayHtml(teams, new Date(2026, 3, 11), "view");
+    const pdfHtml = buildSideBySideRelayHtml(teams, new Date(2026, 3, 11), "pdf");
+
+    expect(viewHtml).toContain("На дистанції");
+    expect(pdfHtml).not.toContain("На дистанції");
+    expect(pdfHtml).not.toContain("Неактивний");
   });
 });
 

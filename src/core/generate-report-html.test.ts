@@ -190,6 +190,10 @@ describe("generateSideBySideIndividualReportHtml", () => {
     expect(report.viewHtml).toContain("Індивідуальний протокол");
     expect(report.viewHtml).toContain("Ч 5-6");
     expect(report.pdfHtml).toContain("Індивідуальний протокол");
+    expect(report.viewHtml).not.toContain("Командні результати");
+    expect(report.pdfHtml).toContain("Командні результати");
+    expect(report.pdfHtml).toContain("<h4>Чоловіки</h4>");
+    expect(report.pdfHtml).toContain("<h4>Жінки</h4>");
     expect(report.viewHtml).toContain('class="page"');
     expect(report.pdfHtml).toContain("@page");
   });
@@ -262,6 +266,8 @@ describe("generateSideBySideRogainingReportHtml", () => {
     expect(report.viewHtml).toContain("За вибором");
     expect(report.viewHtml).toContain("<th>Кількість КП</th>");
     expect(report.viewHtml).toContain("<th>Бал</th>");
+    expect(report.viewHtml).toContain("Неактивний");
+    expect(report.pdfHtml).not.toContain("Неактивний");
     expect(report.pdfHtml).toContain("@page");
   });
 });
@@ -549,14 +555,13 @@ describe("configured PDF signatures", () => {
 });
 
 describe("generateReportsHtml", () => {
-  it("builds two reports for all mode", () => {
+  it("builds one combined side-by-side report for all mode", () => {
     const reports = generateReportsHtml(sampleXml, "all");
 
-    expect(reports).toHaveLength(2);
-    expect(reports.map((report) => report.reportType)).toEqual([
-      "individual",
-      "team",
-    ]);
+    expect(reports).toHaveLength(1);
+    expect(reports[0].reportType).toBe("individual");
+    expect(reports[0].pdfHtml).toContain("Індивідуальний протокол");
+    expect(reports[0].pdfHtml).toContain("Командні результати");
   });
 });
 

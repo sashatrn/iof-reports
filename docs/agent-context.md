@@ -43,7 +43,7 @@ The package requires Node.js 18+. PDF rendering uses Playwright Chromium, so env
 - [src/report-types.ts](/Users/atrukhny/projects/my/iof-reports/src/report-types.ts): canonical report type list and type guards.
 - [src/core/generate-report-html.ts](/Users/atrukhny/projects/my/iof-reports/src/core/generate-report-html.ts): central dispatcher from XML plus options to generated report artifacts.
 
-Important behavior in `generateReportsHtml`: `--report all` currently generates only `individual` and `team`.
+Important behavior in `generateReportsHtml`: `--report all` generates one combined regular side-by-side `individual` report whose PDF includes both individual results and team standings. Explicit `--report team` still generates the standalone team report.
 
 ## Architecture
 

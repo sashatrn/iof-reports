@@ -30,6 +30,7 @@ import {
 } from "../reports/side-by-side-relay-report";
 import { buildSideBySideRogainingHtml } from "../reports/side-by-side-rogaining-report";
 import { buildSideBySideTeamHtml } from "../reports/side-by-side-team-report";
+import { isPdfVisibleParticipant } from "../reports/pdf-status-filter";
 import { applyMilitaryIndividualPoints } from "../scoring/military-individual-points";
 import { pointsFromPosition } from "../scoring/side-by-side-points";
 import { computeTeamResults } from "../scoring/side-by-side-team";
@@ -130,11 +131,15 @@ export function generateSideBySideIndividualReportHtml(
     pointsFromPosition,
     true,
   );
+  const pdfParticipants = participants.filter(isPdfVisibleParticipant);
+  const teamResults = pdfParticipants.length > 0
+    ? computeTeamResults(pdfParticipants, loadConfig(), logger)
+    : undefined;
 
   return {
     reportType: "individual",
     viewHtml: buildSideBySideIndividualHtml(participants, eventDate, "view"),
-    pdfHtml: buildSideBySideIndividualHtml(participants, eventDate, "pdf"),
+    pdfHtml: buildSideBySideIndividualHtml(participants, eventDate, "pdf", teamResults),
     eventDate: toIsoDate(eventDate),
     itemCount: participants.length,
   };
@@ -147,14 +152,19 @@ export function generateSideBySideTeamReportHtml(
   const { logger } = options;
   const { participants, eventDate } = parseParticipantsXml(xml, logger);
   const config = loadConfig();
-  const teamResults = computeTeamResults(participants, config, logger);
+  const viewTeamResults = computeTeamResults(participants, config, logger);
+  const pdfTeamResults = computeTeamResults(
+    participants.filter(isPdfVisibleParticipant),
+    config,
+    logger,
+  );
 
   return {
     reportType: "team",
-    viewHtml: buildSideBySideTeamHtml(teamResults, eventDate, "view"),
-    pdfHtml: buildSideBySideTeamHtml(teamResults, eventDate, "pdf"),
+    viewHtml: buildSideBySideTeamHtml(viewTeamResults, eventDate, "view"),
+    pdfHtml: buildSideBySideTeamHtml(pdfTeamResults, eventDate, "pdf"),
     eventDate: toIsoDate(eventDate),
-    itemCount: teamResults.men.length + teamResults.women.length,
+    itemCount: pdfTeamResults.men.length + pdfTeamResults.women.length,
   };
 }
 
@@ -508,10 +518,7 @@ export function generateReportsHtml(
   options: GenerateReportOptions = {},
 ): GeneratedReport[] {
   if (reportType === "all") {
-    return [
-      generateSideBySideIndividualReportHtml(xml, options),
-      generateSideBySideTeamReportHtml(xml, options),
-    ];
+    return [generateSideBySideIndividualReportHtml(xml, options)];
   }
 
   return [generateReportHtml(xml, reportType, options)];

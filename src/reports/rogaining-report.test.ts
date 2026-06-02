@@ -181,6 +181,7 @@ describe("buildRogainingHtml", () => {
     ];
 
     const html = buildRogainingHtml(teams, new Date(2026, 3, 11), "Рогейн", "view");
+    const pdfHtml = buildRogainingHtml(teams, new Date(2026, 3, 11), "Рогейн", "pdf");
     const openSection = getClassSection(html, "Ч");
 
     expectInOrder(openSection, [
@@ -192,6 +193,8 @@ describe("buildRogainingHtml", () => {
     ]);
     expect(openSection).toContain("<td></td>");
     expect(openSection).toContain("<td>3:03:20</td>");
+    expect(pdfHtml).not.toContain("Не фінішували");
+    expect(pdfHtml).not.toContain("На дистанції");
   });
 
   it("shows points before penalty and total after penalty", () => {
