@@ -18,6 +18,7 @@ import {
   generateRogainingSplitsReportHtml,
   generateSideBySideIndividualReportHtml,
   generateSideBySideRelayReportHtml,
+  generateSideBySideRogainingReportHtml,
   generateSideBySideTeamReportHtml,
 } from "./generate-report-html";
 
@@ -36,6 +37,10 @@ const sampleXml = fs.readFileSync(
 );
 const rogainingXml = fs.readFileSync(
   path.resolve(__dirname, "../__fixtures__/rogaining-test.xml"),
+  "utf-8",
+);
+const sideBySideRogainingXml = fs.readFileSync(
+  path.resolve(__dirname, "../__fixtures__/side-by-side-rogaining.xml"),
   "utf-8",
 );
 const coursesXml = fs.readFileSync(
@@ -245,6 +250,19 @@ describe("generateSideBySideRelayReportHtml", () => {
     expect(report.viewHtml).toContain("Естафета");
     expect(report.pdfHtml).toContain("Естафета");
     expect(report.viewHtml).not.toContain("<tbody>");
+  });
+});
+
+describe("generateSideBySideRogainingReportHtml", () => {
+  it("builds side-by-side rogaining report html from individual IOF XML", () => {
+    const report = generateSideBySideRogainingReportHtml(sideBySideRogainingXml);
+
+    expect(report.reportType).toBe("side-by-side-rogaining");
+    expect(report.itemCount).toBeGreaterThan(0);
+    expect(report.viewHtml).toContain("Вибір");
+    expect(report.viewHtml).toContain("<th>Кількість КП</th>");
+    expect(report.viewHtml).toContain("<th>Бал</th>");
+    expect(report.pdfHtml).toContain("@page");
   });
 });
 
@@ -556,6 +574,16 @@ describe("generateReportHtml", () => {
 
     expect(report.reportType).toBe("side-by-side-relay");
     expect(report.viewHtml).toContain("Естафета");
+  });
+
+  it("dispatches to side-by-side rogaining report generator", () => {
+    const report = generateReportHtml(
+      sideBySideRogainingXml,
+      "side-by-side-rogaining",
+    );
+
+    expect(report.reportType).toBe("side-by-side-rogaining");
+    expect(report.viewHtml).toContain("Вибір");
   });
 
   it("dispatches to rogaining awards report generator", () => {

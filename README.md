@@ -5,6 +5,7 @@ CLI-інструмент для перетворення результатів 
 - Індивідуальний протокол (по класах)
 - Командний протокол (окремо чоловіки та жінки)
 - Естафетний протокол Пліч-о-пліч
+- Протокол вибору Пліч-о-пліч
 - Протокол результатів рогейну
 - Протокол балів рогейну
 - Протокол сплітів рогейну
@@ -36,13 +37,13 @@ CLI-інструмент для перетворення результатів 
 
 1. Відкрийте командний рядок Windows
 1. Виконайте `iof-reports <results.xml>`, де `<results.xml>` - IOF XML файл результатів.
-1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team`, `--report side-by-side-relay`, `--report rogaining`, `--report rogaining-awards`, `--report rogaining-diplomas`, `--report rogaining-score`, `--report rogaining-results`, `--report rogaining-splits`, `--report military-individual`, `--report military-relay` або `--report military-team`.
+1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team`, `--report side-by-side-relay`, `--report side-by-side-rogaining`, `--report rogaining`, `--report rogaining-awards`, `--report rogaining-diplomas`, `--report rogaining-score`, `--report rogaining-results`, `--report rogaining-splits`, `--report military-individual`, `--report military-relay` або `--report military-team`.
 1. За потреби вкажіть інший файл конфігурації: `--config my-config.json`. За замовчуванням використовується `config.json` з поточної теки.
 1. За потреби виберіть формат файлу: `--format pdf` або `--format docx`. DOCX наразі підтримується для `rogaining-awards`.
 1. За потреби згенеруйте HTML-файл: `--html view` або `--html pdf`.
 1. Для `rogaining-diplomas` за потреби увімкніть друк фону диплома через `--diploma-template on`. За замовчуванням `off`.
 
-Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `side-by-side-relay`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`, `rogaining-score`, `rogaining-results`, `rogaining-results-score`, `rogaining-splits`, `military-individual`, `military-relay`, `military-team`.
+Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `side-by-side-relay`, `side-by-side-rogaining`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`, `rogaining-score`, `rogaining-results`, `rogaining-results-score`, `rogaining-splits`, `military-individual`, `military-relay`, `military-team`.
 Доступні значення для `--html`: `none` (за замовчуванням), `view`, `pdf`.
 
 Приклади:
@@ -57,6 +58,7 @@ CLI-інструмент для перетворення результатів 
 - `iof-reports results.xml --report rogaining-splits --courses courses.xml` - створити протокол сплітів рогейну з відстанями між КП
 - `iof-reports results.xml --report rogaining-awards --format docx` - створити редагований DOCX нагородного протоколу
 - `iof-reports relay.xml --report side-by-side-relay --html view` - створити естафетний HTML-протокол Пліч-о-пліч
+- `iof-reports choice.xml --report side-by-side-rogaining --html view` - створити HTML-протокол вибору Пліч-о-пліч
 - `iof-reports long.xml --report military-individual --html view` - створити військовий індивідуальний HTML-протокол
 - `iof-reports relay.xml --report military-relay --html view` - створити військовий протокол естафети
 - `iof-reports long.xml --report military-team --relay relay.xml` - створити військовий загальнокомандний підсумок за довгою дистанцією та естафетою
@@ -154,6 +156,7 @@ iof-reports watch \
 - `--port 4173` - порт локального HTTP-сервера
 - `--report side-by-side-individual` - індивідуальний протокол Пліч-о-пліч для live-перегляду; звіт коректно працює з XML без учасників
 - `--report side-by-side-relay` - естафетний протокол Пліч-о-пліч з очками за шкалою side-by-side
+- `--report side-by-side-rogaining` - протокол вибору Пліч-о-пліч; учасники зі статусом `OK` сортуються за часом, `MissingPunch` - нижче за кількістю взятих КП і часом
 - `--diploma-template off|on` - чи вкладати фон диплома в `rogaining-diplomas`
 - `--courses courses.xml` - файл `CourseData` для `rogaining-splits`
 - `--baza baza.xml` - файл бази УФО для `rogaining-results`; з нього беруться поточні кваліфікації, дати народження, регіони та тренери

@@ -1,0 +1,40 @@
+{% extends "base-view.njk" %}
+
+{% block content %}
+
+{% for class in classes %}
+<div class="class-block">
+  <h3>{{ class.name }}</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Місце</th>
+        <th>Учасник</th>
+        <th>Команда</th>
+        <th>Кількість КП</th>
+        <th>Час</th>
+        <th>Відст.</th>
+        <th>Бал</th>
+        <th>Статус</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for participant in class.participants %}
+      <tr data-status="{{ participant.status }}">
+        <td><strong>{{ participant.position }}</strong></td>
+        <td>{{ participant.name }}</td>
+        <td>{{ participant.organisation }}</td>
+        <td>{{ participant.controlCount }}</td>
+        <td>{{ participant.time }}</td>
+        <td>{{ participant.timeBehind }}</td>
+        <td>{{ participant.points }}</td>
+        <td>{{ participant.status | statusLabel }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endfor %}
+
+{% endblock %}

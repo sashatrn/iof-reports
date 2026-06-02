@@ -28,6 +28,7 @@ import {
   buildSideBySideRelayClasses,
   buildSideBySideRelayHtml,
 } from "../reports/side-by-side-relay-report";
+import { buildSideBySideRogainingHtml } from "../reports/side-by-side-rogaining-report";
 import { buildSideBySideTeamHtml } from "../reports/side-by-side-team-report";
 import { applyMilitaryIndividualPoints } from "../scoring/military-individual-points";
 import { pointsFromPosition } from "../scoring/side-by-side-points";
@@ -154,6 +155,27 @@ export function generateSideBySideTeamReportHtml(
     pdfHtml: buildSideBySideTeamHtml(teamResults, eventDate, "pdf"),
     eventDate: toIsoDate(eventDate),
     itemCount: teamResults.men.length + teamResults.women.length,
+  };
+}
+
+export function generateSideBySideRogainingReportHtml(
+  xml: string,
+  options: GenerateReportOptions = {},
+): GeneratedReport {
+  const { logger } = options;
+  const { participants, eventDate } = parseParticipantsXml(
+    xml,
+    logger,
+    pointsFromPosition,
+    true,
+  );
+
+  return {
+    reportType: "side-by-side-rogaining",
+    viewHtml: buildSideBySideRogainingHtml(participants, eventDate, "view"),
+    pdfHtml: buildSideBySideRogainingHtml(participants, eventDate, "pdf"),
+    eventDate: toIsoDate(eventDate),
+    itemCount: participants.length,
   };
 }
 
@@ -453,6 +475,8 @@ export function generateReportHtml(
       return generateSideBySideIndividualReportHtml(xml, options);
     case "team":
       return generateSideBySideTeamReportHtml(xml, options);
+    case "side-by-side-rogaining":
+      return generateSideBySideRogainingReportHtml(xml, options);
     case "side-by-side-relay":
       return generateSideBySideRelayReportHtml(xml, options);
     case "rogaining":

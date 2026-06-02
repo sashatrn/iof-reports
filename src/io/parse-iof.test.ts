@@ -53,4 +53,53 @@ describe("parseIof", () => {
     expect(shouldExcludeResultStatus("DNS", ignoredStatuses)).toBe(true);
     expect(shouldExcludeResultStatus("DidNotEnter", ignoredStatuses)).toBe(false);
   });
+
+  it("reads control count from score or split controls", () => {
+    const parsed = parseIof(`
+      <ResultList>
+        <ClassResult>
+          <Class>
+            <Name>Ж</Name>
+          </Class>
+          <PersonResult>
+            <Person>
+              <Name>
+                <Family>Score</Family>
+                <Given>Runner</Given>
+              </Name>
+            </Person>
+            <Result>
+              <Status>OK</Status>
+              <Score type="Score">7</Score>
+              <SplitTime status="Additional">
+                <ControlCode>31</ControlCode>
+              </SplitTime>
+            </Result>
+          </PersonResult>
+          <PersonResult>
+            <Person>
+              <Name>
+                <Family>Splits</Family>
+                <Given>Runner</Given>
+              </Name>
+            </Person>
+            <Result>
+              <Status>MissingPunch</Status>
+              <SplitTime status="Additional">
+                <ControlCode>31</ControlCode>
+              </SplitTime>
+              <SplitTime status="Missing">
+                <ControlCode>32</ControlCode>
+              </SplitTime>
+              <SplitTime status="Additional">
+                <ControlCode>33</ControlCode>
+              </SplitTime>
+            </Result>
+          </PersonResult>
+        </ClassResult>
+      </ResultList>
+    `);
+
+    expect(parsed.participants.map((participant) => participant.controlCount)).toEqual([7, 2]);
+  });
 });

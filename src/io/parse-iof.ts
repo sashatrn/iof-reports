@@ -2,6 +2,11 @@ import { XMLParser } from "fast-xml-parser";
 import { loadConfig } from "../config";
 import { parseIsoDate } from "../utils/date";
 
+type IofScoreEntry = {
+  "#text"?: number | string;
+  "@_type"?: string;
+};
+
 export type ParsedIof = {
   eventDate?: Date;
   participants: Participant[];
@@ -17,6 +22,7 @@ export type Participant = {
   status: string;
   points: number;
   pointsLabel?: string;
+  controlCount?: number;
 };
 
 export function loadIgnoredResultStatuses(): Set<string> {
@@ -37,6 +43,49 @@ function toOptionalNumber(value: unknown): number | undefined {
 
   const numberValue = Number(value);
   return Number.isNaN(numberValue) ? undefined : numberValue;
+}
+
+function asArray<T>(value: T | T[] | undefined): T[] {
+  if (value === undefined || value === null) {
+    return [];
+  }
+
+  return Array.isArray(value) ? value : [value];
+}
+
+function findScoreByType(
+  score: IofScoreEntry | IofScoreEntry[] | undefined,
+  type: string,
+): number | undefined {
+  for (const entry of asArray(score)) {
+    if (entry?.["@_type"] === type) {
+      return toOptionalNumber(entry["#text"]);
+    }
+  }
+
+  return undefined;
+}
+
+function countRecordedControls(
+  splitTime:
+    | {
+        ControlCode?: string | number;
+        "@_status"?: string;
+      }
+    | {
+        ControlCode?: string | number;
+        "@_status"?: string;
+      }[]
+    | undefined,
+): number | undefined {
+  const controls = asArray(splitTime).filter(
+    (split) =>
+      split?.ControlCode !== undefined &&
+      split?.ControlCode !== "" &&
+      split?.["@_status"] !== "Missing",
+  );
+
+  return controls.length === 0 ? undefined : controls.length;
 }
 
 export function parseIof(xml: string): ParsedIof {
@@ -90,6 +139,9 @@ export function parseIof(xml: string): ParsedIof {
         position: toOptionalNumber(result?.Position),
         status,
         points: 0,
+        controlCount:
+          findScoreByType(result?.Score, "Score") ??
+          countRecordedControls(result?.SplitTime),
       });
     }
   }

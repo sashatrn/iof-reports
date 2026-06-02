@@ -10,6 +10,7 @@ Main user-facing reports:
 
 - `individual` and `team`
 - `side-by-side-relay`
+- `side-by-side-rogaining`
 - `rogaining`
 - `rogaining-awards`
 - `rogaining-diplomas`
@@ -92,7 +93,7 @@ CLI validations require:
 
 Watch mode is started with `iof-reports watch ...`.
 
-Watch accepts `--report side-by-side-individual` for the regular individual Пліч-о-пліч generator. This report supports an IOF XML with classes but no participants yet, matching the empty-input behavior of `military-individual`. The old `--report individual` name is not a watch-mode option. Watch also accepts `side-by-side-relay`.
+Watch accepts `--report side-by-side-individual` for the regular individual Пліч-о-пліч generator. This report supports an IOF XML with classes but no participants yet, matching the empty-input behavior of `military-individual`. The old `--report individual` name is not a watch-mode option. Watch also accepts `side-by-side-relay` and `side-by-side-rogaining`.
 
 Key files:
 
@@ -135,6 +136,7 @@ Useful fixtures:
 - `src/__fixtures__/courses.xml`
 - `src/__fixtures__/relay.xml`
 - `src/__fixtures__/relay2.xml`
+- `src/__fixtures__/side-by-side-rogaining.xml`
 - `src/__fixtures__/military-long.xml`
 - `src/__fixtures__/rogaining-score-masters-config.json`
 - `src/__fixtures__/rogaining-score-flat-regions-config.json`
