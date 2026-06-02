@@ -2,6 +2,7 @@
 
 {% block content %}
 
+<h2>Індивідуальні результати</h2>
 {% for class in classes %}
 <div class="class-block">
   <h3>{{ class.name }}</h3>
@@ -36,5 +37,30 @@
   </table>
 </div>
 {% endfor %}
+
+{% if teamResults and teamResults.length %}
+<div class="class-block">
+  <h2>Командні результати</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Місце</th>
+        <th>Команда</th>
+        <th>Бал</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for team in teamResults %}
+      <tr>
+        <td><strong>{{ team.place }}</strong></td>
+        <td>{{ team.organisation }}</td>
+        <td><strong>{{ team.points }}</strong></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
 
 {% endblock %}

@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { type Participant } from "../io/parse-iof";
-import { buildSideBySideRogainingClasses } from "./side-by-side-rogaining-report";
+import {
+  buildSideBySideRogainingClasses,
+  buildSideBySideRogainingTeamResults,
+} from "./side-by-side-rogaining-report";
 
 function getClassRows(participants: Participant[]) {
   return buildSideBySideRogainingClasses(participants)[0].participants;
@@ -65,6 +68,27 @@ describe("buildSideBySideRogainingClasses", () => {
       },
     ]);
   });
+
+  it("sums team results by organisation across classes", () => {
+    const classes = buildSideBySideRogainingClasses([
+      makeParticipant("Ліцей 1 швидко", "OK", 10, 900, "Ж", "Ліцей 1"),
+      makeParticipant("Ліцей 2", "OK", 10, 1000, "Ж", "Ліцей 2"),
+      makeParticipant("Ліцей 1 ще", "OK", 10, 800, "Ч", "Ліцей 1"),
+    ]);
+
+    expect(buildSideBySideRogainingTeamResults(classes)).toEqual([
+      {
+        place: 1,
+        organisation: "Ліцей 1",
+        points: 200,
+      },
+      {
+        place: 2,
+        organisation: "Ліцей 2",
+        points: 95,
+      },
+    ]);
+  });
 });
 
 function makeParticipant(
@@ -72,11 +96,13 @@ function makeParticipant(
   status: string,
   controlCount: number,
   timeSec: number,
+  className = "Ж",
+  club = "Ліцей",
 ): Participant {
   return {
-    className: "Ж",
+    className,
     name,
-    club: "Ліцей",
+    club,
     timeSec,
     status,
     points: 0,

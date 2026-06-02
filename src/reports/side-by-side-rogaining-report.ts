@@ -20,6 +20,17 @@ type SideBySideRogainingParticipant = {
   status: string;
 };
 
+type SideBySideRogainingClass = {
+  name: string;
+  participants: SideBySideRogainingParticipant[];
+};
+
+type SideBySideRogainingTeamResult = {
+  place: number;
+  organisation: string;
+  points: number;
+};
+
 type RankedParticipant = Participant & {
   rankGroup: number;
 };
@@ -127,7 +138,13 @@ function buildClassParticipants(
   });
 }
 
-export function buildSideBySideRogainingClasses(participants: Participant[]) {
+function normalizeOrganisation(organisation: string): string {
+  return organisation.trim() || "Unknown";
+}
+
+export function buildSideBySideRogainingClasses(
+  participants: Participant[],
+): SideBySideRogainingClass[] {
   const byClass = new Map<string, Participant[]>();
 
   for (const participant of participants) {
@@ -144,21 +161,53 @@ export function buildSideBySideRogainingClasses(participants: Participant[]) {
     }));
 }
 
+export function buildSideBySideRogainingTeamResults(
+  classes: SideBySideRogainingClass[],
+): SideBySideRogainingTeamResult[] {
+  const pointsByOrganisation = new Map<string, number>();
+
+  for (const participant of classes.flatMap((classGroup) => classGroup.participants)) {
+    const organisation = normalizeOrganisation(participant.organisation);
+    pointsByOrganisation.set(
+      organisation,
+      (pointsByOrganisation.get(organisation) ?? 0) + participant.points,
+    );
+  }
+
+  return [...pointsByOrganisation.entries()]
+    .map(([organisation, points]) => ({
+      place: 0,
+      organisation,
+      points,
+    }))
+    .sort((left, right) => {
+      if (left.points !== right.points) {
+        return right.points - left.points;
+      }
+
+      return left.organisation.localeCompare(right.organisation, "uk");
+    })
+    .map((result, index) => ({
+      ...result,
+      place: index + 1,
+    }));
+}
+
 function buildSideBySideEvent(eventDate: Date) {
   const config = loadConfig();
   const logo1Path = path.resolve(__dirname, "../assets/logo1.png");
   const logo2Path = path.resolve(__dirname, "../assets/logo2.png");
 
   return {
-    reportTitle: "Дистанція \"За вибором\"",
+    reportTitle: 'Дистанція "За вибором"',
     event: {
       title:
         config.reportHeader.title ??
         `Всеукраїнські змагання<br/>
         "Пліч-о-пліч всеукраїнські шкільні ліги зі спортивного орієнтування"<br/>
         серед учнів закладів загальної середньої освіти "РАЗОМ ПЕРЕМОЖЕМО"`,
-      subtitle: `Протокол загальнокомандних результатів змагань<br/>
-        зі спортивного орієнтування ${config.reportHeader.stage} Пліч-о-пліч, Всеукраїнських шкільних ліг<br/>
+      subtitle: `Протокол загальнокомандних результатів змагань зі спортивного орієнтування<br/>
+        ${config.reportHeader.stage} Пліч-о-пліч, Всеукраїнських шкільних ліг<br/>
         ${config.reportHeader.region_of}, ${formatDate(eventDate, "yyyy")} р.`,
       location: config.reportHeader.location,
       date: formatDate(eventDate),
@@ -176,9 +225,11 @@ export function buildSideBySideRogainingHtml(
 ): string {
   const reportParticipants =
     variant === "pdf" ? participants.filter(isPdfVisibleParticipant) : participants;
+  const classes = buildSideBySideRogainingClasses(reportParticipants);
 
   return renderTemplate(`side-by-side-rogaining-${variant}.njk`, {
     ...buildSideBySideEvent(eventDate),
-    classes: buildSideBySideRogainingClasses(reportParticipants),
+    classes,
+    teamResults: variant === "pdf" ? buildSideBySideRogainingTeamResults(classes) : undefined,
   });
 }

@@ -30,8 +30,8 @@
 
     .header-brand {
       display: grid;
-      grid-template-columns: 24mm 1fr 24mm;
-      gap: 6mm;
+      grid-template-columns: 20mm minmax(0, 1fr) 20mm;
+      column-gap: 2mm;
       align-items: start;
     }
 
@@ -46,9 +46,9 @@
     }
 
     .logo-slot img {
-      height: 20mm;
+      height: 18mm;
       width: auto;
-      max-width: 35mm;
+      max-width: 24mm;
       object-fit: contain;
     }
 
@@ -58,6 +58,7 @@
 
     .event-title {
       margin: 0 0 2mm 0;
+      white-space: nowrap;
     }
 
     .report-title {
@@ -67,6 +68,7 @@
 
     .event-subtitle {
       margin: 0 0 4mm 0;
+      white-space: nowrap;
     }
 
     .header-row {
@@ -99,6 +101,7 @@
       background: #eee;
     }
 
+    h2,
     h3,
     h4,
     .score-doc-section-title,
@@ -203,6 +206,11 @@
     .official-signature-name {
       position: relative;
       z-index: 1;
+    }
+
+    h2 {
+      margin: 3mm 0 2mm 0;
+      text-align: center;
     }
 
     h3 {

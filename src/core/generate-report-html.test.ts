@@ -240,8 +240,8 @@ describe("generateSideBySideRelayReportHtml", () => {
     expect(report.viewHtml).toContain("Естафета");
     expect(report.viewHtml).toContain("<th>Учасники</th>");
     expect(report.viewHtml).toContain("<th>Відст.</th>");
-    expect(report.viewHtml).not.toContain("Командний результат");
-    expect(report.pdfHtml).toContain("Командний результат");
+    expect(report.viewHtml).not.toContain("Командні результати");
+    expect(report.pdfHtml).toContain("Командні результати");
     expect(report.pdfHtml).toContain("@page");
   });
 
@@ -268,6 +268,8 @@ describe("generateSideBySideRogainingReportHtml", () => {
     expect(report.viewHtml).toContain("<th>Бал</th>");
     expect(report.viewHtml).toContain("Неактивний");
     expect(report.pdfHtml).not.toContain("Неактивний");
+    expect(report.viewHtml).not.toContain("Командні результати");
+    expect(report.pdfHtml).toContain("Командні результати");
     expect(report.pdfHtml).toContain("@page");
   });
 });
