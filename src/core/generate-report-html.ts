@@ -137,7 +137,7 @@ export function generateSideBySideIndividualReportHtml(
     : undefined;
 
   return {
-    reportType: "individual",
+    reportType: "side-by-side-individual",
     viewHtml: buildSideBySideIndividualHtml(participants, eventDate, "view"),
     pdfHtml: buildSideBySideIndividualHtml(participants, eventDate, "pdf", teamResults),
     eventDate: toIsoDate(eventDate),
@@ -481,7 +481,7 @@ export function generateReportHtml(
   options: GenerateReportOptions = {},
 ): GeneratedReport {
   switch (reportType) {
-    case "individual":
+    case "side-by-side-individual":
       return generateSideBySideIndividualReportHtml(xml, options);
     case "team":
       return generateSideBySideTeamReportHtml(xml, options);

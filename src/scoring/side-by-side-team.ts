@@ -36,14 +36,14 @@ export function computeTeamResults(
   logger?.info({ womenClasses: [...womenClasses] }, "Detected women classes");
 
   if (menClasses.size !== teamRules.menCount) {
-    logger?.error(
+    logger?.warn(
       { count: menClasses.size, expected: teamRules.menCount },
       `Expected exactly ${teamRules.menCount} men classes`,
     );
   }
 
   if (womenClasses.size !== teamRules.womenCount) {
-    logger?.error(
+    logger?.warn(
       { count: womenClasses.size, expected: teamRules.womenCount },
       `Expected exactly ${teamRules.womenCount} women classes`,
     );

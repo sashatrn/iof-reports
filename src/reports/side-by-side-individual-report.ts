@@ -67,7 +67,7 @@ export function buildSideBySideIndividualHtml(
   const config = loadConfig();
 
   return renderTemplate(`side-by-side-individual-${variant}.njk`, {
-    reportTitle: "Індивідуальний протокол",
+    reportTitle: "Заданий напрямок",
     event: {
       title:
         config.reportHeader.title ??

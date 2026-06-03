@@ -13,7 +13,7 @@ function testLogger(): Logger {
 }
 
 describe("parseWatchArgs", () => {
-  it("accepts side-by-side-individual as a watch alias for individual", () => {
+  it("accepts side-by-side-individual in watch mode", () => {
     const inputDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-watch-input-"));
     const outputDir = path.join(os.tmpdir(), "iof-watch-output");
 
@@ -32,7 +32,7 @@ describe("parseWatchArgs", () => {
       testLogger(),
     );
 
-    expect(options.reportType).toBe("individual");
+    expect(options.reportType).toBe("side-by-side-individual");
     expect(options.requestedReportType).toBe("side-by-side-individual");
   });
 

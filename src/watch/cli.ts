@@ -3,7 +3,7 @@ import path from "path";
 import { Logger } from "pino";
 import { isSingleReportType, SingleReportType } from "../report-types";
 
-export type WatchReportType = Exclude<SingleReportType, "individual"> | "side-by-side-individual";
+export type WatchReportType = SingleReportType;
 
 export type WatchOptions = {
   inputDir: string;
@@ -25,11 +25,7 @@ function printUsage(logger: Logger): void {
 }
 
 function isWatchReportType(value: string): value is WatchReportType {
-  return value === "side-by-side-individual" || (isSingleReportType(value) && value !== "individual");
-}
-
-function normalizeWatchReportType(value: WatchReportType): SingleReportType {
-  return value === "side-by-side-individual" ? "individual" : value;
+  return isSingleReportType(value);
 }
 
 export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
@@ -82,19 +78,17 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
         process.exit(1);
       }
 
-      const normalizedReportType = normalizeWatchReportType(value);
-
       if (
-        normalizedReportType === "rogaining-results" ||
-        normalizedReportType === "rogaining-results-score" ||
-        normalizedReportType === "military-team"
+        value === "rogaining-results" ||
+        value === "rogaining-results-score" ||
+        value === "military-team"
       ) {
         logger.error(`${value} is not supported in watch mode yet. Use the regular CLI with the required companion XML file.`);
         printUsage(logger);
         process.exit(1);
       }
 
-      reportType = normalizedReportType;
+      reportType = value;
       requestedReportType = value;
       i += 1;
       continue;

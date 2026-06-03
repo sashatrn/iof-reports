@@ -210,11 +210,11 @@ describe("generateSideBySideIndividualReportHtml", () => {
   it("builds individual report html from IOF XML", () => {
     const report = generateSideBySideIndividualReportHtml(sampleXml);
 
-    expect(report.reportType).toBe("individual");
+    expect(report.reportType).toBe("side-by-side-individual");
     expect(report.itemCount).toBeGreaterThan(0);
-    expect(report.viewHtml).toContain("Індивідуальний протокол");
+    expect(report.viewHtml).toContain("Заданий напрямок");
     expect(report.viewHtml).toContain("Ч 5-6");
-    expect(report.pdfHtml).toContain("Індивідуальний протокол");
+    expect(report.pdfHtml).toContain("Заданий напрямок");
     expect(report.viewHtml).not.toContain("Командні результати");
     expect(report.pdfHtml).toContain("Командні результати");
     expect(report.pdfHtml).toContain("<h4>Чоловіки</h4>");
@@ -226,10 +226,10 @@ describe("generateSideBySideIndividualReportHtml", () => {
   it("builds an empty individual report when there are no participants yet", () => {
     const report = generateSideBySideIndividualReportHtml(emptyIndividualXml);
 
-    expect(report.reportType).toBe("individual");
+    expect(report.reportType).toBe("side-by-side-individual");
     expect(report.itemCount).toBe(0);
-    expect(report.viewHtml).toContain("Індивідуальний протокол");
-    expect(report.pdfHtml).toContain("Індивідуальний протокол");
+    expect(report.viewHtml).toContain("Заданий напрямок");
+    expect(report.pdfHtml).toContain("Заданий напрямок");
     expect(report.viewHtml).not.toContain("<tbody>");
   });
 
@@ -595,19 +595,19 @@ describe("generateReportsHtml", () => {
     const reports = generateReportsHtml(sampleXml, "all");
 
     expect(reports).toHaveLength(1);
-    expect(reports[0].reportType).toBe("individual");
-    expect(reports[0].pdfHtml).toContain("Індивідуальний протокол");
+    expect(reports[0].reportType).toBe("side-by-side-individual");
+    expect(reports[0].pdfHtml).toContain("Заданий напрямок");
     expect(reports[0].pdfHtml).toContain("Командні результати");
   });
 });
 
 describe("generateReportHtml", () => {
-  it("dispatches to individual report generator", () => {
-    const report = generateReportHtml(sampleXml, "individual");
+  it("dispatches to side-by-side individual report generator", () => {
+    const report = generateReportHtml(sampleXml, "side-by-side-individual");
 
-    expect(report.reportType).toBe("individual");
-    expect(report.viewHtml).toContain("Індивідуальний протокол");
-    expect(report.pdfHtml).toContain("Індивідуальний протокол");
+    expect(report.reportType).toBe("side-by-side-individual");
+    expect(report.viewHtml).toContain("Заданий напрямок");
+    expect(report.pdfHtml).toContain("Заданий напрямок");
   });
 
   it("dispatches to side-by-side relay report generator", () => {
