@@ -2,6 +2,7 @@ export function pointsFromPosition(
   position: number | undefined,
   status: string,
 ): number {
+  if (status === "Active" || status === "Inactive") return 0;
   if (status !== "OK" || position === undefined) return 1;
 
   if (position === 1) return 100;

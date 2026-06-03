@@ -73,6 +73,56 @@ describe("buildSideBySideRelayClasses", () => {
     expect(pdfHtml).not.toContain("На дистанції");
     expect(pdfHtml).not.toContain("Неактивний");
   });
+
+  it("does not score relay teams with active or inactive side-by-side status", () => {
+    const classes = buildSideBySideRelayClasses([
+      makeRelayTeam("Ж 7-8", "Фініш", "Гімназія", 3000),
+      makeRelayTeam(
+        "Ж 7-8",
+        "На дистанції",
+        "Ліцей",
+        3100,
+        true,
+        [1000, 1000, 1100],
+        "Active",
+      ),
+      makeRelayTeam(
+        "Ж 7-8",
+        "Неактивні",
+        "Школа",
+        3200,
+        true,
+        [1000, 1000, 1200],
+        "Inactive",
+      ),
+    ]);
+
+    expect(classes[0].teams).toMatchObject([
+      {
+        teamName: "Фініш",
+        points: 100,
+      },
+      {
+        teamName: "На дистанції",
+        place: "",
+        points: 0,
+        status: "Active",
+      },
+      {
+        teamName: "Неактивні",
+        place: "",
+        points: 0,
+        status: "Inactive",
+      },
+    ]);
+    expect(buildSideBySideRelayTeamResults(classes)).toEqual([
+      {
+        place: 1,
+        organisation: "Гімназія",
+        points: 100,
+      },
+    ]);
+  });
 });
 
 describe("buildSideBySideRelayTeamResults", () => {

@@ -183,6 +183,7 @@ export function buildSideBySideRogainingTeamResults(
       organisation,
       points,
     }))
+    .filter((result) => result.points > 0)
     .sort((left, right) => {
       if (left.points !== right.points) {
         return right.points - left.points;

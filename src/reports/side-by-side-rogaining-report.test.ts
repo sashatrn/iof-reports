@@ -69,6 +69,39 @@ describe("buildSideBySideRogainingClasses", () => {
     ]);
   });
 
+  it("does not score active or inactive participants", () => {
+    const rows = getClassRows([
+      makeParticipant("Фініш", "OK", 10, 900),
+      makeParticipant("На дистанції", "Active", 6, 1000, "Ж", "Ліцей 2"),
+      makeParticipant("Неактивний", "Inactive", 0, 2000, "Ж", "Ліцей 3"),
+    ]);
+
+    expect(rows).toMatchObject([
+      {
+        name: "Фініш",
+        points: 100,
+      },
+      {
+        name: "На дистанції",
+        points: 0,
+        status: "Active",
+      },
+      {
+        name: "Неактивний",
+        points: 0,
+        status: "Inactive",
+      },
+    ]);
+
+    expect(buildSideBySideRogainingTeamResults([{ name: "Ж", participants: rows }])).toEqual([
+      {
+        place: 1,
+        organisation: "Ліцей",
+        points: 100,
+      },
+    ]);
+  });
+
   it("sums team results by organisation across classes", () => {
     const classes = buildSideBySideRogainingClasses([
       makeParticipant("Ліцей 1 швидко", "OK", 10, 900, "Ж", "Ліцей 1"),

@@ -59,7 +59,7 @@ describe("buildSideBySideIndividualHtml", () => {
         timeSec: undefined,
         position: undefined,
         status: "Active",
-        points: 1,
+        points: 0,
       },
       {
         className: "Ч 5-6",
@@ -128,7 +128,16 @@ describe("buildSideBySideIndividualHtml", () => {
         timeSec: undefined,
         position: undefined,
         status: "Active",
-        points: 1,
+        points: 0,
+      },
+      {
+        className: "Ж 7-8",
+        name: "Inactive Runner",
+        club: "Club D",
+        timeSec: undefined,
+        position: undefined,
+        status: "Inactive",
+        points: 0,
       },
     ];
 
@@ -142,9 +151,11 @@ describe("buildSideBySideIndividualHtml", () => {
     expect(html).toContain("<th>Статус</th>");
     expect(html).toContain('data-status="MissingPunch"');
     expect(html).toContain('data-status="Active"');
+    expect(html).toContain('data-status="Inactive"');
     expect(html).toContain("<td>+2:30</td>");
     expect(html).toContain("<td>Не всі КП</td>");
     expect(html).toContain("<td>На дистанції</td>");
+    expect(html).toContain("<td>Неактивний</td>");
   });
 
   it("renders team results in the PDF variant when provided", () => {
