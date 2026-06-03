@@ -34,7 +34,7 @@
         <td>{{ team.stageTimes[2] }}</td>
         <td>{{ team.formattedTime }}</td>
         <td>{{ team.timeBehind }}</td>
-        <td><strong>{{ team.points }}</strong></td>
+        <td><strong>{% if team.points > 0 %}{{ team.points }}{% endif %}</strong></td>
         <td>{{ team.status | statusLabel }}</td>
       </tr>
       {% endfor %}

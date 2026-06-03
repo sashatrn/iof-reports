@@ -26,7 +26,7 @@
         <td>{{ p.club }}</td>
         <td>{{ p.time }}</td>
         <td>{{ p.timeBehind }}</td>
-        <td>{{ p.points }}</td>
+        <td>{% if p.points > 0 %}{{ p.points }}{% endif %}</td>
         <td>{{ p.status | statusLabel }}</td>
       </tr>
       {% endfor %}
@@ -55,7 +55,7 @@
       <tr>
         <td><strong>{{ loop.index }}</strong></td>
         <td>{{ team.club }}</td>
-        <td><strong>{{ team.points }}</strong></td>
+        <td><strong>{% if team.points > 0 %}{{ team.points }}{% endif %}</strong></td>
       </tr>
       {% endfor %}
     </tbody>
@@ -78,7 +78,7 @@
       <tr>
         <td><strong>{{ loop.index }}</strong></td>
         <td>{{ team.club }}</td>
-        <td><strong>{{ team.points }}</strong></td>
+        <td><strong>{% if team.points > 0 %}{{ team.points }}{% endif %}</strong></td>
       </tr>
       {% endfor %}
     </tbody>

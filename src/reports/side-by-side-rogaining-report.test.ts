@@ -2,11 +2,26 @@ import { describe, expect, it } from "vitest";
 import { type Participant } from "../io/parse-iof";
 import {
   buildSideBySideRogainingClasses,
+  buildSideBySideRogainingHtml,
   buildSideBySideRogainingTeamResults,
 } from "./side-by-side-rogaining-report";
 
 function getClassRows(participants: Participant[]) {
   return buildSideBySideRogainingClasses(participants)[0].participants;
+}
+
+function getRowContaining(html: string, rowFragment: string): string {
+  const fragmentIndex = html.indexOf(rowFragment);
+
+  expect(fragmentIndex, `Expected row containing "${rowFragment}" to exist`).toBeGreaterThan(-1);
+
+  const rowStart = html.lastIndexOf("<tr", fragmentIndex);
+  const rowEnd = html.indexOf("</tr>", fragmentIndex);
+
+  expect(rowStart).toBeGreaterThan(-1);
+  expect(rowEnd).toBeGreaterThan(rowStart);
+
+  return html.slice(rowStart, rowEnd + "</tr>".length);
 }
 
 describe("buildSideBySideRogainingClasses", () => {
@@ -70,11 +85,12 @@ describe("buildSideBySideRogainingClasses", () => {
   });
 
   it("does not score active or inactive participants", () => {
-    const rows = getClassRows([
+    const participants = [
       makeParticipant("Фініш", "OK", 10, 900),
       makeParticipant("На дистанції", "Active", 6, 1000, "Ж", "Ліцей 2"),
-      makeParticipant("Неактивний", "Inactive", 0, 2000, "Ж", "Ліцей 3"),
-    ]);
+      makeParticipant("Неактивний", "Inactive", 1, 2000, "Ж", "Ліцей 3"),
+    ];
+    const rows = getClassRows(participants);
 
     expect(rows).toMatchObject([
       {
@@ -100,6 +116,15 @@ describe("buildSideBySideRogainingClasses", () => {
         points: 100,
       },
     ]);
+
+    const html = buildSideBySideRogainingHtml(participants, new Date(2026, 3, 11), "view");
+
+    expect(getRowContaining(html, "На дистанції")).toMatch(
+      /<td><\/td>\s*<td>На дистанції<\/td>/,
+    );
+    expect(getRowContaining(html, "Неактивний")).toMatch(
+      /<td><\/td>\s*<td>Неактивний<\/td>/,
+    );
   });
 
   it("sums team results by organisation across classes", () => {

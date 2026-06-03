@@ -30,6 +30,20 @@ function getClassSection(html: string, className: string): string {
   return html.slice(start, end);
 }
 
+function getRowContaining(html: string, rowFragment: string): string {
+  const fragmentIndex = html.indexOf(rowFragment);
+
+  expect(fragmentIndex, `Expected row containing "${rowFragment}" to exist`).toBeGreaterThan(-1);
+
+  const rowStart = html.lastIndexOf("<tr", fragmentIndex);
+  const rowEnd = html.indexOf("</tr>", fragmentIndex);
+
+  expect(rowStart).toBeGreaterThan(-1);
+  expect(rowEnd).toBeGreaterThan(rowStart);
+
+  return html.slice(rowStart, rowEnd + "</tr>".length);
+}
+
 describe("buildSideBySideIndividualHtml", () => {
   it("groups participants by class and sorts them by position", () => {
     const participants: Participant[] = [
@@ -156,6 +170,12 @@ describe("buildSideBySideIndividualHtml", () => {
     expect(html).toContain("<td>Не всі КП</td>");
     expect(html).toContain("<td>На дистанції</td>");
     expect(html).toContain("<td>Неактивний</td>");
+    expect(getRowContaining(html, "Active Runner")).toMatch(
+      /<td><\/td>\s*<td>На дистанції<\/td>/,
+    );
+    expect(getRowContaining(html, "Inactive Runner")).toMatch(
+      /<td><\/td>\s*<td>Неактивний<\/td>/,
+    );
   });
 
   it("renders team results in the PDF variant when provided", () => {

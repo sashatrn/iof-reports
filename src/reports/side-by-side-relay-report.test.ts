@@ -6,6 +6,20 @@ import {
   buildSideBySideRelayTeamResults,
 } from "./side-by-side-relay-report";
 
+function getRowContaining(html: string, rowFragment: string): string {
+  const fragmentIndex = html.indexOf(rowFragment);
+
+  expect(fragmentIndex, `Expected row containing "${rowFragment}" to exist`).toBeGreaterThan(-1);
+
+  const rowStart = html.lastIndexOf("<tr", fragmentIndex);
+  const rowEnd = html.indexOf("</tr>", fragmentIndex);
+
+  expect(rowStart).toBeGreaterThan(-1);
+  expect(rowEnd).toBeGreaterThan(rowStart);
+
+  return html.slice(rowStart, rowEnd + "</tr>".length);
+}
+
 describe("buildSideBySideRelayClasses", () => {
   it("scores relay teams with side-by-side place points", () => {
     const classes = buildSideBySideRelayClasses([
@@ -75,7 +89,7 @@ describe("buildSideBySideRelayClasses", () => {
   });
 
   it("does not score relay teams with active or inactive side-by-side status", () => {
-    const classes = buildSideBySideRelayClasses([
+    const teams = [
       makeRelayTeam("Ж 7-8", "Фініш", "Гімназія", 3000),
       makeRelayTeam(
         "Ж 7-8",
@@ -95,7 +109,8 @@ describe("buildSideBySideRelayClasses", () => {
         [1000, 1000, 1200],
         "Inactive",
       ),
-    ]);
+    ];
+    const classes = buildSideBySideRelayClasses(teams);
 
     expect(classes[0].teams).toMatchObject([
       {
@@ -122,6 +137,14 @@ describe("buildSideBySideRelayClasses", () => {
         points: 100,
       },
     ]);
+    const html = buildSideBySideRelayHtml(teams, new Date(2026, 3, 11), "view");
+
+    expect(getRowContaining(html, "На дистанції")).toMatch(
+      /<td><strong><\/strong><\/td>\s*<td>На дистанції<\/td>/,
+    );
+    expect(getRowContaining(html, "Неактивні")).toMatch(
+      /<td><strong><\/strong><\/td>\s*<td>Неактивний<\/td>/,
+    );
   });
 });
 

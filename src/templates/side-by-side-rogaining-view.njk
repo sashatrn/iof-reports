@@ -28,7 +28,7 @@
         <td>{{ participant.controlCount }}</td>
         <td>{{ participant.time }}</td>
         <td>{{ participant.timeBehind }}</td>
-        <td>{{ participant.points }}</td>
+        <td>{% if participant.points > 0 %}{{ participant.points }}{% endif %}</td>
         <td>{{ participant.status | statusLabel }}</td>
       </tr>
       {% endfor %}
