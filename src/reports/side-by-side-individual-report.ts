@@ -13,13 +13,22 @@ type SideBySideTeamResults = {
 };
 
 function formatTime(sec?: number) {
-  if (!sec) return "";
+  if (sec === undefined) return "";
   const h = Math.floor(sec / 3600);
   const m = Math.floor((sec % 3600) / 60);
   const s = sec % 60;
   return `${h > 0 ? h + ":" : ""}${m
     .toString()
     .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+}
+
+function formatTimeBehind(sec?: number) {
+  if (sec === undefined || sec === 0) return "";
+  const sign = sec < 0 ? "-" : "+";
+  const absoluteSeconds = Math.abs(sec);
+  const m = Math.floor(absoluteSeconds / 60);
+  const s = Math.floor(absoluteSeconds % 60);
+  return `${sign}${m}:${s.toString().padStart(2, "0")}`;
 }
 
 export function buildSideBySideIndividualHtml(
@@ -49,7 +58,9 @@ export function buildSideBySideIndividualHtml(
         name: p.name,
         club: p.club,
         time: formatTime(p.timeSec),
+        timeBehind: formatTimeBehind(p.timeBehindSec),
         points: p.points,
+        status: p.status,
       })),
   }));
 

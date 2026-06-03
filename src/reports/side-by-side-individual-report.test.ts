@@ -47,6 +47,7 @@ describe("buildSideBySideIndividualHtml", () => {
         name: "Second Runner",
         club: "Club A",
         timeSec: 3900,
+        timeBehindSec: 95,
         position: 2,
         status: "OK",
         points: 7,
@@ -79,6 +80,7 @@ describe("buildSideBySideIndividualHtml", () => {
       "1:02:05",
       "Second Runner",
       "1:05:00",
+      "+1:35",
       "<h3>Ч 7-8</h3>",
       "Runner Without Place",
     ]);
@@ -91,6 +93,58 @@ describe("buildSideBySideIndividualHtml", () => {
       "<td>2</td>",
       "Second Runner",
     ]);
+    expect(classSection).toContain("<th>Відст.</th>");
+    expect(classSection).toContain("<th>Статус</th>");
+    expect(classSection).toContain("<td>+1:35</td>");
+    expect(classSection).toContain("<td>OK</td>");
+  });
+
+  it("renders participant status details in the view variant", () => {
+    const participants: Participant[] = [
+      {
+        className: "Ж 7-8",
+        name: "Finished Runner",
+        club: "Club A",
+        timeSec: 3600,
+        timeBehindSec: 0,
+        position: 1,
+        status: "OK",
+        points: 10,
+      },
+      {
+        className: "Ж 7-8",
+        name: "Missing Runner",
+        club: "Club B",
+        timeSec: 3750,
+        timeBehindSec: 150,
+        position: 2,
+        status: "MissingPunch",
+        points: 1,
+      },
+      {
+        className: "Ж 7-8",
+        name: "Active Runner",
+        club: "Club C",
+        timeSec: undefined,
+        position: undefined,
+        status: "Active",
+        points: 1,
+      },
+    ];
+
+    const html = buildSideBySideIndividualHtml(
+      participants,
+      new Date(2026, 3, 11),
+      "view",
+    );
+
+    expect(html).toContain("<th>Відст.</th>");
+    expect(html).toContain("<th>Статус</th>");
+    expect(html).toContain('data-status="MissingPunch"');
+    expect(html).toContain('data-status="Active"');
+    expect(html).toContain("<td>+2:30</td>");
+    expect(html).toContain("<td>Не всі КП</td>");
+    expect(html).toContain("<td>На дистанції</td>");
   });
 
   it("renders team results in the PDF variant when provided", () => {
