@@ -149,10 +149,13 @@ describe("buildSideBySideRelayClasses", () => {
 });
 
 describe("buildSideBySideRelayTeamResults", () => {
-  it("sums side-by-side relay points by organisation", () => {
+  it("sums only the two best side-by-side relay points by organisation in each class", () => {
     const classes = buildSideBySideRelayClasses([
       makeRelayTeam("Ч 5-6", "Ліцей 1", "Ліцей 1", 3000),
-      makeRelayTeam("Ж 5-6", "Ліцей 1", "Ліцей 1", 3100),
+      makeRelayTeam("Ч 5-6", "Ліцей 1-2", "Ліцей 1", 3100),
+      makeRelayTeam("Ч 5-6", "Ліцей 1-3", "Ліцей 1", 3150),
+      makeRelayTeam("Ж 5-6", "Ліцей 1", "Ліцей 1", 3000),
+      makeRelayTeam("Ч 7-8", "Ліцей 1", "Ліцей 1", 3200),
       makeRelayTeam("Ч 5-6", "Ліцей 2", "Ліцей 2", 3200),
     ]);
 
@@ -160,12 +163,12 @@ describe("buildSideBySideRelayTeamResults", () => {
       {
         place: 1,
         organisation: "Ліцей 1",
-        points: 200,
+        points: 395,
       },
       {
         place: 2,
         organisation: "Ліцей 2",
-        points: 95,
+        points: 85,
       },
     ]);
   });

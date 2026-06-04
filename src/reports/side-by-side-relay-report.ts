@@ -277,12 +277,24 @@ export function buildSideBySideRelayTeamResults(
 ): SideBySideRelayTeamResult[] {
   const pointsByOrganisation = new Map<string, number>();
 
-  for (const relayEntry of relayClasses.flatMap((classGroup) => classGroup.teams)) {
-    const organisation = normalizeOrganisation(relayEntry.organisation);
-    pointsByOrganisation.set(
-      organisation,
-      (pointsByOrganisation.get(organisation) ?? 0) + relayEntry.points,
-    );
+  for (const classGroup of relayClasses) {
+    const pointsByOrganisationInClass = new Map<string, number[]>();
+
+    for (const relayEntry of classGroup.teams) {
+      const organisation = normalizeOrganisation(relayEntry.organisation);
+      const points = pointsByOrganisationInClass.get(organisation) ?? [];
+      points.push(relayEntry.points);
+      pointsByOrganisationInClass.set(organisation, points);
+    }
+
+    for (const [organisation, points] of pointsByOrganisationInClass.entries()) {
+      const bestPoints = [...points].sort((left, right) => right - left).slice(0, 2);
+      const classPoints = bestPoints.reduce((sum, point) => sum + point, 0);
+      pointsByOrganisation.set(
+        organisation,
+        (pointsByOrganisation.get(organisation) ?? 0) + classPoints,
+      );
+    }
   }
 
   return [...pointsByOrganisation.entries()]

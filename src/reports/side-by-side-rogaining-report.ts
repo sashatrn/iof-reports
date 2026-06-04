@@ -169,12 +169,24 @@ export function buildSideBySideRogainingTeamResults(
 ): SideBySideRogainingTeamResult[] {
   const pointsByOrganisation = new Map<string, number>();
 
-  for (const participant of classes.flatMap((classGroup) => classGroup.participants)) {
-    const organisation = normalizeOrganisation(participant.organisation);
-    pointsByOrganisation.set(
-      organisation,
-      (pointsByOrganisation.get(organisation) ?? 0) + participant.points,
-    );
+  for (const classGroup of classes) {
+    const pointsByOrganisationInClass = new Map<string, number[]>();
+
+    for (const participant of classGroup.participants) {
+      const organisation = normalizeOrganisation(participant.organisation);
+      const points = pointsByOrganisationInClass.get(organisation) ?? [];
+      points.push(participant.points);
+      pointsByOrganisationInClass.set(organisation, points);
+    }
+
+    for (const [organisation, points] of pointsByOrganisationInClass.entries()) {
+      const bestPoints = [...points].sort((left, right) => right - left).slice(0, 2);
+      const classPoints = bestPoints.reduce((sum, point) => sum + point, 0);
+      pointsByOrganisation.set(
+        organisation,
+        (pointsByOrganisation.get(organisation) ?? 0) + classPoints,
+      );
+    }
   }
 
   return [...pointsByOrganisation.entries()]

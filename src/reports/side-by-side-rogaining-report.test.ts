@@ -127,23 +127,26 @@ describe("buildSideBySideRogainingClasses", () => {
     );
   });
 
-  it("sums team results by organisation across classes", () => {
+  it("sums only the two best team results by organisation in each class", () => {
     const classes = buildSideBySideRogainingClasses([
       makeParticipant("Ліцей 1 швидко", "OK", 10, 900, "Ж", "Ліцей 1"),
       makeParticipant("Ліцей 2", "OK", 10, 1000, "Ж", "Ліцей 2"),
+      makeParticipant("Ліцей 1 другий Ж", "OK", 10, 950, "Ж", "Ліцей 1"),
+      makeParticipant("Ліцей 1 третій Ж", "OK", 10, 990, "Ж", "Ліцей 1"),
       makeParticipant("Ліцей 1 ще", "OK", 10, 800, "Ч", "Ліцей 1"),
+      makeParticipant("Ліцей 1 третій", "OK", 10, 850, "Ч", "Ліцей 1"),
     ]);
 
     expect(buildSideBySideRogainingTeamResults(classes)).toEqual([
       {
         place: 1,
         organisation: "Ліцей 1",
-        points: 200,
+        points: 390,
       },
       {
         place: 2,
         organisation: "Ліцей 2",
-        points: 95,
+        points: 85,
       },
     ]);
   });
