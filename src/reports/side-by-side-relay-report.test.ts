@@ -220,6 +220,59 @@ describe("buildSideBySideRelayClasses", () => {
     expect(getRowContaining(html, "Є фінішер")).toContain('data-status="ActiveWithResult"');
   });
 
+  it("calculates active relay time behind from the active stage leader", () => {
+    const classes = buildSideBySideRelayClasses([
+      makeRelayTeam(
+        "Ж 9",
+        "Лідер",
+        "Ліцей",
+        900,
+        false,
+        [900, undefined],
+        "Active",
+        ["OK", "Active"],
+      ),
+      makeRelayTeam(
+        "Ж 9",
+        "Переслідувач",
+        "Гімназія",
+        1000,
+        false,
+        [1000, undefined],
+        "Active",
+        ["OK", "Active"],
+      ),
+      makeRelayTeam(
+        "Ж 9",
+        "Ще не старт",
+        "Школа",
+        0,
+        false,
+        [undefined, undefined],
+        "Active",
+        ["Active", "Inactive"],
+      ),
+    ]);
+
+    expect(classes[0].teams).toMatchObject([
+      {
+        teamName: "Лідер",
+        timeBehind: "",
+        status: "Active",
+      },
+      {
+        teamName: "Переслідувач",
+        timeBehind: "+1:40",
+        status: "Active",
+      },
+      {
+        teamName: "Ще не старт",
+        timeBehind: "",
+        status: "Active",
+      },
+    ]);
+  });
+
   it("renders stage columns from relay team member count", () => {
     const html = buildSideBySideRelayHtml(
       [
@@ -230,9 +283,9 @@ describe("buildSideBySideRelayClasses", () => {
     );
     const row = getRowContaining(html, "Два етапи");
 
-    expect(html).toContain("<th>Етап 1</th>");
-    expect(html).toContain("<th>Етап 2</th>");
-    expect(html).not.toContain("<th>Етап 3</th>");
+    expect(html).toContain("<th>Етап&nbsp;1</th>");
+    expect(html).toContain("<th>Етап&nbsp;2</th>");
+    expect(html).not.toContain("<th>Етап&nbsp;3</th>");
     expect(row).toContain("<td>15:00</td>");
     expect(row).toContain("<td>16:40</td>");
   });

@@ -218,7 +218,7 @@ function getRelaySortGroup(status: string): number {
 }
 
 function canUseRelayTeamAsStageLeader(status: string): boolean {
-  return getRelaySortGroup(status) !== 2;
+  return status === "Active" || getRelaySortGroup(status) !== 2;
 }
 
 function rankRelayTeams(teams: TeamIofTeam[], stageCount: number): SideBySideRelayEntry[] {

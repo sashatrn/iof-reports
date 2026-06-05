@@ -353,6 +353,44 @@ describe("buildMilitaryRelayClasses", () => {
     });
   });
 
+  it("calculates active relay time behind from the active stage leader", () => {
+    const classes = buildMilitaryRelayClasses([
+      makeRelayTeam(
+        "Ч ЗСУ",
+        "Лідер",
+        "СВ",
+        900,
+        false,
+        [900, undefined],
+        "Active",
+        ["OK", "Active"],
+      ),
+      makeRelayTeam(
+        "Ч ЗСУ",
+        "Переслідувач",
+        "НАСВ",
+        1000,
+        false,
+        [1000, undefined],
+        "Active",
+        ["OK", "Active"],
+      ),
+    ]);
+
+    expect(classes[0].teams).toMatchObject([
+      {
+        teamName: "Лідер",
+        timeBehind: "",
+        status: "Active",
+      },
+      {
+        teamName: "Переслідувач",
+        timeBehind: "+1:40",
+        status: "Active",
+      },
+    ]);
+  });
+
   it("puts relay teams with a problem status after unfinished teams", () => {
     const classes = buildMilitaryRelayClasses([
       makeRelayTeam("Ч ВВНЗ", "MissingPunch", "ІВМС", 2600, false, [
@@ -428,7 +466,7 @@ describe("buildMilitaryRelayClasses", () => {
     );
     const row = getRowContaining(html, "Чотири етапи");
 
-    expect(html).toContain("<th>Етап 4</th>");
+    expect(html).toContain("<th>Етап&nbsp;4</th>");
     expect(row).toContain("<td>18:20</td>");
   });
 });
