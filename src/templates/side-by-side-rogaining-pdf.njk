@@ -10,26 +10,26 @@
   <table>
     <thead>
       <tr>
-        <th>Місце</th>
+        <th class="place-cell">Місце</th>
         <th>Учасник</th>
         <th>Команда</th>
         <th>Кількість КП</th>
         <th>Час</th>
         <th>Відст.</th>
-        <th>Бал</th>
+        <th class="points-cell">Бал</th>
         <th>Статус</th>
       </tr>
     </thead>
     <tbody>
       {% for participant in class.participants %}
       <tr>
-        <td><strong>{{ participant.position }}</strong></td>
+        <td class="place-cell"><strong>{{ participant.position }}</strong></td>
         <td>{{ participant.name }}</td>
         <td>{{ participant.organisation }}</td>
         <td>{{ participant.controlCount }}</td>
         <td>{{ participant.time }}</td>
         <td>{{ participant.timeBehind }}</td>
-        <td>{% if participant.points > 0 %}{{ participant.points }}{% endif %}</td>
+        <td class="points-cell">{% if participant.points > 0 %}{{ participant.points }}{% endif %}</td>
         <td>{{ participant.status | statusLabel }}</td>
       </tr>
       {% endfor %}
@@ -45,17 +45,17 @@
   <table>
     <thead>
       <tr>
-        <th>Місце</th>
+        <th class="place-cell">Місце</th>
         <th>Команда</th>
-        <th>Бал</th>
+        <th class="points-cell">Бал</th>
       </tr>
     </thead>
     <tbody>
       {% for team in teamResults %}
       <tr>
-        <td><strong>{{ team.place }}</strong></td>
+        <td class="place-cell"><strong>{{ team.place }}</strong></td>
         <td>{{ team.organisation }}</td>
-        <td><strong>{% if team.points > 0 %}{{ team.points }}{% endif %}</strong></td>
+        <td class="points-cell"><strong>{% if team.points > 0 %}{{ team.points }}{% endif %}</strong></td>
       </tr>
       {% endfor %}
     </tbody>

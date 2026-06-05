@@ -21,13 +21,13 @@ describe("buildSideBySideSummaryHtml", () => {
       new Date(2026, 3, 11),
     );
 
-    expect(html).toContain("<th>В заданому напрямку</th>");
-    expect(html).toContain("<th>По вибору</th>");
-    expect(html).toContain("<th>Естафета</th>");
+    expect(html).toContain('<th class="points-cell">В заданому напрямку</th>');
+    expect(html).toContain('<th class="points-cell">По вибору</th>');
+    expect(html).toContain('<th class="points-cell">Естафета</th>');
     expect(html).toContain("<td>Ліцей</td>");
-    expect(html).toContain("<td><strong>215</strong></td>");
+    expect(html).toContain('<td class="points-cell"><strong>215</strong></td>');
     expect(html).toContain("<td>Гімназія</td>");
-    expect(html).toContain("<td><strong>200</strong></td>");
+    expect(html).toContain('<td class="points-cell"><strong>200</strong></td>');
   });
 
   it("keeps duplicate source types as separate numbered columns", () => {
@@ -45,8 +45,8 @@ describe("buildSideBySideSummaryHtml", () => {
       new Date(2026, 3, 11),
     );
 
-    expect(html).toContain("<th>В заданому напрямку 1</th>");
-    expect(html).toContain("<th>В заданому напрямку 2</th>");
-    expect(html).toContain("<td><strong>195</strong></td>");
+    expect(html).toContain('<th class="points-cell">В заданому напрямку 1</th>');
+    expect(html).toContain('<th class="points-cell">В заданому напрямку 2</th>');
+    expect(html).toContain('<td class="points-cell"><strong>195</strong></td>');
   });
 });

@@ -9,7 +9,7 @@
   <table>
     <thead>
       <tr>
-        <th>Місце</th>
+        <th class="place-cell">Місце</th>
         <th>Команда</th>
         <th>Учасники</th>
         <th>ВВНЗ, військо</th>
@@ -18,14 +18,14 @@
         {% endfor %}
         <th>Час</th>
         <th>Відст.</th>
-        <th>Очки</th>
+        <th class="points-cell">Очки</th>
         <th>Статус</th>
       </tr>
     </thead>
     <tbody>
       {% for team in class.teams %}
       <tr>
-        <td><strong>{{ team.place }}</strong></td>
+        <td class="place-cell"><strong>{{ team.place }}</strong></td>
         <td><strong>{{ team.teamName }}</strong></td>
         <td>{{ team.membersLine }}</td>
         <td>{{ team.organisation }}</td>
@@ -34,7 +34,7 @@
         {% endfor %}
         <td>{{ team.formattedTime }}</td>
         <td>{{ team.timeBehind }}</td>
-        <td><strong>{{ team.points }}</strong></td>
+        <td class="points-cell"><strong>{{ team.points }}</strong></td>
         <td>{{ team.status | statusLabel }}</td>
       </tr>
       {% endfor %}
@@ -53,17 +53,17 @@
   <table>
     <thead>
       <tr>
-        <th>Місце</th>
+        <th class="place-cell">Місце</th>
         <th>Команда</th>
-        <th>Очки</th>
+        <th class="points-cell">Очки</th>
       </tr>
     </thead>
     <tbody>
       {% for team in group.teams %}
       <tr>
-        <td><strong>{{ team.place }}</strong></td>
+        <td class="place-cell"><strong>{{ team.place }}</strong></td>
         <td>{{ team.organisation }}</td>
-        <td><strong>{{ team.points }}</strong></td>
+        <td class="points-cell"><strong>{{ team.points }}</strong></td>
       </tr>
       {% endfor %}
     </tbody>

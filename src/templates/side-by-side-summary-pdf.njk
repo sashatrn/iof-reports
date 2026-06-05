@@ -6,23 +6,23 @@
 <table>
   <thead>
     <tr>
-      <th>Місце</th>
+      <th class="place-cell">Місце</th>
       <th>Команда</th>
       {% for source in sources %}
-      <th>{{ source.label }}</th>
+      <th class="points-cell">{{ source.label }}</th>
       {% endfor %}
-      <th>Сума</th>
+      <th class="points-cell">Сума</th>
     </tr>
   </thead>
   <tbody>
     {% for standing in standings %}
     <tr>
-      <td><strong>{{ standing.place }}</strong></td>
+      <td class="place-cell"><strong>{{ standing.place }}</strong></td>
       <td>{{ standing.organisation }}</td>
       {% for sourcePoint in standing.sourcePoints %}
-      <td>{% if sourcePoint.points > 0 %}{{ sourcePoint.points }}{% endif %}</td>
+      <td class="points-cell">{% if sourcePoint.points > 0 %}{{ sourcePoint.points }}{% endif %}</td>
       {% endfor %}
-      <td><strong>{{ standing.totalPoints }}</strong></td>
+      <td class="points-cell"><strong>{{ standing.totalPoints }}</strong></td>
     </tr>
     {% endfor %}
   </tbody>

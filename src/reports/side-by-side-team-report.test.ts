@@ -47,14 +47,18 @@ describe("buildSideBySideTeamHtml", () => {
 
     const menSection = getSectionAfterHeader(html, "Чоловіки");
     expectInOrder(menSection, [
-      "<td>1</td>",
+      '<td class="place-cell">1</td>',
       "Ліцей 1",
-      "<td>42</td>",
-      "<td>2</td>",
+      '<td class="points-cell">42</td>',
+      '<td class="place-cell">2</td>',
       "Ліцей 2",
     ]);
 
     const womenSection = getSectionAfterHeader(html, "Жінки");
-    expectInOrder(womenSection, ["<td>1</td>", "Гімназія 3", "<td>30</td>"]);
+    expectInOrder(womenSection, [
+      '<td class="place-cell">1</td>',
+      "Гімназія 3",
+      '<td class="points-cell">30</td>',
+    ]);
   });
 });

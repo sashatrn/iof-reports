@@ -319,10 +319,10 @@ describe("generateSideBySideSummaryReportHtml", () => {
     expect(report.reportType).toBe("side-by-side-summary");
     expect(report.supportsView).toBe(false);
     expect(report.itemCount).toBeGreaterThan(0);
-    expect(report.pdfHtml).toContain("<th>В заданому напрямку</th>");
-    expect(report.pdfHtml).toContain("<th>По вибору</th>");
-    expect(report.pdfHtml).toContain("<th>Естафета</th>");
-    expect(report.pdfHtml).toContain("<th>Сума</th>");
+    expect(report.pdfHtml).toContain('<th class="points-cell">В заданому напрямку</th>');
+    expect(report.pdfHtml).toContain('<th class="points-cell">По вибору</th>');
+    expect(report.pdfHtml).toContain('<th class="points-cell">Естафета</th>');
+    expect(report.pdfHtml).toContain('<th class="points-cell">Сума</th>');
     expect(report.pdfHtml).toContain("@page");
   });
 
@@ -335,8 +335,12 @@ describe("generateSideBySideSummaryReportHtml", () => {
     });
 
     expect(report.reportType).toBe("side-by-side-summary");
-    expect(report.pdfHtml).not.toContain("<th>В заданому напрямку</th>");
-    expectInOrder(report.pdfHtml, ["<th>По вибору</th>", "<th>Естафета</th>", "<th>Сума</th>"]);
+    expect(report.pdfHtml).not.toContain('<th class="points-cell">В заданому напрямку</th>');
+    expectInOrder(report.pdfHtml, [
+      '<th class="points-cell">По вибору</th>',
+      '<th class="points-cell">Естафета</th>',
+      '<th class="points-cell">Сума</th>',
+    ]);
   });
 });
 
@@ -427,7 +431,7 @@ describe("generateMilitaryRelayReportHtml", () => {
     expect(viewRow).toContain("<td><strong>0</strong></td>");
     expect(viewRow).not.toContain("<td>OK</td>");
     expect(pdfRow).toContain("<td>Не всі КП</td>");
-    expect(pdfRow).toContain("<td><strong>0</strong></td>");
+    expect(pdfRow).toContain('<td class="points-cell"><strong>0</strong></td>');
     expect(pdfRow).not.toContain("<td>OK</td>");
   });
 });
@@ -444,8 +448,8 @@ describe("generateMilitaryTeamReportHtml", () => {
     expect(report.pdfHtml).toContain("Командний підсумок");
     expect(report.pdfHtml).toContain("<h3>ВВНЗ</h3>");
     expect(report.pdfHtml).toContain("<h3>ЗСУ</h3>");
-    expect(report.pdfHtml).toContain("<th>Індивідуальні очки</th>");
-    expect(report.pdfHtml).toContain("<th>Естафетні очки</th>");
+    expect(report.pdfHtml).toContain('<th class="points-cell">Індивідуальні очки</th>');
+    expect(report.pdfHtml).toContain('<th class="points-cell">Естафетні очки</th>');
   });
 
   it("requires relay/team XML", () => {
@@ -526,7 +530,9 @@ describe("generateRogainingScoreReportHtml", () => {
     expect(report.reportType).toBe("rogaining-score");
     expect(report.itemCount).toBeGreaterThan(0);
     expect(report.viewHtml).toContain("<h1 class=\"score-doc-title\">Звіт</h1>");
-    expect(report.viewHtml).toContain("<th>очки рейтин-гу</th>");
+    expect(report.viewHtml).toContain(
+      '<th class="score-doc-points-cell">очки рейтин-гу</th>',
+    );
     expect(report.pdfHtml).toContain("<h1 class=\"score-doc-title\">Звіт</h1>");
   });
 });

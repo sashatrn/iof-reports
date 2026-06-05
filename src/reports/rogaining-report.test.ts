@@ -450,7 +450,7 @@ describe("buildRogainingScoreHtml", () => {
     expect(html).toMatch(/<strong>Кількість країн\/регіонів:<\/strong>\s*12/);
     expect(html).toMatch(/<strong>Кількість \(команд\):<\/strong>\s*12/);
     expect(html).toContain("<th>Прізвище, ім'я, по батькові спортсмена</th>");
-    expect(html).toContain("<th>очки рейтин-гу</th>");
+    expect(html).toContain('<th class="score-doc-points-cell">очки рейтин-гу</th>');
     expect(html).toContain("<div class=\"score-doc-section-title\">Групи регіонів</div>");
     expectInOrder(html, [
       "<div><strong>Результати змагань:</strong></div>",

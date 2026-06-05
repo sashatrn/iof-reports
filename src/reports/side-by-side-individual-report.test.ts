@@ -102,9 +102,9 @@ describe("buildSideBySideIndividualHtml", () => {
 
     const classSection = getClassSection(html, "Ч 5-6");
     expectInOrder(classSection, [
-      "<td>1</td>",
+      '<td class="place-cell">1</td>',
       "First Runner",
-      "<td>2</td>",
+      '<td class="place-cell">2</td>',
       "Second Runner",
     ]);
     expect(classSection).toContain("<th>Відст.</th>");

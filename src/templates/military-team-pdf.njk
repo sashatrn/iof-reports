@@ -9,21 +9,21 @@
   <table>
     <thead>
       <tr>
-        <th>Місце</th>
+        <th class="place-cell">Місце</th>
         <th>Команда</th>
-        <th>Індивідуальні очки</th>
-        <th>Естафетні очки</th>
-        <th>Сума</th>
+        <th class="points-cell">Індивідуальні очки</th>
+        <th class="points-cell">Естафетні очки</th>
+        <th class="points-cell">Сума</th>
       </tr>
     </thead>
     <tbody>
       {% for standing in group.standings %}
       <tr>
-        <td><strong>{{ standing.place }}</strong></td>
+        <td class="place-cell"><strong>{{ standing.place }}</strong></td>
         <td>{{ standing.organisation }}</td>
-        <td>{{ standing.individualPoints }}</td>
-        <td>{{ standing.relayPoints }}</td>
-        <td><strong>{{ standing.totalPoints }}</strong></td>
+        <td class="points-cell">{{ standing.individualPoints }}</td>
+        <td class="points-cell">{{ standing.relayPoints }}</td>
+        <td class="points-cell"><strong>{{ standing.totalPoints }}</strong></td>
       </tr>
       {% endfor %}
     </tbody>

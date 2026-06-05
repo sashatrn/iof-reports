@@ -7,17 +7,17 @@
 <table>
   <thead>
     <tr>
-      <th>Місце</th>
+      <th class="place-cell">Місце</th>
       <th>Команда</th>
-      <th>Бал</th>
+      <th class="points-cell">Бал</th>
     </tr>
   </thead>
   <tbody>
     {% for t in men %}
     <tr>
-      <td>{{ loop.index }}</td>
+      <td class="place-cell">{{ loop.index }}</td>
       <td>{{ t.club }}</td>
-      <td>{% if t.points > 0 %}{{ t.points }}{% endif %}</td>
+      <td class="points-cell">{% if t.points > 0 %}{{ t.points }}{% endif %}</td>
     </tr>
     {% endfor %}
   </tbody>
@@ -30,17 +30,17 @@
 <table>
   <thead>
     <tr>
-      <th>Місце</th>
+      <th class="place-cell">Місце</th>
       <th>Команда</th>
-      <th>Бал</th>
+      <th class="points-cell">Бал</th>
     </tr>
   </thead>
   <tbody>
     {% for t in women %}
     <tr>
-      <td>{{ loop.index }}</td>
+      <td class="place-cell">{{ loop.index }}</td>
       <td>{{ t.club }}</td>
-      <td>{% if t.points > 0 %}{{ t.points }}{% endif %}</td>
+      <td class="points-cell">{% if t.points > 0 %}{{ t.points }}{% endif %}</td>
     </tr>
     {% endfor %}
   </tbody>
