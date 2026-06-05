@@ -243,14 +243,34 @@ function getRelayMemberProblemStatus(memberResults: TeamIofMember[]): string | u
   return undefined;
 }
 
+function isInactiveRelayMember(member: TeamIofMember): boolean {
+  const statuses = [member.overallStatus, member.status].filter(
+    (status): status is string => status !== undefined,
+  );
+
+  return statuses.length > 0 && statuses.every((status) => status === "Inactive");
+}
+
+function isActiveRelayMember(member: TeamIofMember): boolean {
+  return member.status === "Active" || member.overallStatus === "Active";
+}
+
 function normalizeRelayTeamStatus(
   status: string,
   memberResults: TeamIofMember[],
 ): string {
+  if (memberResults.some(isActiveRelayMember)) {
+    return "Active";
+  }
+
   const problemStatus = getRelayMemberProblemStatus(memberResults);
 
   if (problemStatus) {
     return problemStatus;
+  }
+
+  if (memberResults.length > 0 && memberResults.every(isInactiveRelayMember)) {
+    return "Inactive";
   }
 
   if (memberResults.length > 0 && !memberResults.every(hasFinishedRelayLeg)) {

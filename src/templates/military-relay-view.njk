@@ -13,9 +13,9 @@
         <th>Команда</th>
         <th>Учасники</th>
         <th>ВВНЗ, військо</th>
-        <th>Етап 1</th>
-        <th>Етап 2</th>
-        <th>Етап 3</th>
+        {% for stageNumber in stageNumbers %}
+        <th>Етап {{ stageNumber }}</th>
+        {% endfor %}
         <th>Час</th>
         <th>Відст.</th>
         <th>Очки</th>
@@ -24,14 +24,14 @@
     </thead>
     <tbody>
       {% for team in class.teams %}
-      <tr data-status="{{ team.status }}">
+      <tr data-status="{{ team.rowStatus }}">
         <td><strong>{{ team.place }}</strong></td>
         <td><strong>{{ team.teamName }}</strong></td>
         <td>{{ team.membersLine }}</td>
         <td>{{ team.organisation }}</td>
-        <td>{{ team.stageTimes[0] }}</td>
-        <td>{{ team.stageTimes[1] }}</td>
-        <td>{{ team.stageTimes[2] }}</td>
+        {% for stageTime in team.stageTimes %}
+        <td>{{ stageTime }}</td>
+        {% endfor %}
         <td>{{ team.formattedTime }}</td>
         <td>{{ team.timeBehind }}</td>
         <td><strong>{{ team.points }}</strong></td>

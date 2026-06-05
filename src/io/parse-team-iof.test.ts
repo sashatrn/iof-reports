@@ -324,7 +324,54 @@ describe("parseTeamIof", () => {
     expect(parsed.teams[0].memberTimeSecs).toEqual([2919, undefined]);
   });
 
-  it("treats active relay members as an incomplete team, not as a problem status", () => {
+  it("keeps relay teams inactive when all members are inactive", () => {
+    const parsed = parseTeamIof(`
+      <ResultList>
+        <ClassResult>
+          <Class>
+            <Name>Естафета</Name>
+          </Class>
+          <TeamResult>
+            <Name>Неактивні</Name>
+            <TeamMemberResult>
+              <Person>
+                <Name>
+                  <Family>Перший</Family>
+                  <Given>Учасник</Given>
+                </Name>
+              </Person>
+              <Result>
+                <Status>Inactive</Status>
+                <OverallResult>
+                  <Status>Inactive</Status>
+                </OverallResult>
+              </Result>
+            </TeamMemberResult>
+            <TeamMemberResult>
+              <Person>
+                <Name>
+                  <Family>Другий</Family>
+                  <Given>Учасник</Given>
+                </Name>
+              </Person>
+              <Result>
+                <Status>Inactive</Status>
+                <OverallResult>
+                  <Status>Inactive</Status>
+                </OverallResult>
+              </Result>
+            </TeamMemberResult>
+          </TeamResult>
+        </ClassResult>
+      </ResultList>
+    `);
+
+    expect(parsed.teams[0].allMembersFinished).toBe(false);
+    expect(parsed.teams[0].status).toBe("Inactive");
+    expect(parsed.teams[0].memberStatuses).toEqual(["Inactive", "Inactive"]);
+  });
+
+  it("treats active relay members as an active team, not as a problem status", () => {
     const parsed = parseTeamIof(`
       <ResultList>
         <ClassResult>
@@ -388,7 +435,7 @@ describe("parseTeamIof", () => {
       </ResultList>
     `);
 
-    expect(parsed.teams[0].status).toBe("DidNotFinish");
+    expect(parsed.teams[0].status).toBe("Active");
     expect(parsed.teams[0].memberStatuses).toEqual(["OK", "Active", "Inactive"]);
     expect(parsed.teams[0].memberTimeSecs).toEqual([873, undefined, undefined]);
   });

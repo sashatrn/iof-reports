@@ -32,17 +32,17 @@ describe("buildSideBySideRelayClasses", () => {
       {
         teamName: "Ліцей 1",
         place: "1",
-        points: 100,
+        points: 300,
       },
       {
         teamName: "Ліцей 1-2",
         place: "2",
-        points: 95,
+        points: 285,
       },
       {
         teamName: "Ліцей 2",
         place: "3",
-        points: 90,
+        points: 270,
       },
     ]);
   });
@@ -57,13 +57,13 @@ describe("buildSideBySideRelayClasses", () => {
       {
         teamName: "Фініш",
         place: "1",
-        points: 100,
+        points: 300,
         status: "OK",
       },
       {
         teamName: "Два етапи",
         place: "",
-        points: 1,
+        points: 2,
         status: "DidNotFinish",
         timeBehind: "",
       },
@@ -115,13 +115,14 @@ describe("buildSideBySideRelayClasses", () => {
     expect(classes[0].teams).toMatchObject([
       {
         teamName: "Фініш",
-        points: 100,
+        points: 300,
       },
       {
         teamName: "На дистанції",
         place: "",
         points: 0,
         status: "Active",
+        rowStatus: "ActiveWithResult",
       },
       {
         teamName: "Неактивні",
@@ -134,7 +135,7 @@ describe("buildSideBySideRelayClasses", () => {
       {
         place: 1,
         organisation: "Гімназія",
-        points: 100,
+        points: 300,
       },
     ]);
     const html = buildSideBySideRelayHtml(teams, new Date(2026, 3, 11), "view");
@@ -142,9 +143,98 @@ describe("buildSideBySideRelayClasses", () => {
     expect(getRowContaining(html, "На дистанції")).toMatch(
       /<td><strong><\/strong><\/td>\s*<td>На дистанції<\/td>/,
     );
+    expect(getRowContaining(html, "На дистанції")).toContain('data-status="ActiveWithResult"');
     expect(getRowContaining(html, "Неактивні")).toMatch(
       /<td><strong><\/strong><\/td>\s*<td>Неактивний<\/td>/,
     );
+  });
+
+  it("keeps fully inactive relay teams inactive even without stage times", () => {
+    const classes = buildSideBySideRelayClasses([
+      makeRelayTeam(
+        "Ж 9",
+        "Неактивні",
+        "Ліцей",
+        0,
+        false,
+        [undefined, undefined],
+        "Inactive",
+        ["Inactive", "Inactive"],
+      ),
+    ]);
+
+    expect(classes[0].teams[0]).toMatchObject({
+      teamName: "Неактивні",
+      place: "",
+      points: 0,
+      status: "Inactive",
+    });
+  });
+
+  it("keeps stage cells empty for inactive relay members", () => {
+    const classes = buildSideBySideRelayClasses([
+      makeRelayTeam(
+        "Ж 9",
+        "Неактивні",
+        "Ліцей",
+        0,
+        false,
+        [undefined, undefined],
+        "Inactive",
+        ["Inactive", "Inactive"],
+      ),
+    ]);
+
+    expect(classes[0].teams[0].stageTimes).toEqual(["", ""]);
+  });
+
+  it("marks only active relay teams without finished stages as hideable active rows", () => {
+    const html = buildSideBySideRelayHtml(
+      [
+        makeRelayTeam(
+          "Ж 9",
+          "Ще ніхто",
+          "Ліцей",
+          0,
+          false,
+          [undefined, undefined],
+          "Active",
+          ["Active", "Inactive"],
+        ),
+        makeRelayTeam(
+          "Ж 9",
+          "Є фінішер",
+          "Гімназія",
+          900,
+          false,
+          [900, undefined],
+          "Active",
+          ["OK", "Active"],
+        ),
+      ],
+      new Date(2026, 3, 11),
+      "view",
+    );
+
+    expect(getRowContaining(html, "Ще ніхто")).toContain('data-status="Active"');
+    expect(getRowContaining(html, "Є фінішер")).toContain('data-status="ActiveWithResult"');
+  });
+
+  it("renders stage columns from relay team member count", () => {
+    const html = buildSideBySideRelayHtml(
+      [
+        makeRelayTeam("Ж 9", "Два етапи", "Ліцей", 1900, true, [900, 1000]),
+      ],
+      new Date(2026, 3, 11),
+      "view",
+    );
+    const row = getRowContaining(html, "Два етапи");
+
+    expect(html).toContain("<th>Етап 1</th>");
+    expect(html).toContain("<th>Етап 2</th>");
+    expect(html).not.toContain("<th>Етап 3</th>");
+    expect(row).toContain("<td>15:00</td>");
+    expect(row).toContain("<td>16:40</td>");
   });
 });
 
@@ -160,16 +250,16 @@ describe("buildSideBySideRelayTeamResults", () => {
     ]);
 
     expect(buildSideBySideRelayTeamResults(classes)).toEqual([
-      {
-        place: 1,
-        organisation: "Ліцей 1",
-        points: 395,
-      },
-      {
-        place: 2,
-        organisation: "Ліцей 2",
-        points: 85,
-      },
+          {
+            place: 1,
+            organisation: "Ліцей 1",
+            points: 1185,
+          },
+          {
+            place: 2,
+            organisation: "Ліцей 2",
+            points: 255,
+          },
     ]);
   });
 });

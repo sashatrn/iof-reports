@@ -20,6 +20,7 @@ type SideBySideRelayEntry = {
   timeBehind: string;
   points: number;
   status: string;
+  rowStatus: string;
 };
 
 type SideBySideRelayClass = {
@@ -35,7 +36,26 @@ type SideBySideRelayTeamResult = {
 
 const PLACEABLE_STATUSES = new Set(["OK"]);
 const RELAY_INCOMPLETE_STATUS = "DidNotFinish";
-const SIDE_BY_SIDE_RELAY_STAGE_COUNT = 3;
+const ACTIVE_WITH_RESULT_STATUS = "ActiveWithResult";
+
+function getTeamStageCount(team: TeamIofTeam): number {
+  return Math.max(
+    team.memberTimeSecs?.length ?? 0,
+    team.memberStatuses?.length ?? 0,
+    team.members.length,
+    team.memberCount,
+  );
+}
+
+function getRelayStageCount(teams: TeamIofTeam[]): number {
+  return teams.reduce((stageCount, team) => {
+    return Math.max(stageCount, getTeamStageCount(team));
+  }, 0);
+}
+
+function getStageNumbers(stageCount: number): number[] {
+  return Array.from({ length: stageCount }, (_, index) => index + 1);
+}
 
 function normalizeOrganisation(organisation: string): string {
   return organisation.trim() || "Unknown";
@@ -69,7 +89,7 @@ function formatTimeBehind(sec?: number): string {
 }
 
 function formatRelayStage(timeSec: number | undefined, status: string | undefined): string {
-  if (status === "Active") {
+  if (status === "Active" || status === "Inactive") {
     return "";
   }
 
@@ -88,7 +108,27 @@ function getRelayCompletedStageCount(team: TeamIofTeam): number {
   return team.memberTimeSecs.filter((timeSec) => timeSec !== undefined).length;
 }
 
-function getSideBySideRelayStatus(team: TeamIofTeam): string {
+function hasRelayMemberStatus(team: TeamIofTeam, status: string): boolean {
+  return team.memberStatuses?.includes(status) ?? false;
+}
+
+function hasOnlyRelayMemberStatus(team: TeamIofTeam, status: string): boolean {
+  return (
+    team.memberStatuses !== undefined &&
+    team.memberStatuses.length > 0 &&
+    team.memberStatuses.every((memberStatus) => memberStatus === status)
+  );
+}
+
+function getSideBySideRelayStatus(team: TeamIofTeam, stageCount: number): string {
+  if (hasRelayMemberStatus(team, "Active")) {
+    return "Active";
+  }
+
+  if (hasOnlyRelayMemberStatus(team, "Inactive")) {
+    return "Inactive";
+  }
+
   if (
     !PLACEABLE_STATUSES.has(team.status) &&
     team.status !== RELAY_INCOMPLETE_STATUS &&
@@ -98,14 +138,35 @@ function getSideBySideRelayStatus(team: TeamIofTeam): string {
     return team.status;
   }
 
+  if (team.status === "Inactive") {
+    return team.status;
+  }
+
   if (
     team.memberTimeSecs !== undefined &&
-    getRelayCompletedStageCount(team) < SIDE_BY_SIDE_RELAY_STAGE_COUNT
+    getRelayCompletedStageCount(team) < stageCount
   ) {
     return RELAY_INCOMPLETE_STATUS;
   }
 
   return team.allMembersFinished === false ? RELAY_INCOMPLETE_STATUS : team.status;
+}
+
+function getRelayRowStatus(status: string, completedStageCount: number): string {
+  return status === "Active" && completedStageCount > 0 ? ACTIVE_WITH_RESULT_STATUS : status;
+}
+
+function getRelayPoints(
+  place: number | undefined,
+  status: string,
+  completedStageCount: number,
+  teamStageCount: number,
+): number {
+  if (completedStageCount === 0) {
+    return 0;
+  }
+
+  return pointsFromPosition(place, status) * teamStageCount;
 }
 
 function getRelayProgressTime(team: TeamIofTeam): number {
@@ -160,10 +221,10 @@ function canUseRelayTeamAsStageLeader(status: string): boolean {
   return getRelaySortGroup(status) !== 2;
 }
 
-function rankRelayTeams(teams: TeamIofTeam[]): SideBySideRelayEntry[] {
+function rankRelayTeams(teams: TeamIofTeam[], stageCount: number): SideBySideRelayEntry[] {
   const sortedTeams = [...teams].sort((left, right) => {
-    const leftStatus = getSideBySideRelayStatus(left);
-    const rightStatus = getSideBySideRelayStatus(right);
+    const leftStatus = getSideBySideRelayStatus(left, stageCount);
+    const rightStatus = getSideBySideRelayStatus(right, stageCount);
     const leftSortGroup = getRelaySortGroup(leftStatus);
     const rightSortGroup = getRelaySortGroup(rightStatus);
 
@@ -199,7 +260,7 @@ function rankRelayTeams(teams: TeamIofTeam[]): SideBySideRelayEntry[] {
   const bestStageSumByStageCount = new Map<number, number>();
 
   for (const team of sortedTeams) {
-    const status = getSideBySideRelayStatus(team);
+    const status = getSideBySideRelayStatus(team, stageCount);
 
     if (!canUseRelayTeamAsStageLeader(status)) {
       continue;
@@ -223,8 +284,9 @@ function rankRelayTeams(teams: TeamIofTeam[]): SideBySideRelayEntry[] {
   }
 
   return sortedTeams.map((team) => {
-    const status = getSideBySideRelayStatus(team);
+    const status = getSideBySideRelayStatus(team, stageCount);
     const completedStageCount = getRelayCompletedStageCount(team);
+    const teamStageCount = getTeamStageCount(team);
     const stageSum = getRelayStageSum(team, completedStageCount);
     const bestStageSum = bestStageSumByStageCount.get(completedStageCount);
     const place = PLACEABLE_STATUSES.has(status) ? currentPlace + 1 : undefined;
@@ -239,7 +301,7 @@ function rankRelayTeams(teams: TeamIofTeam[]): SideBySideRelayEntry[] {
       sourceClassName: team.className,
       membersLine: team.members.join(", "),
       organisation: team.organisation,
-      stageTimes: Array.from({ length: SIDE_BY_SIDE_RELAY_STAGE_COUNT }, (_, index) =>
+      stageTimes: Array.from({ length: stageCount }, (_, index) =>
         formatRelayStage(team.memberTimeSecs?.[index], team.memberStatuses?.[index]),
       ),
       formattedTime: formatTime(team.timeSec),
@@ -247,14 +309,16 @@ function rankRelayTeams(teams: TeamIofTeam[]): SideBySideRelayEntry[] {
         bestStageSum === undefined || stageSum === undefined
           ? ""
           : formatTimeBehind(stageSum - bestStageSum),
-      points: pointsFromPosition(place, status),
+      points: getRelayPoints(place, status, completedStageCount, teamStageCount),
       status,
+      rowStatus: getRelayRowStatus(status, completedStageCount),
     };
   });
 }
 
 export function buildSideBySideRelayClasses(
   teams: TeamIofTeam[],
+  stageCount = getRelayStageCount(teams),
 ): SideBySideRelayClass[] {
   const byClass = new Map<string, TeamIofTeam[]>();
 
@@ -268,7 +332,7 @@ export function buildSideBySideRelayClasses(
     .sort((left, right) => left.localeCompare(right, "uk"))
     .map((className) => ({
       name: className,
-      teams: rankRelayTeams(byClass.get(className) ?? []),
+      teams: rankRelayTeams(byClass.get(className) ?? [], stageCount),
     }));
 }
 
@@ -346,11 +410,13 @@ export function buildSideBySideRelayHtml(
   variant: HtmlVariant = "pdf",
 ): string {
   const reportTeams = variant === "pdf" ? teams.filter(isPdfVisibleRelayTeam) : teams;
-  const classes = buildSideBySideRelayClasses(reportTeams);
+  const stageCount = getRelayStageCount(reportTeams);
+  const classes = buildSideBySideRelayClasses(reportTeams, stageCount);
 
   return renderTemplate(`side-by-side-relay-${variant}.njk`, {
     ...buildSideBySideEvent(eventDate, "Естафета"),
     classes,
+    stageNumbers: getStageNumbers(stageCount),
     teamResults: buildSideBySideRelayTeamResults(classes),
   });
 }

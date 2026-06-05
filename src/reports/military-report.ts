@@ -29,6 +29,7 @@ type MilitaryRelayEntry = {
   timeBehind: string;
   points: number;
   status: string;
+  rowStatus: string;
 };
 
 type MilitaryRelayClass = {
@@ -62,7 +63,26 @@ type MilitaryIndividualTeamGroup = {
 
 const PLACEABLE_STATUSES = new Set(["OK"]);
 const RELAY_INCOMPLETE_STATUS = "DidNotFinish";
-const MILITARY_RELAY_STAGE_COUNT = 3;
+const ACTIVE_WITH_RESULT_STATUS = "ActiveWithResult";
+
+function getTeamStageCount(team: TeamIofTeam): number {
+  return Math.max(
+    team.memberTimeSecs?.length ?? 0,
+    team.memberStatuses?.length ?? 0,
+    team.members.length,
+    team.memberCount,
+  );
+}
+
+function getRelayStageCount(teams: TeamIofTeam[]): number {
+  return teams.reduce((stageCount, team) => {
+    return Math.max(stageCount, getTeamStageCount(team));
+  }, 0);
+}
+
+function getStageNumbers(stageCount: number): number[] {
+  return Array.from({ length: stageCount }, (_, index) => index + 1);
+}
 
 function normalizeMilitaryOrganisation(organisation: string): string {
   return organisation.trim() || "Unknown";
@@ -96,7 +116,7 @@ function formatTimeBehind(sec?: number): string {
 }
 
 function formatRelayStage(timeSec: number | undefined, status: string | undefined): string {
-  if (status === "Active") {
+  if (status === "Active" || status === "Inactive") {
     return "";
   }
 
@@ -225,7 +245,27 @@ function buildMilitaryEvent(eventDate: Date, reportTitle: string) {
   };
 }
 
-function getMilitaryRelayStatus(team: TeamIofTeam): string {
+function hasRelayMemberStatus(team: TeamIofTeam, status: string): boolean {
+  return team.memberStatuses?.includes(status) ?? false;
+}
+
+function hasOnlyRelayMemberStatus(team: TeamIofTeam, status: string): boolean {
+  return (
+    team.memberStatuses !== undefined &&
+    team.memberStatuses.length > 0 &&
+    team.memberStatuses.every((memberStatus) => memberStatus === status)
+  );
+}
+
+function getMilitaryRelayStatus(team: TeamIofTeam, stageCount: number): string {
+  if (hasRelayMemberStatus(team, "Active")) {
+    return "Active";
+  }
+
+  if (hasOnlyRelayMemberStatus(team, "Inactive")) {
+    return "Inactive";
+  }
+
   if (
     !PLACEABLE_STATUSES.has(team.status) &&
     team.status !== RELAY_INCOMPLETE_STATUS &&
@@ -235,14 +275,22 @@ function getMilitaryRelayStatus(team: TeamIofTeam): string {
     return team.status;
   }
 
+  if (team.status === "Inactive") {
+    return team.status;
+  }
+
   if (
     team.memberTimeSecs !== undefined &&
-    getRelayCompletedStageCount(team) < MILITARY_RELAY_STAGE_COUNT
+    getRelayCompletedStageCount(team) < stageCount
   ) {
     return RELAY_INCOMPLETE_STATUS;
   }
 
   return team.allMembersFinished === false ? RELAY_INCOMPLETE_STATUS : team.status;
+}
+
+function getRelayRowStatus(status: string, completedStageCount: number): string {
+  return status === "Active" && completedStageCount > 0 ? ACTIVE_WITH_RESULT_STATUS : status;
 }
 
 function getRelayCompletedStageCount(team: TeamIofTeam): number {
@@ -307,10 +355,14 @@ function canUseRelayTeamAsStageLeader(status: string): boolean {
   return getRelaySortGroup(status) !== 2;
 }
 
-function rankRelayTeams(teams: TeamIofTeam[], classCanScore = true): MilitaryRelayEntry[] {
+function rankRelayTeams(
+  teams: TeamIofTeam[],
+  classCanScore = true,
+  stageCount = getRelayStageCount(teams),
+): MilitaryRelayEntry[] {
   const sortedTeams = [...teams].sort((left, right) => {
-    const leftStatus = getMilitaryRelayStatus(left);
-    const rightStatus = getMilitaryRelayStatus(right);
+    const leftStatus = getMilitaryRelayStatus(left, stageCount);
+    const rightStatus = getMilitaryRelayStatus(right, stageCount);
     const leftSortGroup = getRelaySortGroup(leftStatus);
     const rightSortGroup = getRelaySortGroup(rightStatus);
 
@@ -347,7 +399,7 @@ function rankRelayTeams(teams: TeamIofTeam[], classCanScore = true): MilitaryRel
   const bestStageSumByStageCount = new Map<number, number>();
 
   for (const team of sortedTeams) {
-    const status = getMilitaryRelayStatus(team);
+    const status = getMilitaryRelayStatus(team, stageCount);
 
     if (!canUseRelayTeamAsStageLeader(status)) {
       continue;
@@ -371,7 +423,7 @@ function rankRelayTeams(teams: TeamIofTeam[], classCanScore = true): MilitaryRel
   }
 
   return sortedTeams.map((team) => {
-    const status = getMilitaryRelayStatus(team);
+    const status = getMilitaryRelayStatus(team, stageCount);
     const completedStageCount = getRelayCompletedStageCount(team);
     const stageSum = getRelayStageSum(team, completedStageCount);
     const bestStageSum = bestStageSumByStageCount.get(completedStageCount);
@@ -395,7 +447,7 @@ function rankRelayTeams(teams: TeamIofTeam[], classCanScore = true): MilitaryRel
       sourceClassName: team.className,
       membersLine: team.members.join(", "),
       organisation: team.organisation,
-      stageTimes: Array.from({ length: MILITARY_RELAY_STAGE_COUNT }, (_, index) =>
+      stageTimes: Array.from({ length: stageCount }, (_, index) =>
         formatRelayStage(team.memberTimeSecs?.[index], team.memberStatuses?.[index]),
       ),
       formattedTime: formatTime(team.timeSec),
@@ -405,6 +457,7 @@ function rankRelayTeams(teams: TeamIofTeam[], classCanScore = true): MilitaryRel
           : formatTimeBehind(stageSum - bestStageSum),
       points: canScore ? militaryRelayPointsFromPlace(place, status) : 0,
       status,
+      rowStatus: getRelayRowStatus(status, completedStageCount),
     };
   });
 }
@@ -412,6 +465,7 @@ function rankRelayTeams(teams: TeamIofTeam[], classCanScore = true): MilitaryRel
 export function buildMilitaryRelayClasses(
   teams: TeamIofTeam[],
   classFilterRegex = ".*",
+  stageCount = getRelayStageCount(teams),
 ): MilitaryRelayClass[] {
   const classFilter = buildMilitaryClassFilter(classFilterRegex);
   const byClass = new Map<string, TeamIofTeam[]>();
@@ -426,7 +480,11 @@ export function buildMilitaryRelayClasses(
     .sort((left, right) => left.localeCompare(right, "uk"))
     .map((className) => ({
       name: className,
-      teams: rankRelayTeams(byClass.get(className) ?? [], classFilter.test(className)),
+      teams: rankRelayTeams(
+        byClass.get(className) ?? [],
+        classFilter.test(className),
+        stageCount,
+      ),
     }));
 }
 
@@ -774,11 +832,17 @@ export function buildMilitaryRelayHtml(
 ): string {
   const config = loadConfig();
   const reportTeams = variant === "pdf" ? teams.filter(isPdfVisibleRelayTeam) : teams;
-  const classes = buildMilitaryRelayClasses(reportTeams, config.military.classFilterRegex);
+  const stageCount = getRelayStageCount(reportTeams);
+  const classes = buildMilitaryRelayClasses(
+    reportTeams,
+    config.military.classFilterRegex,
+    stageCount,
+  );
 
   return renderTemplate(`military-relay-${variant}.njk`, {
     ...buildMilitaryEvent(eventDate, "Естафета"),
     classes,
+    stageNumbers: getStageNumbers(stageCount),
     teamResults: buildMilitaryRelayTeamResults(
       classes,
       config.military.teamFilterRegex,

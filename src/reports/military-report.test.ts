@@ -25,6 +25,20 @@ const teamGroups = [
   },
 ];
 
+function getRowContaining(html: string, rowFragment: string): string {
+  const fragmentIndex = html.indexOf(rowFragment);
+
+  expect(fragmentIndex, `Expected row containing "${rowFragment}" to exist`).toBeGreaterThan(-1);
+
+  const rowStart = html.lastIndexOf("<tr", fragmentIndex);
+  const rowEnd = html.indexOf("</tr>", fragmentIndex);
+
+  expect(rowStart).toBeGreaterThan(-1);
+  expect(rowEnd).toBeGreaterThan(rowStart);
+
+  return html.slice(rowStart, rowEnd + "</tr>".length);
+}
+
 afterEach(() => {
   setConfigPath(undefined);
 });
@@ -293,8 +307,9 @@ describe("buildMilitaryRelayClasses", () => {
 
     expect(classes[0].teams[0]).toMatchObject({
       teamName: "СВ - 1",
-      stageTimes: ["14:33", "", "Неактивний"],
-      status: "DidNotFinish",
+      stageTimes: ["14:33", "", ""],
+      status: "Active",
+      rowStatus: "ActiveWithResult",
     });
   });
 
@@ -314,6 +329,28 @@ describe("buildMilitaryRelayClasses", () => {
     expect(viewHtml).toContain("На дистанції");
     expect(pdfHtml).not.toContain("На дистанції");
     expect(pdfHtml).not.toContain("Неактивний");
+  });
+
+  it("keeps fully inactive relay teams inactive even without stage times", () => {
+    const classes = buildMilitaryRelayClasses([
+      makeRelayTeam(
+        "Ч ЗСУ",
+        "Неактивні",
+        "СВ",
+        0,
+        false,
+        [undefined, undefined],
+        "Inactive",
+        ["Inactive", "Inactive"],
+      ),
+    ]);
+
+    expect(classes[0].teams[0]).toMatchObject({
+      teamName: "Неактивні",
+      place: "",
+      points: 0,
+      status: "Inactive",
+    });
   });
 
   it("puts relay teams with a problem status after unfinished teams", () => {
@@ -374,6 +411,25 @@ describe("buildMilitaryRelayClasses", () => {
         points: 0,
       },
     ]);
+  });
+
+  it("renders stage columns from relay team member count", () => {
+    const html = buildMilitaryRelayHtml(
+      [
+        makeRelayTeam("Ч ВВНЗ", "Чотири етапи", "ЖВІ", 4000, true, [
+          900,
+          1000,
+          1000,
+          1100,
+        ]),
+      ],
+      new Date(2026, 3, 11),
+      "view",
+    );
+    const row = getRowContaining(html, "Чотири етапи");
+
+    expect(html).toContain("<th>Етап 4</th>");
+    expect(row).toContain("<td>18:20</td>");
   });
 });
 
