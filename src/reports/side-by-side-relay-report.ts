@@ -325,11 +325,11 @@ function buildSideBySideEvent(eventDate: Date, reportTitle: string) {
     event: {
       title:
         config.reportHeader.title ??
-        `Всеукраїнські змагання "Пліч-о-пліч всеукраїнські шкільні ліги зі<br/>
-        спортивного орієнтування" серед учнів закладів загальної середньої<br/>
-        освіти "РАЗОМ ПЕРЕМОЖЕМО"`,
-      subtitle: `ЗАГАЛЬНОКОМАНДНИХ РЕЗУЛЬТАТІВ ЗМАГАНЬ<br/>
-        зі спортивного орієнтування ${config.reportHeader.stage} Пліч-о-пліч, Всеукраїнських шкільних ліг<br/>
+        `Всеукраїнські змагання<br/>
+        "Пліч-о-пліч всеукраїнські шкільні ліги зі спортивного орієнтування"<br/>
+        серед учнів закладів загальної середньої освіти "РАЗОМ ПЕРЕМОЖЕМО"`,
+      subtitle: `Протокол загальнокомандних результатів змагань зі спортивного орієнтування<br/>
+        ${config.reportHeader.stage} Пліч-о-пліч, Всеукраїнських шкільних ліг<br/>
         ${config.reportHeader.region_of}, ${formatDate(eventDate, "yyyy")} р.`,
       location: config.reportHeader.location,
       date: formatDate(eventDate),

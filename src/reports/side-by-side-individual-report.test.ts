@@ -189,7 +189,7 @@ describe("buildSideBySideIndividualHtml", () => {
       },
     );
 
-    expect(html).toContain("<h3>Командні результати</h3>");
+    expect(html).toContain("<h2>Командні результати</h2>");
     expect(html).toContain("<h4>Чоловіки</h4>");
     expect(html).toContain("Ліцей 1");
     expect(html).toContain("<h4>Жінки</h4>");
