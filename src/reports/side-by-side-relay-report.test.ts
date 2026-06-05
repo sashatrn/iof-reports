@@ -47,7 +47,7 @@ describe("buildSideBySideRelayClasses", () => {
     ]);
   });
 
-  it("keeps unfinished relay teams in progress order with side-by-side minimum points", () => {
+  it("keeps partially completed relay teams on course without side-by-side points", () => {
     const classes = buildSideBySideRelayClasses([
       makeRelayTeam("Ж 7-8", "Фініш", "Гімназія", 3000, true, [1000, 1000, 1000]),
       makeRelayTeam("Ж 7-8", "Два етапи", "Ліцей", 1900, false, [900, 1000]),
@@ -63,8 +63,9 @@ describe("buildSideBySideRelayClasses", () => {
       {
         teamName: "Два етапи",
         place: "",
-        points: 2,
-        status: "DidNotFinish",
+        points: 0,
+        status: "Active",
+        rowStatus: "ActiveWithResult",
         timeBehind: "",
       },
     ]);

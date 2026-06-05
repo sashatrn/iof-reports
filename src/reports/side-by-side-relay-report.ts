@@ -142,9 +142,19 @@ function getSideBySideRelayStatus(team: TeamIofTeam, stageCount: number): string
     return team.status;
   }
 
+  const completedStageCount = getRelayCompletedStageCount(team);
+
   if (
     team.memberTimeSecs !== undefined &&
-    getRelayCompletedStageCount(team) < stageCount
+    completedStageCount > 0 &&
+    completedStageCount < stageCount
+  ) {
+    return "Active";
+  }
+
+  if (
+    team.memberTimeSecs !== undefined &&
+    completedStageCount < stageCount
   ) {
     return RELAY_INCOMPLETE_STATUS;
   }
