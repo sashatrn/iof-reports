@@ -37,20 +37,53 @@ async function main(): Promise<void> {
   const logger = createLogger(config);
   logger.info({ version: getAppVersion() }, "iof-reports starting");
 
-  const { inputPath, relayInputPath, courseDataPath, bazaPath, report, format, html, diplomaTemplate } = parseCliArgs(process.argv, logger);
+  const {
+    inputPath,
+    relayInputPath,
+    rogainingInputPath,
+    seriesInputPaths,
+    courseDataPath,
+    bazaPath,
+    report,
+    format,
+    html,
+    diplomaTemplate,
+  } = parseCliArgs(process.argv, logger);
 
-  logger.info({ file: inputPath, configPath, relayInputPath, courseDataPath, bazaPath, report, format, html, diplomaTemplate }, "Reading XML file");
+  logger.info(
+    {
+      file: inputPath,
+      configPath,
+      relayInputPath,
+      rogainingInputPath,
+      seriesInputPaths,
+      courseDataPath,
+      bazaPath,
+      report,
+      format,
+      html,
+      diplomaTemplate,
+    },
+    "Reading XML file",
+  );
 
   const xml = fs.readFileSync(inputPath, "utf-8");
   const relayXml = relayInputPath ? fs.readFileSync(relayInputPath, "utf-8") : undefined;
+  const rogainingXml = rogainingInputPath ? fs.readFileSync(rogainingInputPath, "utf-8") : undefined;
   const courseDataXml = courseDataPath ? fs.readFileSync(courseDataPath, "utf-8") : undefined;
   const bazaXml = bazaPath ? fs.readFileSync(bazaPath) : undefined;
+  const sideBySideSeriesXmls = seriesInputPaths.map((input) => ({
+    type: input.type,
+    xml: fs.readFileSync(input.path, "utf-8"),
+  }));
   const generatedReports = generateReportsHtml(xml, report, {
     logger,
     includeDiplomaBackground: diplomaTemplate === "on",
     courseDataXml,
     bazaXml,
     relayXml,
+    rogainingXml,
+    sideBySideSeriesXmls,
   });
 
   for (const generatedReport of generatedReports) {

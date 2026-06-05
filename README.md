@@ -6,6 +6,7 @@ CLI-інструмент для перетворення результатів 
 - Командний протокол (окремо чоловіки та жінки)
 - Естафетний протокол Пліч-о-пліч
 - Протокол вибору Пліч-о-пліч
+- Загальнокомандний підсумок Пліч-о-пліч за вибраними протоколами
 - Протокол результатів рогейну
 - Протокол балів рогейну
 - Протокол сплітів рогейну
@@ -39,13 +40,13 @@ CLI-інструмент для перетворення результатів 
 
 1. Відкрийте командний рядок Windows
 1. Виконайте `iof-reports <results.xml>`, де `<results.xml>` - IOF XML файл результатів.
-1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report side-by-side-individual`, `--report team`, `--report side-by-side-relay`, `--report side-by-side-rogaining`, `--report rogaining`, `--report rogaining-awards`, `--report rogaining-diplomas`, `--report rogaining-score`, `--report rogaining-results`, `--report rogaining-splits`, `--report military-individual`, `--report military-relay` або `--report military-team`.
+1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report side-by-side-individual`, `--report team`, `--report side-by-side-relay`, `--report side-by-side-rogaining`, `--report side-by-side-summary`, `--report rogaining`, `--report rogaining-awards`, `--report rogaining-diplomas`, `--report rogaining-score`, `--report rogaining-results`, `--report rogaining-splits`, `--report military-individual`, `--report military-relay` або `--report military-team`.
 1. За потреби вкажіть інший файл конфігурації: `--config my-config.json`. За замовчуванням використовується `config.json` з поточної теки.
 1. За потреби виберіть формат файлу: `--format pdf` або `--format docx`. DOCX наразі підтримується для `rogaining-awards`.
 1. За потреби згенеруйте HTML-файл: `--html view` або `--html pdf`.
 1. Для `rogaining-diplomas` за потреби увімкніть друк фону диплома через `--diploma-template on`. За замовчуванням `off`.
 
-Доступні значення для `--report`: `all` (за замовчуванням), `side-by-side-individual`, `team`, `side-by-side-relay`, `side-by-side-rogaining`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`, `rogaining-score`, `rogaining-results`, `rogaining-results-score`, `rogaining-splits`, `military-individual`, `military-relay`, `military-team`.
+Доступні значення для `--report`: `all` (за замовчуванням), `side-by-side-individual`, `team`, `side-by-side-relay`, `side-by-side-rogaining`, `side-by-side-summary`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`, `rogaining-score`, `rogaining-results`, `rogaining-results-score`, `rogaining-splits`, `military-individual`, `military-relay`, `military-team`.
 Доступні значення для `--html`: `none` (за замовчуванням), `view`, `pdf`.
 
 Приклади:
@@ -61,11 +62,30 @@ CLI-інструмент для перетворення результатів 
 - `iof-reports results.xml --report rogaining-awards --format docx` - створити редагований DOCX нагородного протоколу
 - `iof-reports relay.xml --report side-by-side-relay --html view` - створити естафетний HTML-протокол Пліч-о-пліч
 - `iof-reports choice.xml --report side-by-side-rogaining --html view` - створити HTML-протокол вибору Пліч-о-пліч
+- `iof-reports long.xml --report side-by-side-summary --rogaining choice.xml --relay relay.xml` - створити загальнокомандний підсумок Пліч-о-пліч за індивідуальною, вибором та естафетою
+- `iof-reports --report side-by-side-summary --series individual=long.xml --series rogaining=choice.xml --series relay=relay.xml` - те саме через явний список джерел і порядок колонок
 - `iof-reports long.xml --report military-individual --html view` - створити військовий індивідуальний HTML-протокол
 - `iof-reports relay.xml --report military-relay --html view` - створити військовий протокол естафети
 - `iof-reports long.xml --report military-team --relay relay.xml` - створити військовий загальнокомандний підсумок за довгою дистанцією та естафетою
 
 Якщо є проблема з виводом кіриличних символів в консолі Windows, виконайте команду `chcp 65001` перед запуском додатку.
+
+## Підсумок Пліч-о-пліч
+
+`side-by-side-summary` формує загальнокомандний підсумок за вибраними протоколами Пліч-о-пліч. За замовчуванням основний XML вважається індивідуальною дистанцією, а додаткові дистанції можна передати через `--rogaining` та `--relay`:
+
+```bash
+iof-reports long.xml --report side-by-side-summary --rogaining choice.xml --relay relay.xml
+```
+
+Якщо потрібно явно задати набір і порядок колонок, використовуйте `--series type=file.xml`. Підтримуються типи `individual`, `rogaining`, `relay` та їх повні назви `side-by-side-individual`, `side-by-side-rogaining`, `side-by-side-relay`:
+
+```bash
+iof-reports --report side-by-side-summary \
+  --series individual=long.xml \
+  --series rogaining=choice.xml \
+  --series relay=relay.xml
+```
 
 ## Military протоколи
 
@@ -159,6 +179,7 @@ iof-reports watch \
 - `--report side-by-side-individual` - індивідуальний протокол Пліч-о-пліч для live-перегляду; звіт коректно працює з XML без учасників
 - `--report side-by-side-relay` - естафетний протокол Пліч-о-пліч з очками за шкалою side-by-side
 - `--report side-by-side-rogaining` - протокол вибору Пліч-о-пліч; учасники зі статусом `OK` сортуються за часом, `MissingPunch` - нижче за кількістю взятих КП і часом
+- `--report side-by-side-summary` - загальнокомандний підсумок Пліч-о-пліч; latest XML береться як індивідуальний, додаткові файли можна передати через `--rogaining choice.xml` та `--relay relay.xml`
 - `--diploma-template off|on` - чи вкладати фон диплома в `rogaining-diplomas`
 - `--courses courses.xml` - файл `CourseData` для `rogaining-splits`
 - `--baza baza.xml` - файл бази УФО для `rogaining-results`; з нього беруться поточні кваліфікації, дати народження, регіони та тренери

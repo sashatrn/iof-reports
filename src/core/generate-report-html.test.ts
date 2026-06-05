@@ -20,6 +20,7 @@ import {
   generateSideBySideIndividualReportHtml,
   generateSideBySideRelayReportHtml,
   generateSideBySideRogainingReportHtml,
+  generateSideBySideSummaryReportHtml,
   generateSideBySideTeamReportHtml,
 } from "./generate-report-html";
 
@@ -308,6 +309,38 @@ describe("generateSideBySideRogainingReportHtml", () => {
   });
 });
 
+describe("generateSideBySideSummaryReportHtml", () => {
+  it("builds a side-by-side team summary from individual, rogaining and relay XML files", () => {
+    const report = generateSideBySideSummaryReportHtml(sampleXml, {
+      rogainingXml: sideBySideRogainingXml,
+      relayXml: rogainingXml,
+    });
+
+    expect(report.reportType).toBe("side-by-side-summary");
+    expect(report.itemCount).toBeGreaterThan(0);
+    expect(report.viewHtml).toContain("Командний підсумок");
+    expect(report.pdfHtml).toContain("<th>Індивідуальна</th>");
+    expect(report.pdfHtml).toContain("<th>Вибір</th>");
+    expect(report.pdfHtml).toContain("<th>Естафета</th>");
+    expect(report.pdfHtml).toContain("<th>Сума</th>");
+    expect(report.viewHtml).toContain('class="page"');
+    expect(report.pdfHtml).toContain("@page");
+  });
+
+  it("uses an explicit side-by-side series list when provided", () => {
+    const report = generateSideBySideSummaryReportHtml(sampleXml, {
+      sideBySideSeriesXmls: [
+        { type: "rogaining", xml: sideBySideRogainingXml },
+        { type: "relay", xml: rogainingXml },
+      ],
+    });
+
+    expect(report.reportType).toBe("side-by-side-summary");
+    expect(report.pdfHtml).not.toContain("<th>Індивідуальна</th>");
+    expectInOrder(report.pdfHtml, ["<th>Вибір</th>", "<th>Естафета</th>", "<th>Сума</th>"]);
+  });
+});
+
 describe("generateMilitaryIndividualReportHtml", () => {
   it("builds military individual report html from IOF XML", () => {
     const report = generateMilitaryIndividualReportHtml(sampleXml);
@@ -548,6 +581,10 @@ describe("configured PDF signatures", () => {
     const reports = [
       generateSideBySideIndividualReportHtml(sampleXml),
       generateSideBySideRelayReportHtml(rogainingXml),
+      generateSideBySideSummaryReportHtml(sampleXml, {
+        rogainingXml: sideBySideRogainingXml,
+        relayXml: rogainingXml,
+      }),
       generateMilitaryIndividualReportHtml(sampleXml),
       generateMilitaryRelayReportHtml(rogainingXml),
       generateMilitaryTeamReportHtml(militaryLongXml, { relayXml: militaryRelayXml }),
@@ -625,6 +662,16 @@ describe("generateReportHtml", () => {
 
     expect(report.reportType).toBe("side-by-side-rogaining");
     expect(report.viewHtml).toContain('Дистанція "За вибором"');
+  });
+
+  it("dispatches to side-by-side summary report generator", () => {
+    const report = generateReportHtml(sampleXml, "side-by-side-summary", {
+      rogainingXml: sideBySideRogainingXml,
+      relayXml: rogainingXml,
+    });
+
+    expect(report.reportType).toBe("side-by-side-summary");
+    expect(report.pdfHtml).toContain("Командний підсумок");
   });
 
   it("dispatches to rogaining awards report generator", () => {

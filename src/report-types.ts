@@ -4,6 +4,7 @@ export const REPORT_TYPES = [
   "team",
   "side-by-side-rogaining",
   "side-by-side-relay",
+  "side-by-side-summary",
   "rogaining",
   "rogaining-awards",
   "rogaining-diplomas",
@@ -29,6 +30,7 @@ export function isSingleReportType(value: string): value is SingleReportType {
     value === "team" ||
     value === "side-by-side-rogaining" ||
     value === "side-by-side-relay" ||
+    value === "side-by-side-summary" ||
     value === "rogaining" ||
     value === "rogaining-awards" ||
     value === "rogaining-diplomas" ||

@@ -81,4 +81,37 @@ describe("parseWatchArgs", () => {
     expect(options.reportType).toBe("side-by-side-rogaining");
     expect(options.requestedReportType).toBe("side-by-side-rogaining");
   });
+
+  it("accepts side-by-side-summary companion files in watch mode", () => {
+    const inputDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-watch-input-"));
+    const outputDir = path.join(os.tmpdir(), "iof-watch-output");
+    const rogainingPath = path.join(inputDir, "choice.xml");
+    const relayPath = path.join(inputDir, "relay.xml");
+
+    fs.writeFileSync(rogainingPath, "<ResultList />");
+    fs.writeFileSync(relayPath, "<ResultList />");
+
+    const options = parseWatchArgs(
+      [
+        "node",
+        "dist/index.js",
+        "watch",
+        "--input-dir",
+        inputDir,
+        "--output-dir",
+        outputDir,
+        "--report",
+        "side-by-side-summary",
+        "--rogaining",
+        rogainingPath,
+        "--relay",
+        relayPath,
+      ],
+      testLogger(),
+    );
+
+    expect(options.reportType).toBe("side-by-side-summary");
+    expect(options.rogainingInputPath).toBe(rogainingPath);
+    expect(options.relayInputPath).toBe(relayPath);
+  });
 });

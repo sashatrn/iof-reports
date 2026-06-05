@@ -11,6 +11,7 @@ Main user-facing reports:
 - `individual` and `team`
 - `side-by-side-relay`
 - `side-by-side-rogaining`
+- `side-by-side-summary`
 - `rogaining`
 - `rogaining-awards`
 - `rogaining-diplomas`
@@ -87,6 +88,7 @@ CLI validations require:
 - `rogaining-splits`: `--courses <courses.xml>`
 - `rogaining-results`: `--baza <baza.xml>`
 - `military-team`: `--relay <relay.xml>`
+- `side-by-side-summary`: optional companion XML files via `--rogaining`, `--relay`, or explicit repeated `--series type=file.xml`
 
 `rogaining-results-score` also requires `bazaXml` in generation code, but normal CLI validation currently only enforces `--baza` for `rogaining-results`; verify this before changing related behavior.
 
@@ -94,7 +96,7 @@ CLI validations require:
 
 Watch mode is started with `iof-reports watch ...`.
 
-Watch accepts `--report side-by-side-individual` for the regular individual Пліч-о-пліч generator. This report supports an IOF XML with classes but no participants yet, matching the empty-input behavior of `military-individual`. The old `--report individual` name is not a watch-mode option. Watch also accepts `side-by-side-relay` and `side-by-side-rogaining`.
+Watch accepts `--report side-by-side-individual` for the regular individual Пліч-о-пліч generator. This report supports an IOF XML with classes but no participants yet, matching the empty-input behavior of `military-individual`. The old `--report individual` name is not a watch-mode option. Watch also accepts `side-by-side-relay`, `side-by-side-rogaining`, and `side-by-side-summary`. For summary watch mode, latest XML is the primary individual source and optional static companion files can be passed with `--rogaining` and `--relay`.
 
 Key files:
 
@@ -118,7 +120,7 @@ Viewer URLs:
 - `/report-pdf`
 - `/meta`
 
-Watch hashing currently includes main XML and optional course data XML.
+Watch hashing currently includes main XML, optional course data XML, and optional summary companion XML files.
 
 ## Tests
 
