@@ -10,8 +10,6 @@ export type WatchOptions = {
   outputDir: string;
   configPath?: string;
   courseDataPath?: string;
-  relayInputPath?: string;
-  rogainingInputPath?: string;
   reportType: SingleReportType;
   requestedReportType: WatchReportType;
   pollMs: number;
@@ -22,7 +20,7 @@ export type WatchOptions = {
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <side-by-side-individual|team|side-by-side-rogaining|side-by-side-relay|side-by-side-summary|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-splits|military-individual|military-relay> [--config config.json] [--courses courses.xml] [--rogaining choice.xml] [--relay relay.xml] [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
+    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <side-by-side-individual|team|side-by-side-rogaining|side-by-side-relay|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-splits|military-individual|military-relay> [--config config.json] [--courses courses.xml] [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
   );
 }
 
@@ -35,8 +33,6 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
   let outputDir = "";
   let configPath: string | undefined;
   let courseDataPath: string | undefined;
-  let relayInputPath: string | undefined;
-  let rogainingInputPath: string | undefined;
   let reportType: SingleReportType | undefined;
   let requestedReportType: WatchReportType | undefined;
   let pollMs = 3000;
@@ -76,7 +72,7 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
       if (!value || !isWatchReportType(value)) {
         logger.error(
           { report: value },
-          "Invalid watch report type. Expected one of: side-by-side-individual, team, side-by-side-rogaining, side-by-side-relay, side-by-side-summary, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-splits, military-individual, military-relay.",
+          "Invalid watch report type. Expected one of: side-by-side-individual, team, side-by-side-rogaining, side-by-side-relay, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-splits, military-individual, military-relay.",
         );
         printUsage(logger);
         process.exit(1);
@@ -85,7 +81,8 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
       if (
         value === "rogaining-results" ||
         value === "rogaining-results-score" ||
-        value === "military-team"
+        value === "military-team" ||
+        value === "side-by-side-summary"
       ) {
         logger.error(`${value} is not supported in watch mode yet. Use the regular CLI with the required companion XML file.`);
         printUsage(logger);
@@ -94,30 +91,6 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
 
       reportType = value;
       requestedReportType = value;
-      i += 1;
-      continue;
-    }
-
-    if (arg === "--relay" || arg === "--relay-xml" || arg === "--team-xml") {
-      if (!value) {
-        logger.error("No relay/team IOF XML file provided for --relay.");
-        printUsage(logger);
-        process.exit(1);
-      }
-
-      relayInputPath = path.resolve(process.cwd(), value);
-      i += 1;
-      continue;
-    }
-
-    if (arg === "--rogaining" || arg === "--choice" || arg === "--choice-xml") {
-      if (!value) {
-        logger.error("No rogaining/choice IOF XML file provided for --rogaining.");
-        printUsage(logger);
-        process.exit(1);
-      }
-
-      rogainingInputPath = path.resolve(process.cwd(), value);
       i += 1;
       continue;
     }
@@ -193,16 +166,6 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
     process.exit(1);
   }
 
-  if (relayInputPath && !fs.existsSync(relayInputPath)) {
-    logger.error({ path: relayInputPath }, "Relay/team IOF XML file not found.");
-    process.exit(1);
-  }
-
-  if (rogainingInputPath && !fs.existsSync(rogainingInputPath)) {
-    logger.error({ path: rogainingInputPath }, "Rogaining/choice IOF XML file not found.");
-    process.exit(1);
-  }
-
   if (reportType === "rogaining-splits" && !courseDataPath) {
     logger.error("rogaining-splits report requires --courses <courses.xml>.");
     printUsage(logger);
@@ -229,8 +192,6 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
     outputDir,
     configPath,
     courseDataPath,
-    relayInputPath,
-    rogainingInputPath,
     reportType,
     requestedReportType,
     pollMs,

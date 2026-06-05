@@ -337,12 +337,13 @@ export function generateSideBySideSummaryReportHtml(
   const eventName = parsedSources.find((parsedSource) => parsedSource.eventName)?.eventName;
   const sources = parsedSources.map((parsedSource) => parsedSource.source);
   const standings = buildSideBySideSummaryStandings(sources);
-  const html = buildSideBySideSummaryHtml(sources, eventDate, "pdf");
+  const html = buildSideBySideSummaryHtml(sources, eventDate);
 
   return {
     reportType: "side-by-side-summary",
-    viewHtml: buildSideBySideSummaryHtml(sources, eventDate, "view"),
+    viewHtml: html,
     pdfHtml: html,
+    supportsView: false,
     eventName,
     eventDate: toIsoDate(eventDate),
     itemCount: standings.length,

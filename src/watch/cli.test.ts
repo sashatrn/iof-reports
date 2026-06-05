@@ -2,7 +2,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { Logger } from "pino";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { parseWatchArgs } from "./cli";
 
 function testLogger(): Logger {
@@ -11,6 +11,10 @@ function testLogger(): Logger {
     info: () => undefined,
   } as unknown as Logger;
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("parseWatchArgs", () => {
   it("accepts side-by-side-individual in watch mode", () => {
@@ -82,36 +86,31 @@ describe("parseWatchArgs", () => {
     expect(options.requestedReportType).toBe("side-by-side-rogaining");
   });
 
-  it("accepts side-by-side-summary companion files in watch mode", () => {
+  it("rejects side-by-side-summary in watch mode", () => {
     const inputDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-watch-input-"));
     const outputDir = path.join(os.tmpdir(), "iof-watch-output");
-    const rogainingPath = path.join(inputDir, "choice.xml");
-    const relayPath = path.join(inputDir, "relay.xml");
+    const exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation((() => {
+        throw new Error("process.exit");
+      }) as never);
 
-    fs.writeFileSync(rogainingPath, "<ResultList />");
-    fs.writeFileSync(relayPath, "<ResultList />");
-
-    const options = parseWatchArgs(
-      [
-        "node",
-        "dist/index.js",
-        "watch",
-        "--input-dir",
-        inputDir,
-        "--output-dir",
-        outputDir,
-        "--report",
-        "side-by-side-summary",
-        "--rogaining",
-        rogainingPath,
-        "--relay",
-        relayPath,
-      ],
-      testLogger(),
-    );
-
-    expect(options.reportType).toBe("side-by-side-summary");
-    expect(options.rogainingInputPath).toBe(rogainingPath);
-    expect(options.relayInputPath).toBe(relayPath);
+    expect(() =>
+      parseWatchArgs(
+        [
+          "node",
+          "dist/index.js",
+          "watch",
+          "--input-dir",
+          inputDir,
+          "--output-dir",
+          outputDir,
+          "--report",
+          "side-by-side-summary",
+        ],
+        testLogger(),
+      ),
+    ).toThrow("process.exit");
+    expect(exitSpy).toHaveBeenCalledWith(1);
   });
 });

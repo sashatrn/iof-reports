@@ -19,11 +19,10 @@ describe("buildSideBySideSummaryHtml", () => {
         },
       ],
       new Date(2026, 3, 11),
-      "pdf",
     );
 
-    expect(html).toContain("<th>Індивідуальна</th>");
-    expect(html).toContain("<th>Вибір</th>");
+    expect(html).toContain("<th>В заданому напрямку</th>");
+    expect(html).toContain("<th>По вибору</th>");
     expect(html).toContain("<th>Естафета</th>");
     expect(html).toContain("<td>Ліцей</td>");
     expect(html).toContain("<td><strong>215</strong></td>");
@@ -44,11 +43,10 @@ describe("buildSideBySideSummaryHtml", () => {
         },
       ],
       new Date(2026, 3, 11),
-      "pdf",
     );
 
-    expect(html).toContain("<th>Індивідуальна 1</th>");
-    expect(html).toContain("<th>Індивідуальна 2</th>");
+    expect(html).toContain("<th>В заданому напрямку 1</th>");
+    expect(html).toContain("<th>В заданому напрямку 2</th>");
     expect(html).toContain("<td><strong>195</strong></td>");
   });
 });

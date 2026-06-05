@@ -9,8 +9,6 @@ import {
 import { formatDate } from "../utils/date";
 import { getLeftLogo, getRightLogo } from "./report-logos";
 
-type HtmlVariant = "view" | "pdf";
-
 export type SideBySideSummarySourceType = "individual" | "rogaining" | "relay";
 
 export type SideBySideSummarySource = {
@@ -20,8 +18,8 @@ export type SideBySideSummarySource = {
 };
 
 const SOURCE_LABELS: Record<SideBySideSummarySourceType, string> = {
-  individual: "Індивідуальна",
-  rogaining: "Вибір",
+  individual: "В заданому напрямку",
+  rogaining: "По вибору",
   relay: "Естафета",
 };
 
@@ -73,11 +71,10 @@ function buildPointSources(sources: SideBySideSummarySource[]): TeamSummaryPoint
 export function buildSideBySideSummaryHtml(
   sources: SideBySideSummarySource[],
   eventDate: Date,
-  variant: HtmlVariant = "pdf",
 ): string {
   const pointSources = buildPointSources(sources);
 
-  return renderTemplate(`side-by-side-summary-${variant}.njk`, {
+  return renderTemplate("side-by-side-summary-pdf.njk", {
     ...buildSideBySideEvent(eventDate),
     sources: pointSources.map((source) => ({
       key: source.key,

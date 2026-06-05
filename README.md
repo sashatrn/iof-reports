@@ -72,7 +72,7 @@ CLI-інструмент для перетворення результатів 
 
 ## Підсумок Пліч-о-пліч
 
-`side-by-side-summary` формує загальнокомандний підсумок за вибраними протоколами Пліч-о-пліч. За замовчуванням основний XML вважається індивідуальною дистанцією, а додаткові дистанції можна передати через `--rogaining` та `--relay`:
+`side-by-side-summary` формує PDF загальнокомандного підсумку за вибраними протоколами Пліч-о-пліч. За замовчуванням основний XML вважається індивідуальною дистанцією, а додаткові дистанції можна передати через `--rogaining` та `--relay`:
 
 ```bash
 iof-reports long.xml --report side-by-side-summary --rogaining choice.xml --relay relay.xml
@@ -179,7 +179,6 @@ iof-reports watch \
 - `--report side-by-side-individual` - індивідуальний протокол Пліч-о-пліч для live-перегляду; звіт коректно працює з XML без учасників
 - `--report side-by-side-relay` - естафетний протокол Пліч-о-пліч з очками за шкалою side-by-side
 - `--report side-by-side-rogaining` - протокол вибору Пліч-о-пліч; учасники зі статусом `OK` сортуються за часом, `MissingPunch` - нижче за кількістю взятих КП і часом
-- `--report side-by-side-summary` - загальнокомандний підсумок Пліч-о-пліч; latest XML береться як індивідуальний, додаткові файли можна передати через `--rogaining choice.xml` та `--relay relay.xml`
 - `--diploma-template off|on` - чи вкладати фон диплома в `rogaining-diplomas`
 - `--courses courses.xml` - файл `CourseData` для `rogaining-splits`
 - `--baza baza.xml` - файл бази УФО для `rogaining-results`; з нього беруться поточні кваліфікації, дати народження, регіони та тренери

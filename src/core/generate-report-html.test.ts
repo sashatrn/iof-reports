@@ -317,13 +317,12 @@ describe("generateSideBySideSummaryReportHtml", () => {
     });
 
     expect(report.reportType).toBe("side-by-side-summary");
+    expect(report.supportsView).toBe(false);
     expect(report.itemCount).toBeGreaterThan(0);
-    expect(report.viewHtml).toContain("Командний підсумок");
-    expect(report.pdfHtml).toContain("<th>Індивідуальна</th>");
-    expect(report.pdfHtml).toContain("<th>Вибір</th>");
+    expect(report.pdfHtml).toContain("<th>В заданому напрямку</th>");
+    expect(report.pdfHtml).toContain("<th>По вибору</th>");
     expect(report.pdfHtml).toContain("<th>Естафета</th>");
     expect(report.pdfHtml).toContain("<th>Сума</th>");
-    expect(report.viewHtml).toContain('class="page"');
     expect(report.pdfHtml).toContain("@page");
   });
 
@@ -336,8 +335,8 @@ describe("generateSideBySideSummaryReportHtml", () => {
     });
 
     expect(report.reportType).toBe("side-by-side-summary");
-    expect(report.pdfHtml).not.toContain("<th>Індивідуальна</th>");
-    expectInOrder(report.pdfHtml, ["<th>Вибір</th>", "<th>Естафета</th>", "<th>Сума</th>"]);
+    expect(report.pdfHtml).not.toContain("<th>В заданому напрямку</th>");
+    expectInOrder(report.pdfHtml, ["<th>По вибору</th>", "<th>Естафета</th>", "<th>Сума</th>"]);
   });
 });
 
