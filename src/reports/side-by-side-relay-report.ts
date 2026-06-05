@@ -1,5 +1,5 @@
 import { loadConfig } from "../config";
-import { RogainingTeam } from "../io/parse-rogaining-iof";
+import { RogainingTeam } from "../io/parse-team-iof";
 import { renderTemplate } from "../render/template-engine";
 import { pointsFromPosition } from "../scoring/side-by-side-points";
 import { isPdfVisibleRelayTeam } from "./pdf-status-filter";

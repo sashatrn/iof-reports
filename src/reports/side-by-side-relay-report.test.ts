@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { type RogainingTeam } from "../io/parse-rogaining-iof";
+import { type RogainingTeam } from "../io/parse-team-iof";
 import {
   buildSideBySideRelayClasses,
   buildSideBySideRelayHtml,

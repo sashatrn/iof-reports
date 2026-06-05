@@ -7,11 +7,11 @@ type IofScoreEntry = {
   "@_type"?: string;
 };
 
-type RogainingMember = {
+type TeamIofMember = {
   name: string;
   organisation: string;
   controls: string[];
-  splits: RogainingSplit[];
+  splits: TeamIofSplit[];
   finishTimeSec?: number;
   score?: number;
   penalty?: number;
@@ -20,12 +20,12 @@ type RogainingMember = {
   overallStatus?: string;
 };
 
-export type RogainingSplit = {
+export type TeamIofSplit = {
   controlCode: string;
   timeSec?: number;
 };
 
-export type RogainingTeam = {
+export type TeamIofTeam = {
   className: string;
   teamName: string;
   organisation: string;
@@ -34,7 +34,7 @@ export type RogainingTeam = {
   memberTimeSecs?: Array<number | undefined>;
   memberStatuses?: string[];
   memberControls?: string[][];
-  memberSplits?: RogainingSplit[][];
+  memberSplits?: TeamIofSplit[][];
   controlGateStatus?: "OK" | "-" | "DSQ";
   memberCount: number;
   score: number;
@@ -45,11 +45,15 @@ export type RogainingTeam = {
   allMembersFinished?: boolean;
 };
 
-export type ParsedRogainingIof = {
+export type ParsedTeamIof = {
   eventDate?: Date;
   eventName?: string;
-  teams: RogainingTeam[];
+  teams: TeamIofTeam[];
 };
+
+export type RogainingSplit = TeamIofSplit;
+export type RogainingTeam = TeamIofTeam;
+export type ParsedRogainingIof = ParsedTeamIof;
 
 function asArray<T>(value: T | T[] | undefined): T[] {
   if (value === undefined || value === null) {
@@ -70,6 +74,11 @@ function toNumber(value: unknown): number | undefined {
   }
 
   return undefined;
+}
+
+function toText(value: unknown, fallback = ""): string {
+  const text = String(value ?? "").trim();
+  return text === "" ? fallback : text;
 }
 
 function findScoreByType(
@@ -99,7 +108,7 @@ function extractMemberName(memberResult: {
 }
 
 function extractControls(
-  splits: RogainingSplit[],
+  splits: TeamIofSplit[],
 ): string[] {
   return splits.map((split) => split.controlCode);
 }
@@ -115,7 +124,7 @@ function extractSplits(
         Time?: string | number;
       }[]
     | undefined,
-): RogainingSplit[] {
+): TeamIofSplit[] {
   return asArray(splitTime)
     .map((entry) => ({
       controlCode: String(entry?.ControlCode ?? "").trim(),
@@ -134,7 +143,7 @@ function isKnownMemberOrganisation(organisation: string): boolean {
 }
 
 function formatTeamOrganisation(
-  memberResults: RogainingMember[],
+  memberResults: TeamIofMember[],
   teamOrganisationName: unknown,
   classOrganisationName: unknown,
 ): string {
@@ -171,7 +180,7 @@ function formatTeamOrganisation(
   );
 }
 
-function normalizeTeam(memberResults: RogainingMember[]): {
+function normalizeTeam(memberResults: TeamIofMember[]): {
   score: number;
   penalty: number;
   timeSec?: number;
@@ -211,7 +220,7 @@ function normalizeTeam(memberResults: RogainingMember[]): {
   };
 }
 
-function hasFinishedRelayLeg(member: RogainingMember): boolean {
+function hasFinishedRelayLeg(member: TeamIofMember): boolean {
   const overallStatusOk = member.overallStatus === undefined || member.overallStatus === "OK";
 
   return (
@@ -221,7 +230,7 @@ function hasFinishedRelayLeg(member: RogainingMember): boolean {
   );
 }
 
-function getRelayMemberProblemStatus(memberResults: RogainingMember[]): string | undefined {
+function getRelayMemberProblemStatus(memberResults: TeamIofMember[]): string | undefined {
   for (const member of memberResults) {
     const statuses = [member.overallStatus, member.status].filter(
       (status): status is string => status !== undefined && status !== "OK",
@@ -240,7 +249,7 @@ function getRelayMemberProblemStatus(memberResults: RogainingMember[]): string |
 
 function normalizeRelayTeamStatus(
   status: string,
-  memberResults: RogainingMember[],
+  memberResults: TeamIofMember[],
 ): string {
   const problemStatus = getRelayMemberProblemStatus(memberResults);
 
@@ -255,7 +264,7 @@ function normalizeRelayTeamStatus(
   return status;
 }
 
-export function parseRogainingIof(xml: string): ParsedRogainingIof {
+export function parseTeamIof(xml: string): ParsedTeamIof {
   const parser = new XMLParser({
     ignoreAttributes: false,
     removeNSPrefix: true,
@@ -263,14 +272,17 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
 
   const json = parser.parse(xml);
   const eventDate = parseIsoDate(json?.ResultList?.Event?.StartTime?.Date);
-  const eventName = json?.ResultList?.Event?.Name;
+  const eventName =
+    json?.ResultList?.Event?.Name === undefined
+      ? undefined
+      : toText(json.ResultList.Event.Name);
   const classResults = asArray(json?.ResultList?.ClassResult);
   const ignoredStatuses = loadIgnoredResultStatuses();
 
-  const teams: RogainingTeam[] = [];
+  const teams: TeamIofTeam[] = [];
 
   for (const classResult of classResults) {
-    const className = classResult?.Class?.Name;
+    const className = toText(classResult?.Class?.Name);
 
     if (!className) {
       continue;
@@ -291,9 +303,12 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
           finishTimeSec: toNumber(result?.Time),
           score: findScoreByType(result?.Score, "Score"),
           penalty: findScoreByType(result?.Score, "Penalty"),
-          status: result?.Status ?? "Unknown",
+          status: toText(result?.Status, "Unknown"),
           overallTimeSec: toNumber(result?.OverallResult?.Time),
-          overallStatus: result?.OverallResult?.Status,
+          overallStatus:
+            result?.OverallResult?.Status === undefined
+              ? undefined
+              : toText(result.OverallResult.Status, "Unknown"),
         };
       });
       const memberResults = rawMemberResults.filter(
@@ -321,7 +336,7 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
 
       teams.push({
         className,
-        teamName: teamResult?.Name ?? "Unknown",
+        teamName: toText(teamResult?.Name, "Unknown"),
         organisation,
         members: memberResults.map((member) => member.name),
         memberOrganisations: memberResults.map((member) => member.organisation),
@@ -346,3 +361,5 @@ export function parseRogainingIof(xml: string): ParsedRogainingIof {
     teams,
   };
 }
+
+export const parseRogainingIof = parseTeamIof;

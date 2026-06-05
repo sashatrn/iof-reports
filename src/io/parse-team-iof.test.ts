@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { parseRogainingIof } from "./parse-rogaining-iof";
+import { parseTeamIof } from "./parse-team-iof";
 
-describe("parseRogainingIof", () => {
+describe("parseTeamIof", () => {
   it("treats Score as already final and does not subtract penalty twice", () => {
-    const parsed = parseRogainingIof(`
+    const parsed = parseTeamIof(`
       <ResultList>
         <Event>
           <StartTime>
@@ -58,7 +58,7 @@ describe("parseRogainingIof", () => {
   });
 
   it("joins unique member regions in participant order", () => {
-    const parsed = parseRogainingIof(`
+    const parsed = parseTeamIof(`
       <ResultList>
         <ClassResult>
           <Class>
@@ -132,7 +132,7 @@ describe("parseRogainingIof", () => {
   });
 
   it("uses team organisation before member organisations", () => {
-    const parsed = parseRogainingIof(`
+    const parsed = parseTeamIof(`
       <ResultList>
         <ClassResult>
           <Class>
@@ -171,8 +171,47 @@ describe("parseRogainingIof", () => {
     expect(parsed.teams[0].memberOrganisations).toEqual(["ХНУПС"]);
   });
 
+  it("keeps numeric-looking event, class, and team names as strings", () => {
+    const parsed = parseTeamIof(`
+      <ResultList>
+        <Event>
+          <Name>123</Name>
+        </Event>
+        <ClassResult>
+          <Class>
+            <Name>9</Name>
+          </Class>
+          <TeamResult>
+            <Name>1</Name>
+            <Organisation>
+              <Name>Великобірківський ліцей</Name>
+            </Organisation>
+            <TeamMemberResult>
+              <Person>
+                <Name>
+                  <Family>Мацелюх</Family>
+                  <Given>Вікторія</Given>
+                </Name>
+              </Person>
+              <Result>
+                <Status>Inactive</Status>
+                <OverallResult>
+                  <Status>Inactive</Status>
+                </OverallResult>
+              </Result>
+            </TeamMemberResult>
+          </TeamResult>
+        </ClassResult>
+      </ResultList>
+    `);
+
+    expect(parsed.eventName).toBe("123");
+    expect(parsed.teams[0].className).toBe("9");
+    expect(parsed.teams[0].teamName).toBe("1");
+  });
+
   it("excludes DidNotEnter team members and empty teams", () => {
-    const parsed = parseRogainingIof(`
+    const parsed = parseTeamIof(`
       <ResultList>
         <ClassResult>
           <Class>
@@ -237,7 +276,7 @@ describe("parseRogainingIof", () => {
   });
 
   it("marks relay teams as incomplete when at least one member did not finish", () => {
-    const parsed = parseRogainingIof(`
+    const parsed = parseTeamIof(`
       <ResultList>
         <ClassResult>
           <Class>
@@ -286,7 +325,7 @@ describe("parseRogainingIof", () => {
   });
 
   it("treats active relay members as an incomplete team, not as a problem status", () => {
-    const parsed = parseRogainingIof(`
+    const parsed = parseTeamIof(`
       <ResultList>
         <ClassResult>
           <Class>
@@ -355,7 +394,7 @@ describe("parseRogainingIof", () => {
   });
 
   it("keeps relay team problem status from a member result", () => {
-    const parsed = parseRogainingIof(`
+    const parsed = parseTeamIof(`
       <ResultList>
         <ClassResult>
           <Class>

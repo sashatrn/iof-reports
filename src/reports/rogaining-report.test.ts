@@ -1,7 +1,7 @@
 import path from "path";
 import { afterEach, describe, expect, it } from "vitest";
 import { setConfigPath } from "../config";
-import { RogainingTeam } from "../io/parse-rogaining-iof";
+import { RogainingTeam } from "../io/parse-team-iof";
 import {
   buildRogainingAwardsHtml,
   buildRogainingDiplomasHtml,

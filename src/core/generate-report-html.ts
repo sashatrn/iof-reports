@@ -2,7 +2,7 @@ import { Logger } from "pino";
 import { loadConfig } from "../config";
 import { parseCourseData } from "../io/parse-course-data";
 import { parseIof } from "../io/parse-iof";
-import { parseRogainingIof } from "../io/parse-rogaining-iof";
+import { parseTeamIof } from "../io/parse-team-iof";
 import { parseUofBaza } from "../io/parse-uof-baza";
 import { buildSideBySideIndividualHtml } from "../reports/side-by-side-individual-report";
 import {
@@ -100,8 +100,8 @@ function parseParticipantsXml(
   };
 }
 
-function parseRelayXml(xml: string, logger?: Logger, allowEmpty = false) {
-  const parsed = parseRogainingIof(xml);
+function parseTeamResultsXml(xml: string, logger?: Logger, allowEmpty = false) {
+  const parsed = parseTeamIof(xml);
   const eventDate = normalizeEventDate(parsed.eventDate, logger);
 
   if (parsed.teams.length === 0 && !allowEmpty) {
@@ -110,7 +110,7 @@ function parseRelayXml(xml: string, logger?: Logger, allowEmpty = false) {
 
   logger?.info(
     { count: parsed.teams.length },
-    "Relay teams parsed successfully",
+    "Team results parsed successfully",
   );
 
   return {
@@ -194,7 +194,7 @@ export function generateSideBySideRelayReportHtml(
   options: GenerateReportOptions = {},
 ): GeneratedReport {
   const { logger } = options;
-  const { teams, eventDate, eventName } = parseRelayXml(xml, logger, true);
+  const { teams, eventDate, eventName } = parseTeamResultsXml(xml, logger, true);
 
   return {
     reportType: "side-by-side-relay",
@@ -239,7 +239,7 @@ export function generateMilitaryRelayReportHtml(
 ): GeneratedReport {
   const { logger } = options;
   const config = loadConfig();
-  const { teams, eventDate, eventName } = parseRelayXml(xml, logger, true);
+  const { teams, eventDate, eventName } = parseTeamResultsXml(xml, logger, true);
 
   return {
     reportType: "military-relay",
@@ -276,7 +276,7 @@ export function generateMilitaryTeamReportHtml(
     config.military.teamFilterRegex,
     config.military.classFilterRegex,
   );
-  const { teams: relayTeams, eventName } = parseRelayXml(relayXml, logger, true);
+  const { teams: relayTeams, eventName } = parseTeamResultsXml(relayXml, logger, true);
   const standingGroups = buildMilitaryTeamStandingGroups(participants, relayTeams);
   const html = buildMilitaryTeamHtml(participants, relayTeams, eventDate);
 
@@ -296,7 +296,7 @@ export function generateRogainingReportHtml(
   options: GenerateReportOptions = {},
 ): GeneratedReport {
   const { logger } = options;
-  const parsed = parseRogainingIof(xml);
+  const parsed = parseTeamIof(xml);
   const eventDate = normalizeEventDate(parsed.eventDate, logger);
 
   logger?.info(
@@ -319,7 +319,7 @@ export function generateRogainingAwardsReportHtml(
   options: GenerateReportOptions = {},
 ): GeneratedReport {
   const { logger } = options;
-  const parsed = parseRogainingIof(xml);
+  const parsed = parseTeamIof(xml);
   const eventDate = normalizeEventDate(parsed.eventDate, logger);
 
   logger?.info(
@@ -343,7 +343,7 @@ export function generateRogainingDiplomasReportHtml(
   options: GenerateReportOptions = {},
 ): GeneratedReport {
   const { logger, includeDiplomaBackground } = options;
-  const parsed = parseRogainingIof(xml);
+  const parsed = parseTeamIof(xml);
   const eventDate = normalizeEventDate(parsed.eventDate, logger);
 
   logger?.info(
@@ -370,7 +370,7 @@ export function generateRogainingScoreReportHtml(
   options: GenerateReportOptions = {},
 ): GeneratedReport {
   const { logger } = options;
-  const parsed = parseRogainingIof(xml);
+  const parsed = parseTeamIof(xml);
   const eventDate = normalizeEventDate(parsed.eventDate, logger);
 
   logger?.info(
@@ -398,7 +398,7 @@ export function generateRogainingResultsReportHtml(
     throw new Error("rogaining-results report requires a UOF baza XML file.");
   }
 
-  const parsed = parseRogainingIof(xml);
+  const parsed = parseTeamIof(xml);
   const baza = parseUofBaza(bazaXml);
   const eventDate = normalizeEventDate(parsed.eventDate, logger);
 
@@ -427,7 +427,7 @@ export function generateRogainingResultsScoreReportHtml(
     throw new Error("rogaining-results-score report requires a UOF baza XML file.");
   }
 
-  const parsed = parseRogainingIof(xml);
+  const parsed = parseTeamIof(xml);
   const baza = parseUofBaza(bazaXml);
   const eventDate = normalizeEventDate(parsed.eventDate, logger);
 
@@ -456,7 +456,7 @@ export function generateRogainingSplitsReportHtml(
     throw new Error("rogaining-splits report requires a CourseData XML file.");
   }
 
-  const parsed = parseRogainingIof(xml);
+  const parsed = parseTeamIof(xml);
   const courseData = parseCourseData(courseDataXml);
   const eventDate = normalizeEventDate(parsed.eventDate, logger);
 

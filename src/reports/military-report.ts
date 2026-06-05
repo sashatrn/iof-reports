@@ -1,6 +1,6 @@
 import { loadConfig, type MilitaryIndividualTeamGroupConfig } from "../config";
 import { Participant } from "../io/parse-iof";
-import { RogainingTeam } from "../io/parse-rogaining-iof";
+import { RogainingTeam } from "../io/parse-team-iof";
 import { renderTemplate } from "../render/template-engine";
 import {
   isPdfVisibleParticipant,

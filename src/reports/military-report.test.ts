@@ -4,7 +4,7 @@ import path from "path";
 import { afterEach, describe, expect, it } from "vitest";
 import { setConfigPath } from "../config";
 import { type Participant } from "../io/parse-iof";
-import { type RogainingTeam } from "../io/parse-rogaining-iof";
+import { type RogainingTeam } from "../io/parse-team-iof";
 import {
   buildMilitaryIndividualTeamResults,
   buildMilitaryRelayClasses,

@@ -1,7 +1,7 @@
 import path from "path";
 import { AppConfig, loadConfig } from "../config";
 import { CourseControlPoint, ParsedCourseData } from "../io/parse-course-data";
-import { RogainingSplit, RogainingTeam } from "../io/parse-rogaining-iof";
+import { RogainingSplit, RogainingTeam } from "../io/parse-team-iof";
 import { ParsedUofBaza, UofBazaSportsman } from "../io/parse-uof-baza";
 import { DocxBlock, renderDocx } from "../render/docx";
 import { renderTemplate } from "../render/template-engine";

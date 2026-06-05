@@ -1,5 +1,5 @@
 import { Participant } from "../io/parse-iof";
-import { RogainingTeam } from "../io/parse-rogaining-iof";
+import { RogainingTeam } from "../io/parse-team-iof";
 
 const PDF_HIDDEN_STATUSES = new Set(["Active", "Inactive"]);
 
