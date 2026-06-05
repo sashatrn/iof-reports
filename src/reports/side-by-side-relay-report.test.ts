@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { type RogainingTeam } from "../io/parse-team-iof";
+import { type TeamIofTeam } from "../io/parse-team-iof";
 import {
   buildSideBySideRelayClasses,
   buildSideBySideRelayHtml,
@@ -183,7 +183,7 @@ function makeRelayTeam(
   memberTimeSecs: Array<number | undefined> = [1000, 1000, timeSec - 2000],
   status = "OK",
   memberStatuses?: string[],
-): RogainingTeam {
+): TeamIofTeam {
   const members = memberTimeSecs.map((_, index) => `${teamName} ${index + 1}`);
 
   return {

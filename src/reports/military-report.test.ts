@@ -4,7 +4,7 @@ import path from "path";
 import { afterEach, describe, expect, it } from "vitest";
 import { setConfigPath } from "../config";
 import { type Participant } from "../io/parse-iof";
-import { type RogainingTeam } from "../io/parse-team-iof";
+import { type TeamIofTeam } from "../io/parse-team-iof";
 import {
   buildMilitaryIndividualTeamResults,
   buildMilitaryRelayClasses,
@@ -560,7 +560,7 @@ function makeRelayTeam(
   memberTimeSecs?: Array<number | undefined>,
   status = "OK",
   memberStatuses?: string[],
-): RogainingTeam {
+): TeamIofTeam {
   const members = memberTimeSecs?.map((_, index) => `${teamName} ${index + 1}`) ?? [teamName];
 
   return {

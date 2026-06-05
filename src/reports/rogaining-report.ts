@@ -1,7 +1,7 @@
 import path from "path";
 import { AppConfig, loadConfig } from "../config";
 import { CourseControlPoint, ParsedCourseData } from "../io/parse-course-data";
-import { RogainingSplit, RogainingTeam } from "../io/parse-team-iof";
+import { TeamIofSplit, TeamIofTeam } from "../io/parse-team-iof";
 import { ParsedUofBaza, UofBazaSportsman } from "../io/parse-uof-baza";
 import { DocxBlock, renderDocx } from "../render/docx";
 import { renderTemplate } from "../render/template-engine";
@@ -12,7 +12,7 @@ import { getLeftLogo, getRightLogo } from "./report-logos";
 
 type HtmlVariant = "view" | "pdf";
 
-type RankedRogainingTeam = RogainingTeam & {
+type RankedRogainingTeam = TeamIofTeam & {
   place: string;
   formattedTime: string;
   membersLine: string;
@@ -191,7 +191,7 @@ type RogainingDiplomasOptions = {
 type ControlGateRuleStatus = "OK" | "-" | "DSQ";
 
 function evaluateControlGateRule(
-  team: RogainingTeam,
+  team: TeamIofTeam,
   config: AppConfig,
 ): {
   status: string;
@@ -245,7 +245,7 @@ function evaluateControlGateRule(
   };
 }
 
-function applyRogainingRules(teams: RogainingTeam[], config: AppConfig): RogainingTeam[] {
+function applyRogainingRules(teams: TeamIofTeam[], config: AppConfig): TeamIofTeam[] {
   return teams.map((team) => {
     const controlGateRuleResult = evaluateControlGateRule(team, config);
 
@@ -302,7 +302,7 @@ function stripHtml(value: string): string {
   return value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-function rankTeams(teams: RogainingTeam[]): RankedRogainingTeam[] {
+function rankTeams(teams: TeamIofTeam[]): RankedRogainingTeam[] {
   const sortableTeams = [...teams].sort((left, right) => {
     const leftPlaceable = PLACEABLE_STATUSES.has(left.status);
     const rightPlaceable = PLACEABLE_STATUSES.has(right.status);
@@ -475,7 +475,7 @@ function compareClassAgeLimits(left: number, right: number): number {
 }
 
 function buildEligibleClassNames(
-  team: RogainingTeam,
+  team: TeamIofTeam,
   declaredClasses: ParsedRogainingClass[],
   config: AppConfig,
 ): string[] {
@@ -504,10 +504,10 @@ function buildEligibleClassNames(
 }
 
 function buildRogainingClasses(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   config: AppConfig,
 ): RogainingClassGroup[] {
-  const byClass = new Map<string, RogainingTeam[]>();
+  const byClass = new Map<string, TeamIofTeam[]>();
   const declaredClasses = new Set(teams.map((team) => team.className));
   const parsedDeclaredClasses = [...declaredClasses]
     .map((declaredClass) => parseRogainingClass(declaredClass, config))
@@ -565,10 +565,10 @@ function buildRogainingClasses(
 }
 
 function buildDeclaredRogainingClasses(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   config: AppConfig,
 ): RogainingClassGroup[] {
-  const byClass = new Map<string, RogainingTeam[]>();
+  const byClass = new Map<string, TeamIofTeam[]>();
 
   for (const team of teams) {
     if (!byClass.has(team.className)) {
@@ -604,7 +604,7 @@ function buildDeclaredRogainingClasses(
 }
 
 function buildOpenRogainingResultsClasses(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   config: AppConfig,
 ): RogainingClassGroup[] {
   const groups: Array<{
@@ -615,7 +615,7 @@ function buildOpenRogainingResultsClasses(
     { name: "Ж-О", genderGroup: "women" },
     { name: "МІКС-О", genderGroup: "mix" },
   ];
-  const teamsByGroup = new Map<string, RogainingTeam[]>(
+  const teamsByGroup = new Map<string, TeamIofTeam[]>(
     groups.map((group) => [group.name, []]),
   );
 
@@ -730,7 +730,7 @@ function sortAwardsClasses(
 }
 
 function buildAwardsClasses(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   config: AppConfig,
 ): RogainingClassGroup[] {
   return buildRogainingClasses(teams, config)
@@ -816,7 +816,7 @@ function normalizeRogainingRegion(region: string): string {
   return normalized;
 }
 
-function getRogainingScoreMemberRegion(team: RogainingTeam, memberIndex: number): string {
+function getRogainingScoreMemberRegion(team: TeamIofTeam, memberIndex: number): string {
   const memberOrganisation = team.memberOrganisations?.[memberIndex];
 
   if (
@@ -831,7 +831,7 @@ function getRogainingScoreMemberRegion(team: RogainingTeam, memberIndex: number)
 }
 
 function createRogainingScoreEntries(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   config: AppConfig,
   options: { includeZeroPoints?: boolean } = {},
 ): RogainingScoreEntry[] {
@@ -864,7 +864,7 @@ function createRogainingScoreEntries(
     });
 }
 
-export function buildRogainingScoreEntries(teams: RogainingTeam[]): RogainingScoreEntry[] {
+export function buildRogainingScoreEntries(teams: TeamIofTeam[]): RogainingScoreEntry[] {
   const config = loadConfig();
   const normalizedTeams = applyRogainingRules(teams, config);
   return createRogainingScoreEntries(normalizedTeams, config);
@@ -1384,7 +1384,7 @@ function estimateClassControlCount(teams: RankedRogainingTeam[]): number {
 }
 
 function buildRogainingResultsClasses(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   baza: ParsedUofBaza,
   eventDate: Date,
   config: AppConfig,
@@ -1551,9 +1551,9 @@ function formatPace(timeSec: number | undefined, distanceMeters: number | undefi
 }
 
 function deduplicateAdjacentSplits(
-  splits: Required<RogainingSplit>[],
-): Required<RogainingSplit>[] {
-  return splits.reduce<Required<RogainingSplit>[]>((deduplicated, split) => {
+  splits: Required<TeamIofSplit>[],
+): Required<TeamIofSplit>[] {
+  return splits.reduce<Required<TeamIofSplit>[]>((deduplicated, split) => {
     const previousSplit = deduplicated[deduplicated.length - 1];
 
     if (previousSplit?.controlCode === split.controlCode) {
@@ -1566,9 +1566,9 @@ function deduplicateAdjacentSplits(
   }, []);
 }
 
-function normalizeSplitSequence(splits: RogainingSplit[] | undefined): Required<RogainingSplit>[] {
+function normalizeSplitSequence(splits: TeamIofSplit[] | undefined): Required<TeamIofSplit>[] {
   const chronologicalSplits = (splits ?? [])
-    .filter((split): split is Required<RogainingSplit> => {
+    .filter((split): split is Required<TeamIofSplit> => {
       return split.controlCode !== "" && split.timeSec !== undefined;
     })
     .sort((left, right) => left.timeSec - right.timeSec);
@@ -1576,7 +1576,7 @@ function normalizeSplitSequence(splits: RogainingSplit[] | undefined): Required<
   return deduplicateAdjacentSplits(chronologicalSplits);
 }
 
-function selectTeamSplitSequence(team: RogainingTeam): Required<RogainingSplit>[] {
+function selectTeamSplitSequence(team: TeamIofTeam): Required<TeamIofSplit>[] {
   const sequences = (team.memberSplits ?? [])
     .map((splits) => normalizeSplitSequence(splits))
     .filter((splits) => splits.length > 0);
@@ -1592,7 +1592,7 @@ function selectTeamSplitSequence(team: RogainingTeam): Required<RogainingSplit>[
   return baseSequence.map((baseSplit, index) => {
     const matchingTimes = sequences
       .map((sequence) => sequence[index])
-      .filter((split): split is Required<RogainingSplit> => {
+      .filter((split): split is Required<TeamIofSplit> => {
         return split !== undefined && split.controlCode === baseSplit.controlCode;
       })
       .map((split) => split.timeSec);
@@ -1604,8 +1604,8 @@ function selectTeamSplitSequence(team: RogainingTeam): Required<RogainingSplit>[
   });
 }
 
-function sortRogainingSplitsTeams(teams: RogainingTeam[]): RankedRogainingTeam[] {
-  const byClass = new Map<string, RogainingTeam[]>();
+function sortRogainingSplitsTeams(teams: TeamIofTeam[]): RankedRogainingTeam[] {
+  const byClass = new Map<string, TeamIofTeam[]>();
 
   for (const team of teams) {
     const classTeams = byClass.get(team.className) ?? [];
@@ -1619,7 +1619,7 @@ function sortRogainingSplitsTeams(teams: RogainingTeam[]): RankedRogainingTeam[]
 }
 
 export function buildRogainingSplitTeamEntries(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   courseData: ParsedCourseData,
 ): RogainingSplitTeamEntry[] {
   const controlMap = buildCourseControlMap(courseData);
@@ -1694,7 +1694,7 @@ export function buildRogainingSplitTeamEntries(
 }
 
 export function buildRogainingHtml(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   eventDate: Date,
   eventName?: string,
   variant: HtmlVariant = "pdf",
@@ -1731,7 +1731,7 @@ export function buildRogainingHtml(
 }
 
 export function buildRogainingScoreHtml(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   eventDate: Date,
   eventName?: string,
   variant: HtmlVariant = "pdf",
@@ -1764,7 +1764,7 @@ export function buildRogainingScoreHtml(
 }
 
 export function buildRogainingResultsHtml(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   baza: ParsedUofBaza,
   eventDate: Date,
   eventName?: string,
@@ -1805,7 +1805,7 @@ export function buildRogainingResultsHtml(
 }
 
 function buildRogainingResultsScoreClasses(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   baza: ParsedUofBaza,
   eventDate: Date,
   config: AppConfig,
@@ -1870,7 +1870,7 @@ function buildRogainingResultsScoreClasses(
 }
 
 export function buildRogainingResultsScoreHtml(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   baza: ParsedUofBaza,
   eventDate: Date,
   eventName?: string,
@@ -1906,7 +1906,7 @@ export function buildRogainingResultsScoreHtml(
 }
 
 export function buildRogainingSplitsHtml(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   courseData: ParsedCourseData,
   eventDate: Date,
   eventName?: string,
@@ -1936,7 +1936,7 @@ export function buildRogainingSplitsHtml(
 }
 
 export function buildRogainingAwardsHtml(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   eventDate: Date,
   eventName?: string,
   variant: HtmlVariant = "pdf",
@@ -1965,7 +1965,7 @@ export function buildRogainingAwardsHtml(
 }
 
 export function buildRogainingAwardsDocx(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   eventDate: Date,
   eventName?: string,
 ): Buffer {
@@ -2045,7 +2045,7 @@ export function buildRogainingAwardsDocx(
 }
 
 export function buildRogainingDiplomasHtml(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   eventDate: Date,
   eventName?: string,
   variant: HtmlVariant = "pdf",

@@ -1,7 +1,7 @@
 import path from "path";
 import { afterEach, describe, expect, it } from "vitest";
 import { setConfigPath } from "../config";
-import { RogainingTeam } from "../io/parse-team-iof";
+import { TeamIofTeam } from "../io/parse-team-iof";
 import {
   buildRogainingAwardsHtml,
   buildRogainingDiplomasHtml,
@@ -45,7 +45,7 @@ function getClassSection(html: string, className: string): string {
 
 describe("buildRogainingHtml", () => {
   it("shows only declared classes and dynamically promotes youth and masters", () => {
-    const teams: RogainingTeam[] = [
+    const teams: TeamIofTeam[] = [
       {
         className: "Ч18",
         teamName: "Юнаки",
@@ -141,7 +141,7 @@ describe("buildRogainingHtml", () => {
   });
 
   it("ranks teams by total score, then by time, and leaves non-OK teams unplaced", () => {
-    const teams: RogainingTeam[] = [
+    const teams: TeamIofTeam[] = [
       {
         className: "Ч",
         teamName: "Повільніші",
@@ -198,7 +198,7 @@ describe("buildRogainingHtml", () => {
   });
 
   it("shows points before penalty and total after penalty", () => {
-    const teams: RogainingTeam[] = [
+    const teams: TeamIofTeam[] = [
       {
         className: "Ч",
         teamName: "Штрафні",
@@ -222,7 +222,7 @@ describe("buildRogainingHtml", () => {
   });
 
   it("disqualifies OK teams that reach restricted controls before 22", () => {
-    const teams: RogainingTeam[] = [
+    const teams: TeamIofTeam[] = [
       {
         className: "Ч",
         teamName: "Валідний маршрут",
@@ -295,7 +295,7 @@ describe("buildRogainingHtml", () => {
 
 describe("buildRogainingScoreHtml", () => {
   it("scores participants by class age group and place", () => {
-    const teams: RogainingTeam[] = [
+    const teams: TeamIofTeam[] = [
       {
         className: "Ж18",
         teamName: "Youth One",
@@ -469,7 +469,7 @@ describe("buildRogainingScoreHtml", () => {
   });
 
   it("uses each participant region instead of the combined team region", () => {
-    const teams: RogainingTeam[] = [
+    const teams: TeamIofTeam[] = [
       {
         className: "Ч",
         teamName: "Збірна",
@@ -494,7 +494,7 @@ describe("buildRogainingScoreHtml", () => {
 
   it("can render score region table in flat layout", () => {
     setConfigPath(path.resolve(__dirname, "../__fixtures__/rogaining-score-flat-regions-config.json"));
-    const teams: RogainingTeam[] = [
+    const teams: TeamIofTeam[] = [
       {
         className: "Ч",
         teamName: "Київ",
@@ -532,7 +532,7 @@ describe("buildRogainingScoreHtml", () => {
   });
 
   it("ignores score categories that are not configured", () => {
-    const teams: RogainingTeam[] = [
+    const teams: TeamIofTeam[] = [
       {
         className: "Ч",
         teamName: "Відкритий",
@@ -571,7 +571,7 @@ describe("buildRogainingScoreHtml", () => {
 
   it("scores only masters when only masters score category is configured", () => {
     setConfigPath(path.resolve(__dirname, "../__fixtures__/rogaining-score-masters-config.json"));
-    const teams: RogainingTeam[] = [
+    const teams: TeamIofTeam[] = [
       {
         className: "Ч",
         teamName: "Відкритий",
@@ -619,7 +619,7 @@ describe("buildRogainingSplitsHtml", () => {
     ],
   };
 
-  const teams: RogainingTeam[] = [
+  const teams: TeamIofTeam[] = [
     {
       className: "Ч",
       teamName: "Швидкі",
@@ -758,7 +758,7 @@ describe("buildRogainingSplitsHtml", () => {
 
 describe("buildRogainingAwardsHtml", () => {
   it("keeps only top three teams and sorts classes by youth, veterans, main, open with gender order", () => {
-    const teams: RogainingTeam[] = [
+    const teams: TeamIofTeam[] = [
       {
         className: "Ч18",
         teamName: "Ч18",
@@ -940,7 +940,7 @@ describe("buildRogainingAwardsHtml", () => {
   });
 
   it("applies control gate disqualification to awards without adding a gate column", () => {
-    const teams: RogainingTeam[] = [
+    const teams: TeamIofTeam[] = [
       {
         className: "Ч",
         teamName: "Коректний вхід",
@@ -979,7 +979,7 @@ describe("buildRogainingAwardsHtml", () => {
 
 describe("buildRogainingDiplomasHtml", () => {
   it("applies control gate disqualification to diplomas", () => {
-    const teams: RogainingTeam[] = [
+    const teams: TeamIofTeam[] = [
       {
         className: "Ч",
         teamName: "Фінішери",

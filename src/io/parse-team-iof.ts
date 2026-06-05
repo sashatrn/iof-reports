@@ -51,10 +51,6 @@ export type ParsedTeamIof = {
   teams: TeamIofTeam[];
 };
 
-export type RogainingSplit = TeamIofSplit;
-export type RogainingTeam = TeamIofTeam;
-export type ParsedRogainingIof = ParsedTeamIof;
-
 function asArray<T>(value: T | T[] | undefined): T[] {
   if (value === undefined || value === null) {
     return [];
@@ -361,5 +357,3 @@ export function parseTeamIof(xml: string): ParsedTeamIof {
     teams,
   };
 }
-
-export const parseRogainingIof = parseTeamIof;

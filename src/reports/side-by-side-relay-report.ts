@@ -1,5 +1,5 @@
 import { loadConfig } from "../config";
-import { RogainingTeam } from "../io/parse-team-iof";
+import { TeamIofTeam } from "../io/parse-team-iof";
 import { renderTemplate } from "../render/template-engine";
 import { pointsFromPosition } from "../scoring/side-by-side-points";
 import { isPdfVisibleRelayTeam } from "./pdf-status-filter";
@@ -80,7 +80,7 @@ function formatRelayStage(timeSec: number | undefined, status: string | undefine
   return formatTime(timeSec);
 }
 
-function getRelayCompletedStageCount(team: RogainingTeam): number {
+function getRelayCompletedStageCount(team: TeamIofTeam): number {
   if (team.memberTimeSecs === undefined) {
     return PLACEABLE_STATUSES.has(team.status) ? team.memberCount : 0;
   }
@@ -88,7 +88,7 @@ function getRelayCompletedStageCount(team: RogainingTeam): number {
   return team.memberTimeSecs.filter((timeSec) => timeSec !== undefined).length;
 }
 
-function getSideBySideRelayStatus(team: RogainingTeam): string {
+function getSideBySideRelayStatus(team: TeamIofTeam): string {
   if (
     !PLACEABLE_STATUSES.has(team.status) &&
     team.status !== RELAY_INCOMPLETE_STATUS &&
@@ -108,7 +108,7 @@ function getSideBySideRelayStatus(team: RogainingTeam): string {
   return team.allMembersFinished === false ? RELAY_INCOMPLETE_STATUS : team.status;
 }
 
-function getRelayProgressTime(team: RogainingTeam): number {
+function getRelayProgressTime(team: TeamIofTeam): number {
   const memberTimeSecs = team.memberTimeSecs?.filter((timeSec) => timeSec !== undefined) ?? [];
 
   if (memberTimeSecs.length > 0) {
@@ -118,7 +118,7 @@ function getRelayProgressTime(team: RogainingTeam): number {
   return team.timeSec ?? Number.MAX_SAFE_INTEGER;
 }
 
-function getRelayStageSum(team: RogainingTeam, stageCount: number): number | undefined {
+function getRelayStageSum(team: TeamIofTeam, stageCount: number): number | undefined {
   if (stageCount <= 0) {
     return undefined;
   }
@@ -160,7 +160,7 @@ function canUseRelayTeamAsStageLeader(status: string): boolean {
   return getRelaySortGroup(status) !== 2;
 }
 
-function rankRelayTeams(teams: RogainingTeam[]): SideBySideRelayEntry[] {
+function rankRelayTeams(teams: TeamIofTeam[]): SideBySideRelayEntry[] {
   const sortedTeams = [...teams].sort((left, right) => {
     const leftStatus = getSideBySideRelayStatus(left);
     const rightStatus = getSideBySideRelayStatus(right);
@@ -254,9 +254,9 @@ function rankRelayTeams(teams: RogainingTeam[]): SideBySideRelayEntry[] {
 }
 
 export function buildSideBySideRelayClasses(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
 ): SideBySideRelayClass[] {
-  const byClass = new Map<string, RogainingTeam[]>();
+  const byClass = new Map<string, TeamIofTeam[]>();
 
   for (const team of teams) {
     const classTeams = byClass.get(team.className) ?? [];
@@ -341,7 +341,7 @@ function buildSideBySideEvent(eventDate: Date, reportTitle: string) {
 }
 
 export function buildSideBySideRelayHtml(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   eventDate: Date,
   variant: HtmlVariant = "pdf",
 ): string {

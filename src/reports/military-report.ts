@@ -1,6 +1,6 @@
 import { loadConfig, type MilitaryIndividualTeamGroupConfig } from "../config";
 import { Participant } from "../io/parse-iof";
-import { RogainingTeam } from "../io/parse-team-iof";
+import { TeamIofTeam } from "../io/parse-team-iof";
 import { renderTemplate } from "../render/template-engine";
 import {
   isPdfVisibleParticipant,
@@ -225,7 +225,7 @@ function buildMilitaryEvent(eventDate: Date, reportTitle: string) {
   };
 }
 
-function getMilitaryRelayStatus(team: RogainingTeam): string {
+function getMilitaryRelayStatus(team: TeamIofTeam): string {
   if (
     !PLACEABLE_STATUSES.has(team.status) &&
     team.status !== RELAY_INCOMPLETE_STATUS &&
@@ -245,7 +245,7 @@ function getMilitaryRelayStatus(team: RogainingTeam): string {
   return team.allMembersFinished === false ? RELAY_INCOMPLETE_STATUS : team.status;
 }
 
-function getRelayCompletedStageCount(team: RogainingTeam): number {
+function getRelayCompletedStageCount(team: TeamIofTeam): number {
   if (team.memberTimeSecs === undefined) {
     return PLACEABLE_STATUSES.has(team.status) ? team.memberCount : 0;
   }
@@ -255,7 +255,7 @@ function getRelayCompletedStageCount(team: RogainingTeam): number {
   return completedStageCount;
 }
 
-function getRelayProgressTime(team: RogainingTeam): number {
+function getRelayProgressTime(team: TeamIofTeam): number {
   const memberTimeSecs = team.memberTimeSecs?.filter((timeSec) => timeSec !== undefined) ?? [];
 
   if (memberTimeSecs.length > 0) {
@@ -265,7 +265,7 @@ function getRelayProgressTime(team: RogainingTeam): number {
   return team.timeSec ?? Number.MAX_SAFE_INTEGER;
 }
 
-function getRelayStageSum(team: RogainingTeam, stageCount: number): number | undefined {
+function getRelayStageSum(team: TeamIofTeam, stageCount: number): number | undefined {
   if (stageCount <= 0) {
     return undefined;
   }
@@ -307,7 +307,7 @@ function canUseRelayTeamAsStageLeader(status: string): boolean {
   return getRelaySortGroup(status) !== 2;
 }
 
-function rankRelayTeams(teams: RogainingTeam[], classCanScore = true): MilitaryRelayEntry[] {
+function rankRelayTeams(teams: TeamIofTeam[], classCanScore = true): MilitaryRelayEntry[] {
   const sortedTeams = [...teams].sort((left, right) => {
     const leftStatus = getMilitaryRelayStatus(left);
     const rightStatus = getMilitaryRelayStatus(right);
@@ -410,11 +410,11 @@ function rankRelayTeams(teams: RogainingTeam[], classCanScore = true): MilitaryR
 }
 
 export function buildMilitaryRelayClasses(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   classFilterRegex = ".*",
 ): MilitaryRelayClass[] {
   const classFilter = buildMilitaryClassFilter(classFilterRegex);
-  const byClass = new Map<string, RogainingTeam[]>();
+  const byClass = new Map<string, TeamIofTeam[]>();
 
   for (const team of teams) {
     const classTeams = byClass.get(team.className) ?? [];
@@ -432,7 +432,7 @@ export function buildMilitaryRelayClasses(
 
 export function buildMilitaryTeamStandings(
   participants: Participant[],
-  relayTeams: RogainingTeam[],
+  relayTeams: TeamIofTeam[],
 ): MilitaryTeamStanding[] {
   const config = loadConfig();
   const classFilter = buildMilitaryClassFilter(config.military.classFilterRegex);
@@ -493,7 +493,7 @@ export function buildMilitaryTeamStandings(
 
 export function buildMilitaryTeamStandingGroups(
   participants: Participant[],
-  relayTeams: RogainingTeam[],
+  relayTeams: TeamIofTeam[],
 ): MilitaryTeamStandingGroup[] {
   const config = loadConfig();
   const classFilter = buildMilitaryClassFilter(config.military.classFilterRegex);
@@ -768,7 +768,7 @@ export function buildMilitaryIndividualHtml(
 }
 
 export function buildMilitaryRelayHtml(
-  teams: RogainingTeam[],
+  teams: TeamIofTeam[],
   eventDate: Date,
   variant: HtmlVariant = "pdf",
 ): string {
@@ -790,7 +790,7 @@ export function buildMilitaryRelayHtml(
 
 export function buildMilitaryTeamHtml(
   participants: Participant[],
-  relayTeams: RogainingTeam[],
+  relayTeams: TeamIofTeam[],
   eventDate: Date,
 ): string {
   return renderTemplate("military-team-pdf.njk", {
