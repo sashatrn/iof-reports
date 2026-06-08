@@ -5,6 +5,24 @@
   "ignoredStatuses": ["DidNotEnter"],
   "leftLogo": "",
   "rightLogo": "",
+  "individual": {
+    "scoring": "side-by-side",
+    "classOrder": "name",
+    "teamResults": "gender",
+    "teamFilterRegex": ".*",
+    "classFilterRegex": ".*",
+    "classOrderGroups": [
+      {
+        "name": "ВВНЗ",
+        "classRegex": "ВВНЗ"
+      },
+      {
+        "name": "ЗСУ",
+        "classRegex": "ЗСУ"
+      }
+    ],
+    "reportTitle": "Заданий напрямок"
+  },
   "side-by-side": {
     "teamRules": {
       "menCount": 3,

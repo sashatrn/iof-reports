@@ -3,7 +3,6 @@ import { Participant } from "../io/parse-iof";
 import { TeamIofTeam } from "../io/parse-team-iof";
 import { renderTemplate } from "../render/template-engine";
 import {
-  isPdfVisibleParticipant,
   isPdfVisibleRelayTeam,
 } from "./pdf-status-filter";
 import {
@@ -165,28 +164,6 @@ function compareConfiguredGroupNames(
   }
 
   return leftGroup.localeCompare(rightGroup, "uk");
-}
-
-function getClassGroupIndex(
-  className: string,
-  groupMatchers: Array<MilitaryIndividualTeamGroupConfig & { regex: RegExp }>,
-): number {
-  const groupIndex = groupMatchers.findIndex((group) => group.regex.test(className));
-  return groupIndex === -1 ? Number.MAX_SAFE_INTEGER : groupIndex;
-}
-
-function compareMilitaryClassNames(
-  left: string,
-  right: string,
-  groupMatchers: Array<MilitaryIndividualTeamGroupConfig & { regex: RegExp }>,
-): number {
-  const groupDiff = getClassGroupIndex(left, groupMatchers) - getClassGroupIndex(right, groupMatchers);
-
-  if (groupDiff !== 0) {
-    return groupDiff;
-  }
-
-  return left.localeCompare(right, "uk");
 }
 
 function rankMilitaryTeamStandings(
@@ -774,55 +751,6 @@ export function buildMilitaryRelayTeamResults(
           place: index + 1,
         })),
     }));
-}
-
-export function buildMilitaryIndividualHtml(
-  participants: Participant[],
-  eventDate: Date,
-  variant: HtmlVariant = "pdf",
-): string {
-  const config = loadConfig();
-  const groupMatchers = buildClassGroupMatchers(config.military.individualTeamGroups);
-  const reportParticipants =
-    variant === "pdf" ? participants.filter(isPdfVisibleParticipant) : participants;
-  const byClass = new Map<string, Participant[]>();
-
-  for (const participant of reportParticipants) {
-    const classParticipants = byClass.get(participant.className) ?? [];
-    classParticipants.push(participant);
-    byClass.set(participant.className, classParticipants);
-  }
-
-  const classes = [...byClass.keys()]
-    .sort((left, right) => compareMilitaryClassNames(left, right, groupMatchers))
-    .map((className) => ({
-      name: className,
-      participants: [...(byClass.get(className) ?? [])]
-        .sort((left, right) => {
-          const positionDiff = (left.position ?? 9999) - (right.position ?? 9999);
-          return positionDiff !== 0 ? positionDiff : left.name.localeCompare(right.name, "uk");
-        })
-        .map((participant) => ({
-          position: participant.position ?? "",
-          name: participant.name,
-          organisation: participant.club,
-          time: formatTime(participant.timeSec),
-          timeBehind: formatTimeBehind(participant.timeBehindSec),
-          points: participant.pointsLabel ?? participant.points,
-          status: participant.status,
-        })),
-    }));
-
-  return renderTemplate(`military-individual-${variant}.njk`, {
-    ...buildMilitaryEvent(eventDate, "Довга дистанція"),
-    classes,
-    teamResults: buildMilitaryIndividualTeamResults(
-      reportParticipants,
-      config.military.teamFilterRegex,
-      config.military.classFilterRegex,
-      config.military.individualTeamGroups,
-    ),
-  });
 }
 
 export function buildMilitaryRelayHtml(

@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { setConfigPath } from "../config";
 import { imageToBase64 } from "../utils/image";
 import {
-  generateMilitaryIndividualReportHtml,
+  generateIndividualReportHtml,
   generateMilitaryRelayReportHtml,
   generateMilitaryTeamReportHtml,
   generateReportHtml,
@@ -17,7 +17,6 @@ import {
   generateRogainingResultsScoreReportHtml,
   generateRogainingScoreReportHtml,
   generateRogainingSplitsReportHtml,
-  generateSideBySideIndividualReportHtml,
   generateSideBySideRelayReportHtml,
   generateSideBySideRogainingReportHtml,
   generateSideBySideSummaryReportHtml,
@@ -197,6 +196,53 @@ function useConfiguredLogoConfig(): { leftLogo: string; rightLogo: string } {
   };
 }
 
+function useMilitaryIndividualScoringConfig(): void {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-reports-military-individual-"));
+  const configPath = path.join(tempDir, "config.json");
+
+  tempConfigDirs.push(tempDir);
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      individual: {
+        scoring: "military",
+        classOrder: "grouped",
+        teamResults: "grouped",
+        teamFilterRegex: ".*",
+        classFilterRegex: ".*",
+        classOrderGroups: [
+          {
+            name: "ВВНЗ",
+            classRegex: "ВВНЗ",
+          },
+          {
+            name: "ЗСУ",
+            classRegex: "ЗСУ",
+          },
+        ],
+        reportTitle: "Довга дистанція",
+        title:
+          "Відкритий Кубок Командувача Сухопутних військ ЗСУ<br/>зі спортивного орієнтування (бігом)",
+      },
+      military: {
+        teamFilterRegex: ".*",
+        classFilterRegex: ".*",
+        individualTeamGroups: [
+          {
+            name: "ВВНЗ",
+            classRegex: "ВВНЗ",
+          },
+          {
+            name: "ЗСУ",
+            classRegex: "ЗСУ",
+          },
+        ],
+      },
+    }),
+  );
+  setConfigPath(configPath);
+}
+
 function expectOfficialSignatureImage(pdfHtml: string): void {
   expect(pdfHtml).toContain('class="official-signature-image"');
   expect(pdfHtml).toContain("data:image/png;base64,");
@@ -207,11 +253,11 @@ function countOfficialSignatureImages(pdfHtml: string): number {
   return pdfHtml.match(/class="official-signature-image"/g)?.length ?? 0;
 }
 
-describe("generateSideBySideIndividualReportHtml", () => {
+describe("generateIndividualReportHtml with side-by-side scoring", () => {
   it("builds individual report html from IOF XML", () => {
-    const report = generateSideBySideIndividualReportHtml(sampleXml);
+    const report = generateIndividualReportHtml(sampleXml);
 
-    expect(report.reportType).toBe("side-by-side-individual");
+    expect(report.reportType).toBe("individual");
     expect(report.itemCount).toBeGreaterThan(0);
     expect(report.viewHtml).toContain("Заданий напрямок");
     expect(report.viewHtml).toContain("Ч 5-6");
@@ -225,9 +271,9 @@ describe("generateSideBySideIndividualReportHtml", () => {
   });
 
   it("builds an empty individual report when there are no participants yet", () => {
-    const report = generateSideBySideIndividualReportHtml(emptyIndividualXml);
+    const report = generateIndividualReportHtml(emptyIndividualXml);
 
-    expect(report.reportType).toBe("side-by-side-individual");
+    expect(report.reportType).toBe("individual");
     expect(report.itemCount).toBe(0);
     expect(report.viewHtml).toContain("Заданий напрямок");
     expect(report.pdfHtml).toContain("Заданий напрямок");
@@ -237,7 +283,7 @@ describe("generateSideBySideIndividualReportHtml", () => {
   it("embeds configured report logos from paths relative to config.json", () => {
     const logos = useConfiguredLogoConfig();
 
-    const report = generateSideBySideIndividualReportHtml(sampleXml);
+    const report = generateIndividualReportHtml(sampleXml);
 
     expect(report.pdfHtml).toContain(logos.leftLogo);
     expect(report.pdfHtml).toContain(logos.rightLogo);
@@ -344,11 +390,13 @@ describe("generateSideBySideSummaryReportHtml", () => {
   });
 });
 
-describe("generateMilitaryIndividualReportHtml", () => {
+describe("generateIndividualReportHtml with military scoring", () => {
   it("builds military individual report html from IOF XML", () => {
-    const report = generateMilitaryIndividualReportHtml(sampleXml);
+    useMilitaryIndividualScoringConfig();
 
-    expect(report.reportType).toBe("military-individual");
+    const report = generateIndividualReportHtml(sampleXml);
+
+    expect(report.reportType).toBe("individual");
     expect(report.itemCount).toBeGreaterThan(0);
     expect(report.viewHtml).toContain("Довга дистанція");
     expect(report.viewHtml).toContain("Ч 5-6");
@@ -360,9 +408,11 @@ describe("generateMilitaryIndividualReportHtml", () => {
   });
 
   it("builds an empty military individual report when there are no participants yet", () => {
-    const report = generateMilitaryIndividualReportHtml(emptyIndividualXml);
+    useMilitaryIndividualScoringConfig();
 
-    expect(report.reportType).toBe("military-individual");
+    const report = generateIndividualReportHtml(emptyIndividualXml);
+
+    expect(report.reportType).toBe("individual");
     expect(report.itemCount).toBe(0);
     expect(report.viewHtml).toContain("Довга дистанція");
     expect(report.pdfHtml).toContain("Довга дистанція");
@@ -370,7 +420,9 @@ describe("generateMilitaryIndividualReportHtml", () => {
   });
 
   it("separates military individual team results by ВВНЗ and ЗСУ groups", () => {
-    const report = generateMilitaryIndividualReportHtml(militaryLongXml);
+    useMilitaryIndividualScoringConfig();
+
+    const report = generateIndividualReportHtml(militaryLongXml);
 
     expect(report.pdfHtml).toContain("Командні результати");
     expect(report.pdfHtml).toContain("<h4>ВВНЗ</h4>");
@@ -378,7 +430,9 @@ describe("generateMilitaryIndividualReportHtml", () => {
   });
 
   it("orders military individual class tables by configured team groups", () => {
-    const report = generateMilitaryIndividualReportHtml(militaryLongXml);
+    useMilitaryIndividualScoringConfig();
+
+    const report = generateIndividualReportHtml(militaryLongXml);
 
     expectInOrder(report.pdfHtml, [
       "<h3>Ж ВВНЗ</h3>",
@@ -584,13 +638,12 @@ describe("configured PDF signatures", () => {
     useOfficialSignatureConfig();
 
     const reports = [
-      generateSideBySideIndividualReportHtml(sampleXml),
+      generateIndividualReportHtml(sampleXml),
       generateSideBySideRelayReportHtml(rogainingXml),
       generateSideBySideSummaryReportHtml(sampleXml, {
         rogainingXml: sideBySideRogainingXml,
         relayXml: rogainingXml,
       }),
-      generateMilitaryIndividualReportHtml(sampleXml),
       generateMilitaryRelayReportHtml(rogainingXml),
       generateMilitaryTeamReportHtml(militaryLongXml, { relayXml: militaryRelayXml }),
       generateRogainingReportHtml(rogainingXml),
@@ -637,17 +690,17 @@ describe("generateReportsHtml", () => {
     const reports = generateReportsHtml(sampleXml, "all");
 
     expect(reports).toHaveLength(1);
-    expect(reports[0].reportType).toBe("side-by-side-individual");
+    expect(reports[0].reportType).toBe("individual");
     expect(reports[0].pdfHtml).toContain("Заданий напрямок");
     expect(reports[0].pdfHtml).toContain("Командні результати");
   });
 });
 
 describe("generateReportHtml", () => {
-  it("dispatches to side-by-side individual report generator", () => {
-    const report = generateReportHtml(sampleXml, "side-by-side-individual");
+  it("dispatches to individual report generator", () => {
+    const report = generateReportHtml(sampleXml, "individual");
 
-    expect(report.reportType).toBe("side-by-side-individual");
+    expect(report.reportType).toBe("individual");
     expect(report.viewHtml).toContain("Заданий напрямок");
     expect(report.pdfHtml).toContain("Заданий напрямок");
   });
@@ -719,13 +772,11 @@ describe("generateReportHtml", () => {
   });
 
   it("dispatches to military reports", () => {
-    const individualReport = generateReportHtml(sampleXml, "military-individual");
     const relayReport = generateReportHtml(rogainingXml, "military-relay");
     const teamReport = generateReportHtml(sampleXml, "military-team", {
       relayXml: rogainingXml,
     });
 
-    expect(individualReport.reportType).toBe("military-individual");
     expect(relayReport.reportType).toBe("military-relay");
     expect(teamReport.reportType).toBe("military-team");
   });

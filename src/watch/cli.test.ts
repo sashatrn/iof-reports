@@ -17,7 +17,7 @@ afterEach(() => {
 });
 
 describe("parseWatchArgs", () => {
-  it("accepts side-by-side-individual in watch mode", () => {
+  it("accepts individual in watch mode", () => {
     const inputDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-watch-input-"));
     const outputDir = path.join(os.tmpdir(), "iof-watch-output");
 
@@ -31,13 +31,13 @@ describe("parseWatchArgs", () => {
         "--output-dir",
         outputDir,
         "--report",
-        "side-by-side-individual",
+        "individual",
       ],
       testLogger(),
     );
 
-    expect(options.reportType).toBe("side-by-side-individual");
-    expect(options.requestedReportType).toBe("side-by-side-individual");
+    expect(options.reportType).toBe("individual");
+    expect(options.requestedReportType).toBe("individual");
   });
 
   it("accepts side-by-side-relay in watch mode", () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Participant } from "../io/parse-iof";
-import { buildSideBySideIndividualHtml } from "./side-by-side-individual-report";
+import { buildIndividualHtml } from "./individual-report";
 
 function expectInOrder(text: string, fragments: string[]): void {
   let previousIndex = -1;
@@ -44,7 +44,7 @@ function getRowContaining(html: string, rowFragment: string): string {
   return html.slice(rowStart, rowEnd + "</tr>".length);
 }
 
-describe("buildSideBySideIndividualHtml", () => {
+describe("buildIndividualHtml", () => {
   it("groups participants by class and sorts them by position", () => {
     const participants: Participant[] = [
       {
@@ -86,7 +86,7 @@ describe("buildSideBySideIndividualHtml", () => {
       },
     ];
 
-    const html = buildSideBySideIndividualHtml(participants, new Date(2026, 3, 11));
+    const html = buildIndividualHtml(participants, new Date(2026, 3, 11));
 
     expectInOrder(html, [
       "<h3>Ч 5-6</h3>",
@@ -155,7 +155,7 @@ describe("buildSideBySideIndividualHtml", () => {
       },
     ];
 
-    const html = buildSideBySideIndividualHtml(
+    const html = buildIndividualHtml(
       participants,
       new Date(2026, 3, 11),
       "view",
@@ -179,7 +179,7 @@ describe("buildSideBySideIndividualHtml", () => {
   });
 
   it("renders team results in the PDF variant when provided", () => {
-    const html = buildSideBySideIndividualHtml(
+    const html = buildIndividualHtml(
       [],
       new Date(2026, 3, 11),
       "pdf",

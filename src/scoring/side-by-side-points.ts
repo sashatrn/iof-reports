@@ -1,3 +1,6 @@
+import { type AppConfig } from "../config";
+import { type Participant } from "../io/parse-iof";
+
 export function pointsFromPosition(
   position: number | undefined,
   status: string,
@@ -12,4 +15,13 @@ export function pointsFromPosition(
 
   const p = 85 - (position - 4);
   return p > 1 ? p : 1;
+}
+
+export function applySideBySideIndividualPoints(
+  participants: Participant[],
+  _config: AppConfig,
+): void {
+  for (const participant of participants) {
+    participant.points = pointsFromPosition(participant.position, participant.status);
+  }
 }

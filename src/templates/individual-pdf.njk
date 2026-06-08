@@ -1,0 +1,122 @@
+{% extends "base-pdf.njk" %}
+
+{% block content %}
+
+<h2>Індивідуальні результати</h2>
+{% for class in classes %}
+<div class="class-block">
+  <h3>{{ class.name }}</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="place-cell">Місце</th>
+        <th>Учасник</th>
+        <th>Команда</th>
+        <th>Час</th>
+        <th>Відст.</th>
+        <th class="points-cell">Бал</th>
+        <th>Статус</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for participant in class.participants %}
+      <tr>
+        <td class="place-cell">{{ participant.position }}</td>
+        <td>{{ participant.name }}</td>
+        <td>{{ participant.organisation }}</td>
+        <td>{{ participant.time }}</td>
+        <td>{{ participant.timeBehind }}</td>
+        <td class="points-cell">{% if participant.points > 0 %}{{ participant.points }}{% endif %}</td>
+        <td>{{ participant.status | statusLabel }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endfor %}
+
+{% if teamResults %}
+  {% if teamResults.mode == "gender" and (teamResults.men.length or teamResults.women.length) %}
+  <div class="class-block">
+    <h2>Командні результати</h2>
+
+    {% if teamResults.men.length %}
+    {% if teamResults.women.length %}<h4>Чоловіки</h4>{% endif %}
+
+    <table>
+      <thead>
+        <tr>
+          <th class="place-cell">Місце</th>
+          <th>Команда</th>
+          <th class="points-cell">Бал</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for team in teamResults.men %}
+        <tr>
+          <td class="place-cell"><strong>{{ loop.index }}</strong></td>
+          <td>{{ team.club }}</td>
+          <td class="points-cell"><strong>{% if team.points > 0 %}{{ team.points }}{% endif %}</strong></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+
+    {% if teamResults.women.length %}
+    {% if teamResults.men.length %}<h4>Жінки</h4>{% endif %}
+
+    <table>
+      <thead>
+        <tr>
+          <th class="place-cell">Місце</th>
+          <th>Команда</th>
+          <th class="points-cell">Бал</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for team in teamResults.women %}
+        <tr>
+          <td class="place-cell"><strong>{{ loop.index }}</strong></td>
+          <td>{{ team.club }}</td>
+          <td class="points-cell"><strong>{% if team.points > 0 %}{{ team.points }}{% endif %}</strong></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if teamResults.mode == "grouped" and teamResults.groups.length %}
+  <div class="class-block">
+    <h2>Командні результати</h2>
+
+    {% for group in teamResults.groups %}
+    <h4>{{ group.name }}</h4>
+
+    <table>
+      <thead>
+        <tr>
+          <th class="place-cell">Місце</th>
+          <th>Команда</th>
+          <th class="points-cell">Бал</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for team in group.teams %}
+        <tr>
+          <td class="place-cell"><strong>{{ team.place }}</strong></td>
+          <td>{{ team.organisation }}</td>
+          <td class="points-cell"><strong>{% if team.points > 0 %}{{ team.points }}{% endif %}</strong></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endif %}
+
+{% endblock %}

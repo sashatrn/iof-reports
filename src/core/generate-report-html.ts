@@ -4,14 +4,13 @@ import { parseCourseData } from "../io/parse-course-data";
 import { parseIof } from "../io/parse-iof";
 import { parseTeamIof } from "../io/parse-team-iof";
 import { parseUofBaza } from "../io/parse-uof-baza";
-import { buildSideBySideIndividualHtml } from "../reports/side-by-side-individual-report";
 import {
-  buildMilitaryIndividualHtml,
   buildMilitaryRelayClasses,
   buildMilitaryRelayHtml,
   buildMilitaryTeamHtml,
   buildMilitaryTeamStandingGroups,
 } from "../reports/military-report";
+import { buildIndividualHtml } from "../reports/individual-report";
 import {
   buildRogainingAwardsHtml,
   buildRogainingAwardsDocx,
@@ -42,6 +41,8 @@ import {
 } from "../reports/side-by-side-summary-report";
 import { buildSideBySideTeamHtml } from "../reports/side-by-side-team-report";
 import { isPdfVisibleParticipant, isPdfVisibleRelayTeam } from "../reports/pdf-status-filter";
+import { buildGenderIndividualTeamResults } from "../reports/individual-gender-team-results";
+import { getIndividualScoring } from "../scoring/individual-scoring";
 import { applyMilitaryIndividualPoints } from "../scoring/military-individual-points";
 import { pointsFromPosition } from "../scoring/side-by-side-points";
 import { computeTeamResults } from "../scoring/side-by-side-team";
@@ -136,7 +137,7 @@ function parseTeamResultsXml(xml: string, logger?: Logger, allowEmpty = false) {
   };
 }
 
-export function generateSideBySideIndividualReportHtml(
+export function generateIndividualReportHtml(
   xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
@@ -144,18 +145,23 @@ export function generateSideBySideIndividualReportHtml(
   const { participants, eventDate } = parseParticipantsXml(
     xml,
     logger,
-    pointsFromPosition,
+    () => 0,
     true,
   );
+  const config = loadConfig();
+  const scoring = getIndividualScoring(config.individual.scoring);
+
+  scoring.applyPoints(participants, config);
+
   const pdfParticipants = participants.filter(isPdfVisibleParticipant);
-  const teamResults = pdfParticipants.length > 0
-    ? computeTeamResults(pdfParticipants, loadConfig(), logger)
+  const teamResults = config.individual.teamResults === "gender" && pdfParticipants.length > 0
+    ? buildGenderIndividualTeamResults(pdfParticipants, config, logger)
     : undefined;
 
   return {
-    reportType: "side-by-side-individual",
-    viewHtml: buildSideBySideIndividualHtml(participants, eventDate, "view"),
-    pdfHtml: buildSideBySideIndividualHtml(participants, eventDate, "pdf", teamResults),
+    reportType: "individual",
+    viewHtml: buildIndividualHtml(participants, eventDate, "view"),
+    pdfHtml: buildIndividualHtml(participants, eventDate, "pdf", teamResults),
     eventDate: toIsoDate(eventDate),
     itemCount: participants.length,
   };
@@ -347,33 +353,6 @@ export function generateSideBySideSummaryReportHtml(
     eventName,
     eventDate: toIsoDate(eventDate),
     itemCount: standings.length,
-  };
-}
-
-export function generateMilitaryIndividualReportHtml(
-  xml: string,
-  options: GenerateReportOptions = {},
-): GeneratedReport {
-  const { logger } = options;
-  const { participants, eventDate } = parseParticipantsXml(
-    xml,
-    logger,
-    pointsFromPosition,
-    true,
-  );
-  const config = loadConfig();
-  applyMilitaryIndividualPoints(
-    participants,
-    config.military.teamFilterRegex,
-    config.military.classFilterRegex,
-  );
-
-  return {
-    reportType: "military-individual",
-    viewHtml: buildMilitaryIndividualHtml(participants, eventDate, "view"),
-    pdfHtml: buildMilitaryIndividualHtml(participants, eventDate, "pdf"),
-    eventDate: toIsoDate(eventDate),
-    itemCount: participants.length,
   };
 }
 
@@ -625,8 +604,8 @@ export function generateReportHtml(
   options: GenerateReportOptions = {},
 ): GeneratedReport {
   switch (reportType) {
-    case "side-by-side-individual":
-      return generateSideBySideIndividualReportHtml(xml, options);
+    case "individual":
+      return generateIndividualReportHtml(xml, options);
     case "team":
       return generateSideBySideTeamReportHtml(xml, options);
     case "side-by-side-rogaining":
@@ -649,8 +628,6 @@ export function generateReportHtml(
       return generateRogainingResultsScoreReportHtml(xml, options);
     case "rogaining-splits":
       return generateRogainingSplitsReportHtml(xml, options);
-    case "military-individual":
-      return generateMilitaryIndividualReportHtml(xml, options);
     case "military-relay":
       return generateMilitaryRelayReportHtml(xml, options);
     case "military-team":
@@ -664,7 +641,7 @@ export function generateReportsHtml(
   options: GenerateReportOptions = {},
 ): GeneratedReport[] {
   if (reportType === "all") {
-    return [generateSideBySideIndividualReportHtml(xml, options)];
+    return [generateIndividualReportHtml(xml, options)];
   }
 
   return [generateReportHtml(xml, reportType, options)];

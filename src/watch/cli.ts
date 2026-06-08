@@ -20,7 +20,7 @@ export type WatchOptions = {
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <side-by-side-individual|team|side-by-side-rogaining|side-by-side-relay|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-splits|military-individual|military-relay> [--config config.json] [--courses courses.xml] [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
+    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <individual|team|side-by-side-rogaining|side-by-side-relay|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-splits|military-relay> [--config config.json] [--courses courses.xml] [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
   );
 }
 
@@ -72,7 +72,7 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
       if (!value || !isWatchReportType(value)) {
         logger.error(
           { report: value },
-          "Invalid watch report type. Expected one of: side-by-side-individual, team, side-by-side-rogaining, side-by-side-relay, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-splits, military-individual, military-relay.",
+          "Invalid watch report type. Expected one of: individual, team, side-by-side-rogaining, side-by-side-relay, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-splits, military-relay.",
         );
         printUsage(logger);
         process.exit(1);

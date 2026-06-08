@@ -1,3 +1,4 @@
+import { type AppConfig } from "../config";
 import { type Participant } from "../io/parse-iof";
 
 export const MILITARY_OUT_OF_COMPETITION_POINTS = "";
@@ -105,4 +106,15 @@ export function applyMilitaryIndividualPoints(
       participant.pointsLabel = String(participant.points);
     }
   }
+}
+
+export function applyMilitaryIndividualPointsFromConfig(
+  participants: Participant[],
+  config: AppConfig,
+): void {
+  applyMilitaryIndividualPoints(
+    participants,
+    config.military.teamFilterRegex,
+    config.military.classFilterRegex,
+  );
 }

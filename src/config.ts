@@ -9,16 +9,34 @@ type RogainingScorePoints = {
   masters?: Record<string, number>;
 };
 
-export type MilitaryIndividualTeamGroupConfig = {
+export type ClassGroupConfig = {
   name: string;
   classRegex: string;
 };
+
+export type MilitaryIndividualTeamGroupConfig = ClassGroupConfig;
 
 type SideBySideConfig = {
   teamRules: {
     menCount: number;
     womenCount: number;
   };
+};
+
+export type IndividualScoringType = "side-by-side" | "military";
+export type IndividualClassOrderType = "name" | "grouped";
+export type IndividualTeamResultsType = "gender" | "grouped";
+
+type IndividualConfig = {
+  scoring: IndividualScoringType;
+  classOrder: IndividualClassOrderType;
+  teamResults: IndividualTeamResultsType;
+  teamFilterRegex: string;
+  classFilterRegex: string;
+  classOrderGroups: ClassGroupConfig[];
+  reportTitle: string;
+  title?: string;
+  subtitle?: string;
 };
 
 type OfficialPersonConfig = {
@@ -64,6 +82,7 @@ export type AppConfig = {
   ignoredStatuses: string[];
   leftLogo?: string;
   rightLogo?: string;
+  individual: IndividualConfig;
   "side-by-side": SideBySideConfig;
   military: {
     teamFilterRegex: string;
@@ -137,6 +156,31 @@ const defaultConfig: AppConfig = {
     level: "debug",
   },
   ignoredStatuses: ["DidNotEnter"],
+  individual: {
+    scoring: "side-by-side",
+    classOrder: "name",
+    teamResults: "gender",
+    teamFilterRegex: ".*",
+    classFilterRegex: ".*",
+    classOrderGroups: [
+      {
+        name: "ВВНЗ",
+        classRegex: "ВВНЗ",
+      },
+      {
+        name: "ЗСУ",
+        classRegex: "ЗСУ",
+      },
+    ],
+    reportTitle: "Заданий напрямок",
+    title: `Всеукраїнські змагання<br/>
+        "Пліч-о-пліч всеукраїнські шкільні ліги зі спортивного орієнтування"<br/>
+        серед учнів закладів загальної середньої освіти<br/>
+        "РАЗОМ ПЕРЕМОЖЕМО"`,
+    subtitle: `Протокол загальнокомандних результатів змагань зі спортивного орієнтування<br/>
+        {{stage}} Пліч-о-пліч, Всеукраїнських шкільних ліг<br/>
+        {{region_of}}, {{year}} р.`,
+  },
   "side-by-side": {
     teamRules: {
       menCount: 3,
@@ -541,6 +585,22 @@ export function loadConfig(configPath?: string): AppConfig {
       "Right logo",
     ),
     ignoredStatuses: parsed.ignoredStatuses ?? defaultConfig.ignoredStatuses,
+    individual: {
+      ...defaultConfig.individual,
+      ...parsed.individual,
+      teamFilterRegex:
+        parsed.individual?.teamFilterRegex ??
+        parsed.military?.teamFilterRegex ??
+        defaultConfig.individual.teamFilterRegex,
+      classFilterRegex:
+        parsed.individual?.classFilterRegex ??
+        parsed.military?.classFilterRegex ??
+        defaultConfig.individual.classFilterRegex,
+      classOrderGroups:
+        parsed.individual?.classOrderGroups ??
+        parsed.military?.individualTeamGroups ??
+        defaultConfig.individual.classOrderGroups,
+    },
     rogaining: {
       ...defaultConfig.rogaining,
       ...parsed.rogaining,

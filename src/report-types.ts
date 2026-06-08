@@ -1,6 +1,6 @@
 export const REPORT_TYPES = [
   "all",
-  "side-by-side-individual",
+  "individual",
   "team",
   "side-by-side-rogaining",
   "side-by-side-relay",
@@ -12,7 +12,6 @@ export const REPORT_TYPES = [
   "rogaining-results",
   "rogaining-results-score",
   "rogaining-splits",
-  "military-individual",
   "military-relay",
   "military-team",
 ] as const;
@@ -26,7 +25,7 @@ export function isReportType(value: string): value is ReportType {
 
 export function isSingleReportType(value: string): value is SingleReportType {
   return (
-    value === "side-by-side-individual" ||
+    value === "individual" ||
     value === "team" ||
     value === "side-by-side-rogaining" ||
     value === "side-by-side-relay" ||
@@ -38,7 +37,6 @@ export function isSingleReportType(value: string): value is SingleReportType {
     value === "rogaining-results" ||
     value === "rogaining-results-score" ||
     value === "rogaining-splits" ||
-    value === "military-individual" ||
     value === "military-relay" ||
     value === "military-team"
   );

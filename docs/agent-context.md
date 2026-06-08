@@ -19,7 +19,6 @@ Main user-facing reports:
 - `rogaining-results`
 - `rogaining-results-score`
 - `rogaining-splits`
-- `military-individual`
 - `military-relay`
 - `military-team`
 
@@ -72,6 +71,8 @@ Notable config areas:
 - `ignoredStatuses` controls result statuses skipped by parsers.
 - `leftLogo` and `rightLogo` optionally override PDF header logos; relative paths are resolved from the config file directory.
 - `genderMapping` maps class prefixes.
+- `individual.scoring` selects the individual scoring implementation: `side-by-side` or `military`.
+- `individual.classOrder`, `individual.teamResults`, `individual.teamFilterRegex`, `individual.classFilterRegex`, `individual.classOrderGroups`, `individual.reportTitle`, `individual.title`, and `individual.subtitle` control individual report layout/text independently from scoring.
 - `side-by-side.teamRules` controls regular team report composition.
 - `military` controls military point filters and grouping.
 - `rogaining.controlGateRule`, `rogaining.scorePoints`, `rogaining.scoreReport`, and `rogaining.resultsReport` control rogaining-specific reports.
@@ -96,7 +97,7 @@ CLI validations require:
 
 Watch mode is started with `iof-reports watch ...`.
 
-Watch accepts `--report side-by-side-individual` for the regular individual Пліч-о-пліч generator. This report supports an IOF XML with classes but no participants yet, matching the empty-input behavior of `military-individual`. The old `--report individual` name is not a watch-mode option. Watch also accepts `side-by-side-relay` and `side-by-side-rogaining`. PDF-only reports such as `military-team` and `side-by-side-summary` are not watch-mode options.
+Watch accepts `--report individual` for the individual generator. The scoring mode is selected by `individual.scoring` in config, and the report supports an IOF XML with classes but no participants yet. Watch also accepts `side-by-side-relay` and `side-by-side-rogaining`. PDF-only reports such as `military-team` and `side-by-side-summary` are not watch-mode options.
 
 Key files:
 
@@ -161,7 +162,7 @@ Other local directories seen in this workspace include `incoming`, `out`, `data`
 - Keep changes scoped to source, templates, config, docs, or tests relevant to the requested behavior.
 - Prefer existing report builder and template patterns over new abstractions.
 - When adding a report type, update `REPORT_TYPES`, CLI usage/validation, `generateReportHtml`, README, tests, and any watch-mode restrictions if applicable.
-- Keep regular Пліч-о-пліч individual/team/relay internals under the `side-by-side-*` module/template prefix while preserving existing CLI report values unless the external interface is intentionally changed.
+- Keep regular Пліч-о-пліч team/relay internals under the `side-by-side-*` module/template prefix. The individual report is shared by side-by-side and military scoring.
 - For user-visible Ukrainian text, match existing Ukrainian wording and typography.
 - Use structured XML parsing via `fast-xml-parser`; avoid ad hoc string parsing.
 - Before editing generated/compiled files under `dist`, check whether the project expects source-only changes plus `npm run build`.
