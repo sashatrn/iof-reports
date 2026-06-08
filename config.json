@@ -6,9 +6,9 @@
   "leftLogo": "",
   "rightLogo": "",
   "individual": {
-    "scoring": "side-by-side",
+    "scoring": "regular",
     "classOrder": "name",
-    "teamResults": "gender",
+    "teamResults": "none",
     "teamFilterRegex": ".*",
     "classFilterRegex": ".*",
     "classOrderGroups": [
@@ -21,7 +21,7 @@
         "classRegex": "ЗСУ"
       }
     ],
-    "reportTitle": "Заданий напрямок"
+    "reportTitle": "Індивідуальні результати"
   },
   "side-by-side": {
     "teamRules": {

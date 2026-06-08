@@ -23,9 +23,9 @@ type SideBySideConfig = {
   };
 };
 
-export type IndividualScoringType = "side-by-side" | "military";
+export type IndividualScoringType = "regular" | "side-by-side" | "military";
 export type IndividualClassOrderType = "name" | "grouped";
-export type IndividualTeamResultsType = "gender" | "grouped";
+export type IndividualTeamResultsType = "none" | "gender" | "grouped";
 
 type IndividualConfig = {
   scoring: IndividualScoringType;
@@ -157,9 +157,9 @@ const defaultConfig: AppConfig = {
   },
   ignoredStatuses: ["DidNotEnter"],
   individual: {
-    scoring: "side-by-side",
+    scoring: "regular",
     classOrder: "name",
-    teamResults: "gender",
+    teamResults: "none",
     teamFilterRegex: ".*",
     classFilterRegex: ".*",
     classOrderGroups: [
@@ -172,14 +172,7 @@ const defaultConfig: AppConfig = {
         classRegex: "ЗСУ",
       },
     ],
-    reportTitle: "Заданий напрямок",
-    title: `Всеукраїнські змагання<br/>
-        "Пліч-о-пліч всеукраїнські шкільні ліги зі спортивного орієнтування"<br/>
-        серед учнів закладів загальної середньої освіти<br/>
-        "РАЗОМ ПЕРЕМОЖЕМО"`,
-    subtitle: `Протокол загальнокомандних результатів змагань зі спортивного орієнтування<br/>
-        {{stage}} Пліч-о-пліч, Всеукраїнських шкільних ліг<br/>
-        {{region_of}}, {{year}} р.`,
+    reportTitle: "Індивідуальні результати",
   },
   "side-by-side": {
     teamRules: {

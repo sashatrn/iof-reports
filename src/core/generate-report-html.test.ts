@@ -196,51 +196,8 @@ function useConfiguredLogoConfig(): { leftLogo: string; rightLogo: string } {
   };
 }
 
-function useMilitaryIndividualScoringConfig(): void {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-reports-military-individual-"));
-  const configPath = path.join(tempDir, "config.json");
-
-  tempConfigDirs.push(tempDir);
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      individual: {
-        scoring: "military",
-        classOrder: "grouped",
-        teamResults: "grouped",
-        teamFilterRegex: ".*",
-        classFilterRegex: ".*",
-        classOrderGroups: [
-          {
-            name: "ВВНЗ",
-            classRegex: "ВВНЗ",
-          },
-          {
-            name: "ЗСУ",
-            classRegex: "ЗСУ",
-          },
-        ],
-        reportTitle: "Довга дистанція",
-        title:
-          "Відкритий Кубок Командувача Сухопутних військ ЗСУ<br/>зі спортивного орієнтування (бігом)",
-      },
-      military: {
-        teamFilterRegex: ".*",
-        classFilterRegex: ".*",
-        individualTeamGroups: [
-          {
-            name: "ВВНЗ",
-            classRegex: "ВВНЗ",
-          },
-          {
-            name: "ЗСУ",
-            classRegex: "ЗСУ",
-          },
-        ],
-      },
-    }),
-  );
-  setConfigPath(configPath);
+function useIndividualExampleConfig(name: "side-by-side" | "military"): void {
+  setConfigPath(path.resolve(__dirname, `../../config-individual-${name}.json`));
 }
 
 function expectOfficialSignatureImage(pdfHtml: string): void {
@@ -253,19 +210,17 @@ function countOfficialSignatureImages(pdfHtml: string): number {
   return pdfHtml.match(/class="official-signature-image"/g)?.length ?? 0;
 }
 
-describe("generateIndividualReportHtml with side-by-side scoring", () => {
+describe("generateIndividualReportHtml with regular scoring", () => {
   it("builds individual report html from IOF XML", () => {
     const report = generateIndividualReportHtml(sampleXml);
 
     expect(report.reportType).toBe("individual");
     expect(report.itemCount).toBeGreaterThan(0);
-    expect(report.viewHtml).toContain("Заданий напрямок");
+    expect(report.viewHtml).toContain("Індивідуальні результати");
     expect(report.viewHtml).toContain("Ч 5-6");
-    expect(report.pdfHtml).toContain("Заданий напрямок");
+    expect(report.pdfHtml).toContain("Індивідуальні результати");
     expect(report.viewHtml).not.toContain("Командні результати");
-    expect(report.pdfHtml).toContain("Командні результати");
-    expect(report.pdfHtml).toContain("<h4>Чоловіки</h4>");
-    expect(report.pdfHtml).toContain("<h4>Жінки</h4>");
+    expect(report.pdfHtml).not.toContain("Командні результати");
     expect(report.viewHtml).toContain('class="page"');
     expect(report.pdfHtml).toContain("@page");
   });
@@ -275,8 +230,8 @@ describe("generateIndividualReportHtml with side-by-side scoring", () => {
 
     expect(report.reportType).toBe("individual");
     expect(report.itemCount).toBe(0);
-    expect(report.viewHtml).toContain("Заданий напрямок");
-    expect(report.pdfHtml).toContain("Заданий напрямок");
+    expect(report.viewHtml).toContain("Індивідуальні результати");
+    expect(report.pdfHtml).toContain("Індивідуальні результати");
     expect(report.viewHtml).not.toContain("<tbody>");
   });
 
@@ -287,6 +242,19 @@ describe("generateIndividualReportHtml with side-by-side scoring", () => {
 
     expect(report.pdfHtml).toContain(logos.leftLogo);
     expect(report.pdfHtml).toContain(logos.rightLogo);
+  });
+});
+
+describe("generateIndividualReportHtml with side-by-side scoring", () => {
+  it("recreates the side-by-side individual report from the example config", () => {
+    useIndividualExampleConfig("side-by-side");
+
+    const report = generateIndividualReportHtml(sampleXml);
+
+    expect(report.viewHtml).toContain("Заданий напрямок");
+    expect(report.pdfHtml).toContain("Командні результати");
+    expect(report.pdfHtml).toContain("<h4>Чоловіки</h4>");
+    expect(report.pdfHtml).toContain("<h4>Жінки</h4>");
   });
 });
 
@@ -392,7 +360,7 @@ describe("generateSideBySideSummaryReportHtml", () => {
 
 describe("generateIndividualReportHtml with military scoring", () => {
   it("builds military individual report html from IOF XML", () => {
-    useMilitaryIndividualScoringConfig();
+    useIndividualExampleConfig("military");
 
     const report = generateIndividualReportHtml(sampleXml);
 
@@ -408,7 +376,7 @@ describe("generateIndividualReportHtml with military scoring", () => {
   });
 
   it("builds an empty military individual report when there are no participants yet", () => {
-    useMilitaryIndividualScoringConfig();
+    useIndividualExampleConfig("military");
 
     const report = generateIndividualReportHtml(emptyIndividualXml);
 
@@ -420,7 +388,7 @@ describe("generateIndividualReportHtml with military scoring", () => {
   });
 
   it("separates military individual team results by ВВНЗ and ЗСУ groups", () => {
-    useMilitaryIndividualScoringConfig();
+    useIndividualExampleConfig("military");
 
     const report = generateIndividualReportHtml(militaryLongXml);
 
@@ -430,7 +398,7 @@ describe("generateIndividualReportHtml with military scoring", () => {
   });
 
   it("orders military individual class tables by configured team groups", () => {
-    useMilitaryIndividualScoringConfig();
+    useIndividualExampleConfig("military");
 
     const report = generateIndividualReportHtml(militaryLongXml);
 
@@ -686,13 +654,13 @@ describe("configured PDF signatures", () => {
 });
 
 describe("generateReportsHtml", () => {
-  it("builds one combined side-by-side report for all mode", () => {
+  it("builds the default regular individual report for all mode", () => {
     const reports = generateReportsHtml(sampleXml, "all");
 
     expect(reports).toHaveLength(1);
     expect(reports[0].reportType).toBe("individual");
-    expect(reports[0].pdfHtml).toContain("Заданий напрямок");
-    expect(reports[0].pdfHtml).toContain("Командні результати");
+    expect(reports[0].pdfHtml).toContain("Індивідуальні результати");
+    expect(reports[0].pdfHtml).not.toContain("Командні результати");
   });
 });
 
@@ -701,8 +669,8 @@ describe("generateReportHtml", () => {
     const report = generateReportHtml(sampleXml, "individual");
 
     expect(report.reportType).toBe("individual");
-    expect(report.viewHtml).toContain("Заданий напрямок");
-    expect(report.pdfHtml).toContain("Заданий напрямок");
+    expect(report.viewHtml).toContain("Індивідуальні результати");
+    expect(report.pdfHtml).toContain("Індивідуальні результати");
   });
 
   it("dispatches to side-by-side relay report generator", () => {

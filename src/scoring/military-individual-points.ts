@@ -114,7 +114,7 @@ export function applyMilitaryIndividualPointsFromConfig(
 ): void {
   applyMilitaryIndividualPoints(
     participants,
-    config.military.teamFilterRegex,
-    config.military.classFilterRegex,
+    config.individual.teamFilterRegex,
+    config.individual.classFilterRegex,
   );
 }

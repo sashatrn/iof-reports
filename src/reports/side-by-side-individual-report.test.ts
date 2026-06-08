@@ -1,6 +1,12 @@
-import { describe, expect, it } from "vitest";
+import path from "path";
+import { afterEach, describe, expect, it } from "vitest";
+import { setConfigPath } from "../config";
 import { Participant } from "../io/parse-iof";
 import { buildIndividualHtml } from "./individual-report";
+
+afterEach(() => {
+  setConfigPath(undefined);
+});
 
 function expectInOrder(text: string, fragments: string[]): void {
   let previousIndex = -1;
@@ -179,6 +185,8 @@ describe("buildIndividualHtml", () => {
   });
 
   it("renders team results in the PDF variant when provided", () => {
+    setConfigPath(path.resolve(__dirname, "../../config-individual-side-by-side.json"));
+
     const html = buildIndividualHtml(
       [],
       new Date(2026, 3, 11),

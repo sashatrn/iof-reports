@@ -1,0 +1,22 @@
+{
+  "rightLogo": "src/assets/zhvi-logo.png",
+  "individual": {
+    "scoring": "military",
+    "classOrder": "grouped",
+    "teamResults": "grouped",
+    "teamFilterRegex": ".*",
+    "classFilterRegex": ".*",
+    "classOrderGroups": [
+      {
+        "name": "ВВНЗ",
+        "classRegex": "ВВНЗ"
+      },
+      {
+        "name": "ЗСУ",
+        "classRegex": "ЗСУ"
+      }
+    ],
+    "reportTitle": "Довга дистанція",
+    "title": "Відкритий Кубок Командувача Сухопутних військ ЗСУ<br/>зі спортивного орієнтування (бігом)"
+  }
+}

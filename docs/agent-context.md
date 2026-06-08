@@ -43,7 +43,7 @@ The package requires Node.js 18+. PDF rendering uses Playwright Chromium, so env
 - [src/report-types.ts](/Users/atrukhny/projects/my/iof-reports/src/report-types.ts): canonical report type list and type guards.
 - [src/core/generate-report-html.ts](/Users/atrukhny/projects/my/iof-reports/src/core/generate-report-html.ts): central dispatcher from XML plus options to generated report artifacts.
 
-Important behavior in `generateReportsHtml`: `--report all` generates one combined regular side-by-side `individual` report whose PDF includes both individual results and team standings. Explicit `--report team` still generates the standalone team report.
+Important behavior in `generateReportsHtml`: `--report all` generates the configured `individual` report. With the default `regular` scoring and `teamResults: none`, its PDF contains only individual results. Explicit `--report team` still generates the standalone side-by-side team report.
 
 ## Architecture
 
@@ -71,7 +71,7 @@ Notable config areas:
 - `ignoredStatuses` controls result statuses skipped by parsers.
 - `leftLogo` and `rightLogo` optionally override PDF header logos; relative paths are resolved from the config file directory.
 - `genderMapping` maps class prefixes.
-- `individual.scoring` selects the individual scoring implementation: `side-by-side` or `military`.
+- `individual.scoring` selects the individual scoring implementation: `regular`, `side-by-side`, or `military`. `regular` is the default and calculates rounded `1000 * leader time / participant time` points per class.
 - `individual.classOrder`, `individual.teamResults`, `individual.teamFilterRegex`, `individual.classFilterRegex`, `individual.classOrderGroups`, `individual.reportTitle`, `individual.title`, and `individual.subtitle` control individual report layout/text independently from scoring.
 - `side-by-side.teamRules` controls regular team report composition.
 - `military` controls military point filters and grouping.
@@ -162,7 +162,7 @@ Other local directories seen in this workspace include `incoming`, `out`, `data`
 - Keep changes scoped to source, templates, config, docs, or tests relevant to the requested behavior.
 - Prefer existing report builder and template patterns over new abstractions.
 - When adding a report type, update `REPORT_TYPES`, CLI usage/validation, `generateReportHtml`, README, tests, and any watch-mode restrictions if applicable.
-- Keep regular Пліч-о-пліч team/relay internals under the `side-by-side-*` module/template prefix. The individual report is shared by side-by-side and military scoring.
+- Keep Пліч-о-пліч team/relay internals under the `side-by-side-*` module/template prefix. The individual report is shared by regular, side-by-side, and military scoring.
 - For user-visible Ukrainian text, match existing Ukrainian wording and typography.
 - Use structured XML parsing via `fast-xml-parser`; avoid ad hoc string parsing.
 - Before editing generated/compiled files under `dist`, check whether the project expects source-only changes plus `npm run build`.

@@ -1,6 +1,7 @@
 import { type AppConfig, type IndividualScoringType } from "../config";
 import { type Participant } from "../io/parse-iof";
 import { applyMilitaryIndividualPointsFromConfig } from "./military-individual-points";
+import { applyRegularIndividualPoints } from "./regular-individual-points";
 import { applySideBySideIndividualPoints } from "./side-by-side-points";
 
 export type ApplyIndividualPoints = (
@@ -14,6 +15,10 @@ export type IndividualScoring = {
 };
 
 const individualScoringByType: Record<IndividualScoringType, IndividualScoring> = {
+  regular: {
+    type: "regular",
+    applyPoints: applyRegularIndividualPoints,
+  },
   "side-by-side": {
     type: "side-by-side",
     applyPoints: applySideBySideIndividualPoints,
@@ -29,7 +34,7 @@ export function getIndividualScoring(type: IndividualScoringType): IndividualSco
 
   if (!scoring) {
     throw new Error(
-      `Invalid individual.scoring "${type}". Expected side-by-side or military.`,
+      `Invalid individual.scoring "${type}". Expected regular, side-by-side, or military.`,
     );
   }
 

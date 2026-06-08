@@ -15,7 +15,7 @@ CLI-інструмент для перетворення результатів 
 
 Результати в протоколах розраховуються згідно правил національного проекту Пліч-о-пліч
 
-За замовчуванням side-by-side PDF формується одним файлом: індивідуальні результати та командний підсумок в одному протоколі.
+За замовчуванням індивідуальний протокол використовує scoring `regular`: `1000 × час лідера класу / час учасника`, з математичним округленням до цілого. Командний підсумок у цьому режимі не формується.
 
 ## Встановлення додатку
 
@@ -63,7 +63,7 @@ CLI-інструмент для перетворення результатів 
 - `iof-reports choice.xml --report side-by-side-rogaining --html view` - створити HTML-протокол вибору Пліч-о-пліч
 - `iof-reports long.xml --report side-by-side-summary --rogaining choice.xml --relay relay.xml` - створити загальнокомандний підсумок Пліч-о-пліч за індивідуальною, вибором та естафетою
 - `iof-reports --report side-by-side-summary --series individual=long.xml --series rogaining=choice.xml --series relay=relay.xml` - те саме через явний список джерел і порядок колонок
-- `iof-reports long.xml --report individual --config military-config.json --html view` - створити індивідуальний HTML-протокол з military-нарахуванням балів
+- `iof-reports long.xml --report individual --config config-individual-military.json --html view` - створити індивідуальний HTML-протокол з military-нарахуванням балів
 - `iof-reports relay.xml --report military-relay --html view` - створити військовий протокол естафети
 - `iof-reports long.xml --report military-team --relay relay.xml` - створити військовий загальнокомандний підсумок за довгою дистанцією та естафетою
 
@@ -96,7 +96,7 @@ iof-reports --report side-by-side-summary \
 Індивідуальний military-протокол очікує звичайний IOF XML з індивідуальними результатами:
 
 ```bash
-iof-reports results-long.xml --report individual --config military-config.json --html view
+iof-reports results-long.xml --report individual --config config-individual-military.json --html view
 ```
 
 Естафетний military-протокол очікує IOF XML з `TeamResult`:
@@ -111,7 +111,21 @@ iof-reports results-relay.xml --report military-relay --html view
 iof-reports results-long.xml --report military-team --relay results-relay.xml
 ```
 
-Тип нарахування балів для індивідуального протоколу вибирається в `config.json` у секції `individual`. Доступні значення: `side-by-side` та `military`:
+Тип нарахування балів для індивідуального протоколу вибирається в `config.json` у секції `individual`. Доступні значення: `regular`, `side-by-side` та `military`.
+
+Готові приклади конфігів:
+
+- `config-individual-regular.json` - scoring за часом лідера, без командного підсумку
+- `config-individual-side-by-side.json` - вигляд і підрахунок Пліч-о-пліч, близький до старого `side-by-side-individual`
+- `config-individual-military.json` - військовий вигляд і grouped-командний підсумок, близький до старого `military-individual`
+
+```bash
+iof-reports results.xml --report individual --config config-individual-regular.json
+iof-reports results.xml --report individual --config config-individual-side-by-side.json
+iof-reports results.xml --report individual --config config-individual-military.json
+```
+
+Приклад military-конфігурації:
 
 ```json
 {
@@ -151,9 +165,9 @@ iof-reports results-long.xml --report military-team --relay results-relay.xml
 }
 ```
 
-- `individual.scoring` - alias scoring-файлу з `src/scoring`: `side-by-side` або `military`.
+- `individual.scoring` - alias scoring-файлу з `src/scoring`: `regular`, `side-by-side` або `military`.
 - `individual.classOrder` - порядок класів: `name` за назвою або `grouped` за `individual.classOrderGroups`.
-- `individual.teamResults` - тип командного підсумку в PDF: `gender` або `grouped`.
+- `individual.teamResults` - тип командного підсумку в PDF: `none`, `gender` або `grouped`.
 - `individual.teamFilterRegex`, `individual.classFilterRegex` - фільтри для grouped-заліку в індивідуальному протоколі.
 - `individual.classOrderGroups` - групи для порядку класів і grouped-командного підсумку індивідуального протоколу.
 - `individual.reportTitle`, `individual.title`, `individual.subtitle` - тексти заголовка індивідуального протоколу. У `title` та `subtitle` підтримуються плейсхолдери `{{stage}}`, `{{region_of}}`, `{{year}}`.
