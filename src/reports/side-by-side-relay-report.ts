@@ -142,6 +142,10 @@ function getSideBySideRelayStatus(team: TeamIofTeam, stageCount: number): string
     return team.status;
   }
 
+  if (team.status === RELAY_INCOMPLETE_STATUS) {
+    return RELAY_INCOMPLETE_STATUS;
+  }
+
   const completedStageCount = getRelayCompletedStageCount(team);
 
   if (
@@ -362,8 +366,7 @@ export function buildSideBySideRelayTeamResults(
     }
 
     for (const [organisation, points] of pointsByOrganisationInClass.entries()) {
-      const bestPoints = [...points].sort((left, right) => right - left).slice(0, 2);
-      const classPoints = bestPoints.reduce((sum, point) => sum + point, 0);
+      const classPoints = Math.max(...points);
       pointsByOrganisation.set(
         organisation,
         (pointsByOrganisation.get(organisation) ?? 0) + classPoints,

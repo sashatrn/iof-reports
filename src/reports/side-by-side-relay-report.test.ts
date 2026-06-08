@@ -71,6 +71,39 @@ describe("buildSideBySideRelayClasses", () => {
     ]);
   });
 
+  it("keeps explicit relay did-not-finish status with side-by-side minimum points", () => {
+    const classes = buildSideBySideRelayClasses([
+      makeRelayTeam("Ж 5-6", "Фініш", "Гімназія", 3000, true, [1500, 1500]),
+      makeRelayTeam(
+        "Ж 5-6",
+        "Без фінішу",
+        "Ліцей",
+        2320,
+        false,
+        [2320, undefined],
+        "DidNotFinish",
+        ["OK", "DidNotFinish"],
+      ),
+    ]);
+
+    expect(classes[0].teams).toMatchObject([
+      {
+        teamName: "Фініш",
+        place: "1",
+        points: 200,
+        status: "OK",
+      },
+      {
+        teamName: "Без фінішу",
+        place: "",
+        points: 2,
+        status: "DidNotFinish",
+        rowStatus: "DidNotFinish",
+        stageTimes: ["38:40", "Не фінішував"],
+      },
+    ]);
+  });
+
   it("keeps active relay teams in view html but removes them from pdf html", () => {
     const teams = [
       makeRelayTeam("Ж 7-8", "Фініш", "Гімназія", 3000, true, [1000, 1000, 1000]),
@@ -293,7 +326,7 @@ describe("buildSideBySideRelayClasses", () => {
 });
 
 describe("buildSideBySideRelayTeamResults", () => {
-  it("sums only the two best side-by-side relay points by organisation in each class", () => {
+  it("sums only the best side-by-side relay team by organisation in each class", () => {
     const classes = buildSideBySideRelayClasses([
       makeRelayTeam("Ч 5-6", "Ліцей 1", "Ліцей 1", 3000),
       makeRelayTeam("Ч 5-6", "Ліцей 1-2", "Ліцей 1", 3100),
@@ -307,7 +340,7 @@ describe("buildSideBySideRelayTeamResults", () => {
           {
             place: 1,
             organisation: "Ліцей 1",
-            points: 1185,
+            points: 900,
           },
           {
             place: 2,
