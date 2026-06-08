@@ -9,7 +9,7 @@ Quick recovery notes for future Codex sessions in this repository.
 Main user-facing reports:
 
 - `individual` and `team`
-- `side-by-side-relay`
+- `relay`
 - `side-by-side-rogaining`
 - `side-by-side-summary`
 - `rogaining`
@@ -19,7 +19,6 @@ Main user-facing reports:
 - `rogaining-results`
 - `rogaining-results-score`
 - `rogaining-splits`
-- `military-relay`
 - `military-team`
 
 The README is in Ukrainian and is the source of truth for CLI examples and user-facing behavior.
@@ -73,6 +72,7 @@ Notable config areas:
 - `genderMapping` maps class prefixes.
 - `individual.scoring` selects the individual scoring implementation: `regular`, `side-by-side`, or `military`. `regular` is the default and calculates rounded `1000 * leader time / participant time` points per class.
 - `individual.classOrder`, `individual.teamResults`, `individual.teamFilterRegex`, `individual.classFilterRegex`, `individual.classOrderGroups`, `individual.reportTitle`, `individual.title`, and `individual.subtitle` control individual report layout/text independently from scoring.
+- `relay.scoring` selects `side-by-side` or `military`; both use the same live relay status/ranking pipeline. `relay.teamResults` selects `none`, `flat`, or `grouped`.
 - `side-by-side.teamRules` controls regular team report composition.
 - `military` controls military point filters and grouping.
 - `rogaining.controlGateRule`, `rogaining.scorePoints`, `rogaining.scoreReport`, and `rogaining.resultsReport` control rogaining-specific reports.
@@ -97,7 +97,7 @@ CLI validations require:
 
 Watch mode is started with `iof-reports watch ...`.
 
-Watch accepts `--report individual` for the individual generator. The scoring mode is selected by `individual.scoring` in config, and the report supports an IOF XML with classes but no participants yet. Watch also accepts `side-by-side-relay` and `side-by-side-rogaining`. PDF-only reports such as `military-team` and `side-by-side-summary` are not watch-mode options.
+Watch accepts `--report individual` and `--report relay`; their scoring modes are selected by `individual.scoring` and `relay.scoring`. Watch also accepts `side-by-side-rogaining`. PDF-only reports such as `military-team` and `side-by-side-summary` are not watch-mode options.
 
 Key files:
 
@@ -162,7 +162,7 @@ Other local directories seen in this workspace include `incoming`, `out`, `data`
 - Keep changes scoped to source, templates, config, docs, or tests relevant to the requested behavior.
 - Prefer existing report builder and template patterns over new abstractions.
 - When adding a report type, update `REPORT_TYPES`, CLI usage/validation, `generateReportHtml`, README, tests, and any watch-mode restrictions if applicable.
-- Keep Пліч-о-пліч team/relay internals under the `side-by-side-*` module/template prefix. The individual report is shared by regular, side-by-side, and military scoring.
+- Keep the shared `individual` and `relay` pipelines neutral; scoring-specific code belongs in `src/scoring`. The standalone Пліч-о-пліч team report keeps its `side-by-side-*` prefix.
 - For user-visible Ukrainian text, match existing Ukrainian wording and typography.
 - Use structured XML parsing via `fast-xml-parser`; avoid ad hoc string parsing.
 - Before editing generated/compiled files under `dist`, check whether the project expects source-only changes plus `npm run build`.

@@ -23,6 +23,18 @@
     ],
     "reportTitle": "Індивідуальні результати"
   },
+  "relay": {
+    "scoring": "side-by-side",
+    "teamResults": "flat",
+    "classOrder": "name",
+    "teamFilterRegex": ".*",
+    "classFilterRegex": ".*",
+    "classOrderGroups": [],
+    "reportTitle": "Естафета",
+    "organisationLabel": "Заклад освіти",
+    "teamResultsTitle": "Командні результати",
+    "showZeroPoints": false
+  },
   "side-by-side": {
     "teamRules": {
       "menCount": 3,

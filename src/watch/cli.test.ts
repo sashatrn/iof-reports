@@ -40,7 +40,7 @@ describe("parseWatchArgs", () => {
     expect(options.requestedReportType).toBe("individual");
   });
 
-  it("accepts side-by-side-relay in watch mode", () => {
+  it("accepts relay in watch mode", () => {
     const inputDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-watch-input-"));
     const outputDir = path.join(os.tmpdir(), "iof-watch-output");
 
@@ -54,13 +54,13 @@ describe("parseWatchArgs", () => {
         "--output-dir",
         outputDir,
         "--report",
-        "side-by-side-relay",
+        "relay",
       ],
       testLogger(),
     );
 
-    expect(options.reportType).toBe("side-by-side-relay");
-    expect(options.requestedReportType).toBe("side-by-side-relay");
+    expect(options.reportType).toBe("relay");
+    expect(options.requestedReportType).toBe("relay");
   });
 
   it("accepts side-by-side-rogaining in watch mode", () => {

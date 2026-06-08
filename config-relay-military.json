@@ -1,0 +1,25 @@
+{
+  "rightLogo": "src/assets/zhvi-logo.png",
+  "relay": {
+    "scoring": "military",
+    "teamResults": "grouped",
+    "classOrder": "grouped",
+    "teamFilterRegex": ".*",
+    "classFilterRegex": ".*",
+    "classOrderGroups": [
+      {
+        "name": "ВВНЗ",
+        "classRegex": "ВВНЗ"
+      },
+      {
+        "name": "ЗСУ",
+        "classRegex": "ЗСУ"
+      }
+    ],
+    "reportTitle": "Естафета",
+    "title": "Відкритий Кубок Командувача Сухопутних військ ЗСУ<br/>зі спортивного орієнтування (бігом)",
+    "organisationLabel": "ВВНЗ, військо",
+    "teamResultsTitle": "Загальнокомандний результат",
+    "showZeroPoints": true
+  }
+}

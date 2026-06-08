@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { type TeamIofTeam } from "../io/parse-team-iof";
 import {
-  buildSideBySideRelayClasses,
-  buildSideBySideRelayHtml,
-  buildSideBySideRelayTeamResults,
-} from "./side-by-side-relay-report";
+  buildFlatRelayTeamResults,
+  buildRelayClasses,
+  buildRelayHtml,
+} from "./relay-report";
 
 function getRowContaining(html: string, rowFragment: string): string {
   const fragmentIndex = html.indexOf(rowFragment);
@@ -20,9 +20,9 @@ function getRowContaining(html: string, rowFragment: string): string {
   return html.slice(rowStart, rowEnd + "</tr>".length);
 }
 
-describe("buildSideBySideRelayClasses", () => {
+describe("buildRelayClasses", () => {
   it("scores relay teams with side-by-side place points", () => {
-    const classes = buildSideBySideRelayClasses([
+    const classes = buildRelayClasses([
       makeRelayTeam("Ч 5-6", "Ліцей 1", "Ліцей 1", 3000),
       makeRelayTeam("Ч 5-6", "Ліцей 1-2", "Ліцей 1", 3100),
       makeRelayTeam("Ч 5-6", "Ліцей 2", "Ліцей 2", 3200),
@@ -48,7 +48,7 @@ describe("buildSideBySideRelayClasses", () => {
   });
 
   it("keeps partially completed relay teams on course without side-by-side points", () => {
-    const classes = buildSideBySideRelayClasses([
+    const classes = buildRelayClasses([
       makeRelayTeam("Ж 7-8", "Фініш", "Гімназія", 3000, true, [1000, 1000, 1000]),
       makeRelayTeam("Ж 7-8", "Два етапи", "Ліцей", 1900, false, [900, 1000]),
     ]);
@@ -71,8 +71,43 @@ describe("buildSideBySideRelayClasses", () => {
     ]);
   });
 
+  it("uses military scoring without changing the shared live relay logic", () => {
+    const classes = buildRelayClasses(
+      [
+        makeRelayTeam("Ч ВВНЗ", "ЖВІ - 1", "ЖВІ", 3000),
+        makeRelayTeam("Ч ВВНЗ", "ЖВІ - 2", "ЖВІ", 3100),
+        makeRelayTeam("Ч ВВНЗ", "НАСВ - 1", "НАСВ", 3200),
+        makeRelayTeam(
+          "Ч ВВНЗ",
+          "На дистанції",
+          "ВІТВ",
+          1000,
+          false,
+          [1000, undefined, undefined],
+          "DidNotFinish",
+          ["OK", "Active", "Inactive"],
+        ),
+      ],
+      undefined,
+      "military",
+    );
+
+    expect(classes[0].teams).toMatchObject([
+      { teamName: "ЖВІ - 1", place: "1", points: 126, status: "OK" },
+      { teamName: "ЖВІ - 2", place: "2", points: 0, status: "OK" },
+      { teamName: "НАСВ - 1", place: "3", points: 99, status: "OK" },
+      {
+        teamName: "На дистанції",
+        place: "",
+        points: 0,
+        status: "Active",
+        rowStatus: "ActiveWithResult",
+      },
+    ]);
+  });
+
   it("keeps explicit relay did-not-finish status with side-by-side minimum points", () => {
-    const classes = buildSideBySideRelayClasses([
+    const classes = buildRelayClasses([
       makeRelayTeam("Ж 5-6", "Фініш", "Гімназія", 3000, true, [1500, 1500]),
       makeRelayTeam(
         "Ж 5-6",
@@ -114,8 +149,8 @@ describe("buildSideBySideRelayClasses", () => {
       ], "OK", ["OK", "Active", "Inactive"]),
     ];
 
-    const viewHtml = buildSideBySideRelayHtml(teams, new Date(2026, 3, 11), "view");
-    const pdfHtml = buildSideBySideRelayHtml(teams, new Date(2026, 3, 11), "pdf");
+    const viewHtml = buildRelayHtml(teams, new Date(2026, 3, 11), "view");
+    const pdfHtml = buildRelayHtml(teams, new Date(2026, 3, 11), "pdf");
 
     expect(viewHtml).toContain("На дистанції");
     expect(pdfHtml).not.toContain("На дистанції");
@@ -144,7 +179,7 @@ describe("buildSideBySideRelayClasses", () => {
         "Inactive",
       ),
     ];
-    const classes = buildSideBySideRelayClasses(teams);
+    const classes = buildRelayClasses(teams);
 
     expect(classes[0].teams).toMatchObject([
       {
@@ -165,14 +200,14 @@ describe("buildSideBySideRelayClasses", () => {
         status: "Inactive",
       },
     ]);
-    expect(buildSideBySideRelayTeamResults(classes)).toEqual([
+    expect(buildFlatRelayTeamResults(classes)).toEqual([
       {
         place: 1,
         organisation: "Гімназія",
         points: 300,
       },
     ]);
-    const html = buildSideBySideRelayHtml(teams, new Date(2026, 3, 11), "view");
+    const html = buildRelayHtml(teams, new Date(2026, 3, 11), "view");
 
     expect(getRowContaining(html, "На дистанції")).toMatch(
       /<td><strong><\/strong><\/td>\s*<td>На дистанції<\/td>/,
@@ -184,7 +219,7 @@ describe("buildSideBySideRelayClasses", () => {
   });
 
   it("keeps fully inactive relay teams inactive even without stage times", () => {
-    const classes = buildSideBySideRelayClasses([
+    const classes = buildRelayClasses([
       makeRelayTeam(
         "Ж 9",
         "Неактивні",
@@ -206,7 +241,7 @@ describe("buildSideBySideRelayClasses", () => {
   });
 
   it("keeps stage cells empty for inactive relay members", () => {
-    const classes = buildSideBySideRelayClasses([
+    const classes = buildRelayClasses([
       makeRelayTeam(
         "Ж 9",
         "Неактивні",
@@ -223,7 +258,7 @@ describe("buildSideBySideRelayClasses", () => {
   });
 
   it("marks only active relay teams without finished stages as hideable active rows", () => {
-    const html = buildSideBySideRelayHtml(
+    const html = buildRelayHtml(
       [
         makeRelayTeam(
           "Ж 9",
@@ -255,7 +290,7 @@ describe("buildSideBySideRelayClasses", () => {
   });
 
   it("calculates active relay time behind from the active stage leader", () => {
-    const classes = buildSideBySideRelayClasses([
+    const classes = buildRelayClasses([
       makeRelayTeam(
         "Ж 9",
         "Лідер",
@@ -308,7 +343,7 @@ describe("buildSideBySideRelayClasses", () => {
   });
 
   it("renders stage columns from relay team member count", () => {
-    const html = buildSideBySideRelayHtml(
+    const html = buildRelayHtml(
       [
         makeRelayTeam("Ж 9", "Два етапи", "Ліцей", 1900, true, [900, 1000]),
       ],
@@ -325,9 +360,9 @@ describe("buildSideBySideRelayClasses", () => {
   });
 });
 
-describe("buildSideBySideRelayTeamResults", () => {
+describe("buildFlatRelayTeamResults", () => {
   it("sums only the best side-by-side relay team by organisation in each class", () => {
-    const classes = buildSideBySideRelayClasses([
+    const classes = buildRelayClasses([
       makeRelayTeam("Ч 5-6", "Ліцей 1", "Ліцей 1", 3000),
       makeRelayTeam("Ч 5-6", "Ліцей 1-2", "Ліцей 1", 3100),
       makeRelayTeam("Ч 5-6", "Ліцей 1-3", "Ліцей 1", 3150),
@@ -336,7 +371,7 @@ describe("buildSideBySideRelayTeamResults", () => {
       makeRelayTeam("Ч 5-6", "Ліцей 2", "Ліцей 2", 3200),
     ]);
 
-    expect(buildSideBySideRelayTeamResults(classes)).toEqual([
+    expect(buildFlatRelayTeamResults(classes)).toEqual([
           {
             place: 1,
             organisation: "Ліцей 1",

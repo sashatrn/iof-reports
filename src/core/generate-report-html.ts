@@ -5,8 +5,6 @@ import { parseIof } from "../io/parse-iof";
 import { parseTeamIof } from "../io/parse-team-iof";
 import { parseUofBaza } from "../io/parse-uof-baza";
 import {
-  buildMilitaryRelayClasses,
-  buildMilitaryRelayHtml,
   buildMilitaryTeamHtml,
   buildMilitaryTeamStandingGroups,
 } from "../reports/military-report";
@@ -24,10 +22,10 @@ import {
   buildRogainingSplitsHtml,
 } from "../reports/rogaining-report";
 import {
-  buildSideBySideRelayClasses,
-  buildSideBySideRelayHtml,
-  buildSideBySideRelayTeamResults,
-} from "../reports/side-by-side-relay-report";
+  buildFlatRelayTeamResults,
+  buildRelayClasses,
+  buildRelayHtml,
+} from "../reports/relay-report";
 import {
   buildSideBySideRogainingClasses,
   buildSideBySideRogainingHtml,
@@ -211,7 +209,7 @@ export function generateSideBySideRogainingReportHtml(
   };
 }
 
-export function generateSideBySideRelayReportHtml(
+export function generateRelayReportHtml(
   xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
@@ -219,12 +217,12 @@ export function generateSideBySideRelayReportHtml(
   const { teams, eventDate, eventName } = parseTeamResultsXml(xml, logger, true);
 
   return {
-    reportType: "side-by-side-relay",
-    viewHtml: buildSideBySideRelayHtml(teams, eventDate, "view"),
-    pdfHtml: buildSideBySideRelayHtml(teams, eventDate, "pdf"),
+    reportType: "relay",
+    viewHtml: buildRelayHtml(teams, eventDate, "view"),
+    pdfHtml: buildRelayHtml(teams, eventDate, "pdf"),
     eventName,
     eventDate: toIsoDate(eventDate),
-    itemCount: buildSideBySideRelayClasses(teams).flatMap((classGroup) => classGroup.teams).length,
+    itemCount: buildRelayClasses(teams).flatMap((classGroup) => classGroup.teams).length,
   };
 }
 
@@ -263,12 +261,12 @@ function buildSideBySideSummarySourceFromXml(
 
   if (input.type === "relay") {
     const { teams, eventDate, eventName } = parseTeamResultsXml(input.xml, logger, true);
-    const classes = buildSideBySideRelayClasses(teams.filter(isPdfVisibleRelayTeam));
+    const classes = buildRelayClasses(teams.filter(isPdfVisibleRelayTeam), undefined, "side-by-side");
 
     return {
       source: {
         type: input.type,
-        results: buildSideBySideRelayTeamResults(classes),
+        results: buildFlatRelayTeamResults(classes),
       },
       eventDate,
       eventName,
@@ -353,27 +351,6 @@ export function generateSideBySideSummaryReportHtml(
     eventName,
     eventDate: toIsoDate(eventDate),
     itemCount: standings.length,
-  };
-}
-
-export function generateMilitaryRelayReportHtml(
-  xml: string,
-  options: GenerateReportOptions = {},
-): GeneratedReport {
-  const { logger } = options;
-  const config = loadConfig();
-  const { teams, eventDate, eventName } = parseTeamResultsXml(xml, logger, true);
-
-  return {
-    reportType: "military-relay",
-    viewHtml: buildMilitaryRelayHtml(teams, eventDate, "view"),
-    pdfHtml: buildMilitaryRelayHtml(teams, eventDate, "pdf"),
-    eventName,
-    eventDate: toIsoDate(eventDate),
-    itemCount: buildMilitaryRelayClasses(
-      teams,
-      config.military.classFilterRegex,
-    ).flatMap((classGroup) => classGroup.teams).length,
   };
 }
 
@@ -610,8 +587,8 @@ export function generateReportHtml(
       return generateSideBySideTeamReportHtml(xml, options);
     case "side-by-side-rogaining":
       return generateSideBySideRogainingReportHtml(xml, options);
-    case "side-by-side-relay":
-      return generateSideBySideRelayReportHtml(xml, options);
+    case "relay":
+      return generateRelayReportHtml(xml, options);
     case "side-by-side-summary":
       return generateSideBySideSummaryReportHtml(xml, options);
     case "rogaining":
@@ -628,8 +605,6 @@ export function generateReportHtml(
       return generateRogainingResultsScoreReportHtml(xml, options);
     case "rogaining-splits":
       return generateRogainingSplitsReportHtml(xml, options);
-    case "military-relay":
-      return generateMilitaryRelayReportHtml(xml, options);
     case "military-team":
       return generateMilitaryTeamReportHtml(xml, options);
   }

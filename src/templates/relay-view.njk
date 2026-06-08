@@ -12,7 +12,7 @@
         <th>Місце</th>
         <th>Команда</th>
         <th>Учасники</th>
-        <th>Заклад освіти</th>
+        <th>{{ relay.organisationLabel }}</th>
         {% for stageNumber in stageNumbers %}
         <th>Етап&nbsp;{{ stageNumber }}</th>
         {% endfor %}
@@ -34,7 +34,7 @@
         {% endfor %}
         <td>{{ team.formattedTime }}</td>
         <td>{{ team.timeBehind }}</td>
-        <td><strong>{% if team.points > 0 %}{{ team.points }}{% endif %}</strong></td>
+        <td><strong>{% if relay.showZeroPoints or team.points > 0 %}{{ team.points }}{% endif %}</strong></td>
         <td>{{ team.status | statusLabel }}</td>
       </tr>
       {% endfor %}

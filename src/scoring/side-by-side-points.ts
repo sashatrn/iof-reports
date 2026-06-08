@@ -1,5 +1,6 @@
 import { type AppConfig } from "../config";
 import { type Participant } from "../io/parse-iof";
+import { type ApplyRelayPoints } from "./relay-scoring";
 
 export function pointsFromPosition(
   position: number | undefined,
@@ -25,3 +26,15 @@ export function applySideBySideIndividualPoints(
     participant.points = pointsFromPosition(participant.position, participant.status);
   }
 }
+
+export const applySideBySideRelayPoints: ApplyRelayPoints = (classes) => {
+  for (const classGroup of classes) {
+    for (const team of classGroup.teams) {
+      const place = team.place ? Number(team.place) : undefined;
+      team.points =
+        team.completedStageCount === 0
+          ? 0
+          : pointsFromPosition(place, team.status) * team.teamStageCount;
+    }
+  }
+};

@@ -1,0 +1,17 @@
+{
+  "rightLogo": "src/assets/logo2.png",
+  "relay": {
+    "scoring": "side-by-side",
+    "teamResults": "flat",
+    "classOrder": "name",
+    "teamFilterRegex": ".*",
+    "classFilterRegex": ".*",
+    "classOrderGroups": [],
+    "reportTitle": "Естафета",
+    "title": "Всеукраїнські змагання<br/>\"Пліч-о-пліч всеукраїнські шкільні ліги зі спортивного орієнтування\"<br/>серед учнів закладів загальної середньої освіти \"РАЗОМ ПЕРЕМОЖЕМО\"",
+    "subtitle": "Протокол загальнокомандних результатів змагань зі спортивного орієнтування<br/>{{stage}} Пліч-о-пліч, Всеукраїнських шкільних ліг<br/>{{region_of}}, {{year}} р.",
+    "organisationLabel": "Заклад освіти",
+    "teamResultsTitle": "Командні результати",
+    "showZeroPoints": false
+  }
+}

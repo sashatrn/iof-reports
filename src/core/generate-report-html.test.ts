@@ -6,8 +6,8 @@ import { setConfigPath } from "../config";
 import { imageToBase64 } from "../utils/image";
 import {
   generateIndividualReportHtml,
-  generateMilitaryRelayReportHtml,
   generateMilitaryTeamReportHtml,
+  generateRelayReportHtml,
   generateReportHtml,
   generateReportsHtml,
   generateRogainingAwardsReportHtml,
@@ -17,7 +17,6 @@ import {
   generateRogainingResultsScoreReportHtml,
   generateRogainingScoreReportHtml,
   generateRogainingSplitsReportHtml,
-  generateSideBySideRelayReportHtml,
   generateSideBySideRogainingReportHtml,
   generateSideBySideSummaryReportHtml,
   generateSideBySideTeamReportHtml,
@@ -280,11 +279,11 @@ describe("generateSideBySideTeamReportHtml", () => {
   });
 });
 
-describe("generateSideBySideRelayReportHtml", () => {
-  it("builds side-by-side relay report html from TeamResult IOF XML", () => {
-    const report = generateSideBySideRelayReportHtml(rogainingXml);
+describe("generateRelayReportHtml", () => {
+  it("builds relay report html from TeamResult IOF XML", () => {
+    const report = generateRelayReportHtml(rogainingXml);
 
-    expect(report.reportType).toBe("side-by-side-relay");
+    expect(report.reportType).toBe("relay");
     expect(report.itemCount).toBeGreaterThan(0);
     expect(report.viewHtml).toContain("Естафета");
     expect(report.viewHtml).toContain("<th>Учасники</th>");
@@ -294,10 +293,10 @@ describe("generateSideBySideRelayReportHtml", () => {
     expect(report.pdfHtml).toContain("@page");
   });
 
-  it("builds an empty side-by-side relay report when there are no teams yet", () => {
-    const report = generateSideBySideRelayReportHtml(emptyRelayXml);
+  it("builds an empty relay report when there are no teams yet", () => {
+    const report = generateRelayReportHtml(emptyRelayXml);
 
-    expect(report.reportType).toBe("side-by-side-relay");
+    expect(report.reportType).toBe("relay");
     expect(report.itemCount).toBe(0);
     expect(report.eventName).toBe("Естафета");
     expect(report.viewHtml).toContain("Естафета");
@@ -418,11 +417,12 @@ describe("generateIndividualReportHtml with military scoring", () => {
   });
 });
 
-describe("generateMilitaryRelayReportHtml", () => {
+describe("military relay config", () => {
   it("builds military relay report html from TeamResult IOF XML", () => {
-    const report = generateMilitaryRelayReportHtml(rogainingXml);
+    setConfigPath(path.resolve(__dirname, "../../config-relay-military.json"));
+    const report = generateRelayReportHtml(rogainingXml);
 
-    expect(report.reportType).toBe("military-relay");
+    expect(report.reportType).toBe("relay");
     expect(report.itemCount).toBeGreaterThan(0);
     expect(report.viewHtml).toContain("Естафета");
     expect(report.viewHtml).toContain("<th>Учасники</th>");
@@ -433,9 +433,10 @@ describe("generateMilitaryRelayReportHtml", () => {
   });
 
   it("builds an empty military relay report when there are no teams yet", () => {
-    const report = generateMilitaryRelayReportHtml(emptyRelayXml);
+    setConfigPath(path.resolve(__dirname, "../../config-relay-military.json"));
+    const report = generateRelayReportHtml(emptyRelayXml);
 
-    expect(report.reportType).toBe("military-relay");
+    expect(report.reportType).toBe("relay");
     expect(report.itemCount).toBe(0);
     expect(report.eventName).toBe("Естафета");
     expect(report.viewHtml).toContain("Естафета");
@@ -444,7 +445,8 @@ describe("generateMilitaryRelayReportHtml", () => {
   });
 
   it("marks military relay teams with problem statuses in view and pdf", () => {
-    const report = generateMilitaryRelayReportHtml(militaryRelayXml);
+    setConfigPath(path.resolve(__dirname, "../../config-relay-military.json"));
+    const report = generateRelayReportHtml(militaryRelayXml);
     const viewRow = expectRowContaining(report.viewHtml, "ЖВІ - 4");
     const pdfRow = expectRowContaining(report.pdfHtml, "ЖВІ - 4");
 
@@ -607,12 +609,12 @@ describe("configured PDF signatures", () => {
 
     const reports = [
       generateIndividualReportHtml(sampleXml),
-      generateSideBySideRelayReportHtml(rogainingXml),
+      generateRelayReportHtml(rogainingXml),
       generateSideBySideSummaryReportHtml(sampleXml, {
         rogainingXml: sideBySideRogainingXml,
         relayXml: rogainingXml,
       }),
-      generateMilitaryRelayReportHtml(rogainingXml),
+      generateRelayReportHtml(rogainingXml),
       generateMilitaryTeamReportHtml(militaryLongXml, { relayXml: militaryRelayXml }),
       generateRogainingReportHtml(rogainingXml),
       generateRogainingAwardsReportHtml(rogainingXml),
@@ -673,10 +675,10 @@ describe("generateReportHtml", () => {
     expect(report.pdfHtml).toContain("Індивідуальні результати");
   });
 
-  it("dispatches to side-by-side relay report generator", () => {
-    const report = generateReportHtml(rogainingXml, "side-by-side-relay");
+  it("dispatches to relay report generator", () => {
+    const report = generateReportHtml(rogainingXml, "relay");
 
-    expect(report.reportType).toBe("side-by-side-relay");
+    expect(report.reportType).toBe("relay");
     expect(report.viewHtml).toContain("Естафета");
   });
 
@@ -740,12 +742,13 @@ describe("generateReportHtml", () => {
   });
 
   it("dispatches to military reports", () => {
-    const relayReport = generateReportHtml(rogainingXml, "military-relay");
+    setConfigPath(path.resolve(__dirname, "../../config-relay-military.json"));
+    const relayReport = generateReportHtml(rogainingXml, "relay");
     const teamReport = generateReportHtml(sampleXml, "military-team", {
       relayXml: rogainingXml,
     });
 
-    expect(relayReport.reportType).toBe("military-relay");
+    expect(relayReport.reportType).toBe("relay");
     expect(teamReport.reportType).toBe("military-team");
   });
 });

@@ -33,12 +33,11 @@ const SERIES_TYPE_ALIASES = new Map<string, SideBySideSummarySourceType>([
   ["choice", "rogaining"],
   ["side-by-side-rogaining", "rogaining"],
   ["relay", "relay"],
-  ["side-by-side-relay", "relay"],
 ]);
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|team|side-by-side-rogaining|side-by-side-relay|side-by-side-summary|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-results|rogaining-results-score|rogaining-splits|military-relay|military-team] [--format pdf|docx] [--courses courses.xml] [--baza baza.xml] [--relay relay.xml] [--rogaining choice.xml] [--series individual=long.xml] [--html none|view|pdf] [--diploma-template off|on]",
+    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|team|side-by-side-rogaining|relay|side-by-side-summary|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-results|rogaining-results-score|rogaining-splits|military-team] [--format pdf|docx] [--courses courses.xml] [--baza baza.xml] [--relay relay.xml] [--rogaining choice.xml] [--series individual=long.xml] [--html none|view|pdf] [--diploma-template off|on]",
   );
 }
 
@@ -121,7 +120,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       if (!value || !REPORT_VALUES.has(value)) {
         logger.error(
           { report: value },
-          "Invalid report type. Expected one of: all, individual, team, side-by-side-rogaining, side-by-side-relay, side-by-side-summary, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-results, rogaining-results-score, rogaining-splits, military-relay, military-team.",
+          "Invalid report type. Expected one of: all, individual, team, side-by-side-rogaining, relay, side-by-side-summary, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-results, rogaining-results-score, rogaining-splits, military-team.",
         );
         printUsage(logger);
         process.exit(1);

@@ -26,6 +26,8 @@ type SideBySideConfig = {
 export type IndividualScoringType = "regular" | "side-by-side" | "military";
 export type IndividualClassOrderType = "name" | "grouped";
 export type IndividualTeamResultsType = "none" | "gender" | "grouped";
+export type RelayScoringType = "side-by-side" | "military";
+export type RelayTeamResultsType = "none" | "flat" | "grouped";
 
 type IndividualConfig = {
   scoring: IndividualScoringType;
@@ -37,6 +39,21 @@ type IndividualConfig = {
   reportTitle: string;
   title?: string;
   subtitle?: string;
+};
+
+type RelayConfig = {
+  scoring: RelayScoringType;
+  teamResults: RelayTeamResultsType;
+  classOrder: IndividualClassOrderType;
+  teamFilterRegex: string;
+  classFilterRegex: string;
+  classOrderGroups: ClassGroupConfig[];
+  reportTitle: string;
+  title?: string;
+  subtitle?: string;
+  organisationLabel: string;
+  teamResultsTitle: string;
+  showZeroPoints: boolean;
 };
 
 type OfficialPersonConfig = {
@@ -83,6 +100,7 @@ export type AppConfig = {
   leftLogo?: string;
   rightLogo?: string;
   individual: IndividualConfig;
+  relay: RelayConfig;
   "side-by-side": SideBySideConfig;
   military: {
     teamFilterRegex: string;
@@ -173,6 +191,18 @@ const defaultConfig: AppConfig = {
       },
     ],
     reportTitle: "Індивідуальні результати",
+  },
+  relay: {
+    scoring: "side-by-side",
+    teamResults: "flat",
+    classOrder: "name",
+    teamFilterRegex: ".*",
+    classFilterRegex: ".*",
+    classOrderGroups: [],
+    reportTitle: "Естафета",
+    organisationLabel: "Заклад освіти",
+    teamResultsTitle: "Командні результати",
+    showZeroPoints: false,
   },
   "side-by-side": {
     teamRules: {
@@ -593,6 +623,13 @@ export function loadConfig(configPath?: string): AppConfig {
         parsed.individual?.classOrderGroups ??
         parsed.military?.individualTeamGroups ??
         defaultConfig.individual.classOrderGroups,
+    },
+    relay: {
+      ...defaultConfig.relay,
+      ...parsed.relay,
+      classOrderGroups:
+        parsed.relay?.classOrderGroups ??
+        defaultConfig.relay.classOrderGroups,
     },
     rogaining: {
       ...defaultConfig.rogaining,
