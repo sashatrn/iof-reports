@@ -1,0 +1,53 @@
+{
+  "rightLogo": "src/assets/zhvi-logo.png",
+  "individual": {
+    "scoring": "military",
+    "classOrder": "grouped",
+    "teamResults": "grouped",
+    "teamFilterRegex": ".*",
+    "classFilterRegex": ".*",
+    "classOrderGroups": [
+      {
+        "name": "ВВНЗ",
+        "classRegex": "ВВНЗ"
+      },
+      {
+        "name": "ЗСУ",
+        "classRegex": "ЗСУ"
+      }
+    ],
+    "reportTitle": "Довга дистанція"
+  },
+  "relay": {
+    "scoring": "military",
+    "teamResults": "grouped",
+    "classOrder": "grouped",
+    "teamFilterRegex": ".*",
+    "classFilterRegex": ".*",
+    "classOrderGroups": [
+      {
+        "name": "ВВНЗ",
+        "classRegex": "ВВНЗ"
+      },
+      {
+        "name": "ЗСУ",
+        "classRegex": "ЗСУ"
+      }
+    ],
+    "reportTitle": "Естафета",
+    "organisationLabel": "ВВНЗ, військо",
+    "teamResultsTitle": "Загальнокомандний результат",
+    "showZeroPoints": true
+  },
+  "summaryTeam": {
+    "layout": "grouped",
+    "groupOrder": ["ВВНЗ", "ЗСУ"],
+    "reportTitle": "Командний підсумок",
+    "title": "Відкритий Кубок Командувача Сухопутних військ ЗСУ<br/>зі спортивного орієнтування (бігом)",
+    "sourceLabels": {
+      "individual": "Індивідуальні очки",
+      "relay": "Естафетні очки"
+    },
+    "showZeroPoints": true
+  }
+}

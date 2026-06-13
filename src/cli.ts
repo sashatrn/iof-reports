@@ -2,17 +2,15 @@ import fs from "fs";
 import path from "path";
 import { Logger } from "pino";
 import { ReportType, REPORT_TYPES } from "./report-types";
-import { type SideBySideSummarySourceType } from "./reports/side-by-side-summary-report";
+import { type SummaryTeamSourceType } from "./reports/summary-team-source";
 
 export type SeriesInputPath = {
-  type: SideBySideSummarySourceType;
+  type: SummaryTeamSourceType;
   path: string;
 };
 
 export type CliOptions = {
   inputPath: string;
-  relayInputPath?: string;
-  rogainingInputPath?: string;
   seriesInputPaths: SeriesInputPath[];
   configPath?: string;
   courseDataPath?: string;
@@ -27,17 +25,17 @@ const REPORT_VALUES = new Set<string>(REPORT_TYPES);
 const HTML_VALUES = new Set<string>(["none", "view", "pdf"]);
 const FORMAT_VALUES = new Set<string>(["pdf", "docx"]);
 const DIPLOMA_TEMPLATE_VALUES = new Set<string>(["off", "on"]);
-const SERIES_TYPE_ALIASES = new Map<string, SideBySideSummarySourceType>([
+const SERIES_TYPE_ALIASES = new Map<string, SummaryTeamSourceType>([
   ["individual", "individual"],
-  ["rogaining", "rogaining"],
-  ["choice", "rogaining"],
-  ["side-by-side-rogaining", "rogaining"],
+  ["rogaining", "side-by-side-rogaining"],
+  ["choice", "side-by-side-rogaining"],
+  ["side-by-side-rogaining", "side-by-side-rogaining"],
   ["relay", "relay"],
 ]);
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|team|side-by-side-rogaining|relay|side-by-side-summary|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-results|rogaining-results-score|rogaining-splits|military-team] [--format pdf|docx] [--courses courses.xml] [--baza baza.xml] [--relay relay.xml] [--rogaining choice.xml] [--series individual=long.xml] [--html none|view|pdf] [--diploma-template off|on]",
+    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|team|side-by-side-rogaining|relay|summary-team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-results|rogaining-results-score|rogaining-splits] [--format pdf|docx] [--courses courses.xml] [--baza baza.xml] [--series individual=long.xml] [--html none|view|pdf] [--diploma-template off|on]",
   );
 }
 
@@ -77,7 +75,7 @@ function parseSeriesInputPath(value: string | undefined): SeriesInputPath {
 
   if (!sourceType) {
     throw new Error(
-      `Invalid --series type "${typeToken}". Expected individual, rogaining, or relay.`,
+      `Invalid --series type "${typeToken}". Expected individual, side-by-side-rogaining, or relay.`,
     );
   }
 
@@ -89,8 +87,6 @@ function parseSeriesInputPath(value: string | undefined): SeriesInputPath {
 
 export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
   let input: string | undefined;
-  let relayInputPath: string | undefined;
-  let rogainingInputPath: string | undefined;
   const seriesInputPaths: SeriesInputPath[] = [];
   let report: CliOptions["report"] = "all";
   let configPath: string | undefined;
@@ -120,7 +116,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       if (!value || !REPORT_VALUES.has(value)) {
         logger.error(
           { report: value },
-          "Invalid report type. Expected one of: all, individual, team, side-by-side-rogaining, relay, side-by-side-summary, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-results, rogaining-results-score, rogaining-splits, military-team.",
+          "Invalid report type. Expected one of: all, individual, team, side-by-side-rogaining, relay, summary-team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-results, rogaining-results-score, rogaining-splits.",
         );
         printUsage(logger);
         process.exit(1);
@@ -155,34 +151,6 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       }
 
       courseDataPath = path.resolve(process.cwd(), value);
-      i += 1;
-      continue;
-    }
-
-    if (arg === "--relay" || arg === "--relay-xml" || arg === "--team-xml") {
-      const value = argv[i + 1];
-
-      if (!value) {
-        logger.error("No relay/team IOF XML file provided for --relay.");
-        printUsage(logger);
-        process.exit(1);
-      }
-
-      relayInputPath = path.resolve(process.cwd(), value);
-      i += 1;
-      continue;
-    }
-
-    if (arg === "--rogaining" || arg === "--choice" || arg === "--choice-xml") {
-      const value = argv[i + 1];
-
-      if (!value) {
-        logger.error("No rogaining/choice IOF XML file provided for --rogaining.");
-        printUsage(logger);
-        process.exit(1);
-      }
-
-      rogainingInputPath = path.resolve(process.cwd(), value);
       i += 1;
       continue;
     }
@@ -270,7 +238,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
     process.exit(1);
   }
 
-  if (!input && !(report === "side-by-side-summary" && seriesInputPaths.length > 0)) {
+  if (!input && !(report === "summary-team" && seriesInputPaths.length > 0)) {
     logger.error("No XML file provided.");
     printUsage(logger);
     process.exit(1);
@@ -300,16 +268,6 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
     process.exit(1);
   }
 
-  if (rogainingInputPath && !fs.existsSync(rogainingInputPath)) {
-    logger.error({ path: rogainingInputPath }, "Rogaining/choice IOF XML file not found.");
-    process.exit(1);
-  }
-
-  if (relayInputPath && !fs.existsSync(relayInputPath)) {
-    logger.error({ path: relayInputPath }, "Relay/team IOF XML file not found.");
-    process.exit(1);
-  }
-
   for (const seriesInputPath of seriesInputPaths) {
     if (!fs.existsSync(seriesInputPath.path)) {
       logger.error({ path: seriesInputPath.path }, "Series IOF XML file not found.");
@@ -329,16 +287,14 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
     process.exit(1);
   }
 
-  if (report === "military-team" && !relayInputPath) {
-    logger.error("military-team report requires --relay <relay.xml>.");
+  if (report === "summary-team" && seriesInputPaths.length === 0) {
+    logger.error("summary-team report requires at least one --series type=path.xml.");
     printUsage(logger);
     process.exit(1);
   }
 
   return {
     inputPath: absolutePath,
-    relayInputPath,
-    rogainingInputPath,
     seriesInputPaths,
     configPath,
     courseDataPath,

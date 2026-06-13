@@ -19,7 +19,7 @@ type SideBySideRogainingParticipant = {
   status: string;
 };
 
-type SideBySideRogainingClass = {
+export type SideBySideRogainingClass = {
   name: string;
   participants: SideBySideRogainingParticipant[];
 };

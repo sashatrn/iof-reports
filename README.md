@@ -38,13 +38,13 @@ CLI-інструмент для перетворення результатів 
 
 1. Відкрийте командний рядок Windows
 1. Виконайте `iof-reports <results.xml>`, де `<results.xml>` - IOF XML файл результатів.
-1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team`, `--report relay`, `--report side-by-side-rogaining`, `--report side-by-side-summary`, `--report rogaining`, `--report rogaining-awards`, `--report rogaining-diplomas`, `--report rogaining-score`, `--report rogaining-results`, `--report rogaining-splits` або `--report military-team`.
+1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team`, `--report relay`, `--report side-by-side-rogaining`, `--report summary-team`, `--report rogaining`, `--report rogaining-awards`, `--report rogaining-diplomas`, `--report rogaining-score`, `--report rogaining-results` або `--report rogaining-splits`.
 1. За потреби вкажіть інший файл конфігурації: `--config my-config.json`. За замовчуванням використовується `config.json` з поточної теки.
 1. За потреби виберіть формат файлу: `--format pdf` або `--format docx`. DOCX наразі підтримується для `rogaining-awards`.
 1. За потреби згенеруйте HTML-файл: `--html view` або `--html pdf`.
 1. Для `rogaining-diplomas` за потреби увімкніть друк фону диплома через `--diploma-template on`. За замовчуванням `off`.
 
-Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `relay`, `side-by-side-rogaining`, `side-by-side-summary`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`, `rogaining-score`, `rogaining-results`, `rogaining-results-score`, `rogaining-splits`, `military-team`.
+Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `relay`, `side-by-side-rogaining`, `summary-team`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`, `rogaining-score`, `rogaining-results`, `rogaining-results-score`, `rogaining-splits`.
 Доступні значення для `--html`: `none` (за замовчуванням), `view`, `pdf`.
 
 Приклади:
@@ -60,37 +60,33 @@ CLI-інструмент для перетворення результатів 
 - `iof-reports results.xml --report rogaining-awards --format docx` - створити редагований DOCX нагородного протоколу
 - `iof-reports relay.xml --report relay --config config-relay-side-by-side.json --html view` - створити естафетний HTML-протокол Пліч-о-пліч
 - `iof-reports choice.xml --report side-by-side-rogaining --html view` - створити HTML-протокол вибору Пліч-о-пліч
-- `iof-reports long.xml --report side-by-side-summary --rogaining choice.xml --relay relay.xml` - створити загальнокомандний підсумок Пліч-о-пліч за індивідуальною, вибором та естафетою
-- `iof-reports --report side-by-side-summary --series individual=long.xml --series rogaining=choice.xml --series relay=relay.xml` - те саме через явний список джерел і порядок колонок
+- `iof-reports --report summary-team --config config-summary-team-side-by-side.json --series individual=long.xml --series rogaining=choice.xml --series relay=relay.xml` - створити загальнокомандний підсумок Пліч-о-пліч
 - `iof-reports long.xml --report individual --config config-individual-military.json --html view` - створити індивідуальний HTML-протокол з military-нарахуванням балів
 - `iof-reports relay.xml --report relay --config config-relay-military.json --html view` - створити військовий протокол естафети
-- `iof-reports long.xml --report military-team --relay relay.xml` - створити військовий загальнокомандний підсумок за довгою дистанцією та естафетою
+- `iof-reports --report summary-team --config config-summary-team-military.json --series individual=long.xml --series relay=relay.xml` - створити військовий загальнокомандний підсумок
 
 Якщо є проблема з виводом кіриличних символів в консолі Windows, виконайте команду `chcp 65001` перед запуском додатку.
 
-## Підсумок Пліч-о-пліч
+## Командний підсумок
 
-`side-by-side-summary` формує PDF загальнокомандного підсумку за вибраними протоколами Пліч-о-пліч. За замовчуванням основний XML вважається індивідуальною дистанцією, а додаткові дистанції можна передати через `--rogaining` та `--relay`:
-
-```bash
-iof-reports long.xml --report side-by-side-summary --rogaining choice.xml --relay relay.xml
-```
-
-Якщо потрібно явно задати набір і порядок колонок, використовуйте `--series type=file.xml`. Підтримуються типи `individual`, `rogaining`, `relay` та повна назва `side-by-side-rogaining`:
+`summary-team` формує PDF командного підсумку з командних результатів вибраних звітів. Джерела та порядок колонок задаються повторюваним `--series type=file.xml`:
 
 ```bash
-iof-reports --report side-by-side-summary \
+iof-reports --report summary-team \
+  --config config-summary-team-side-by-side.json \
   --series individual=long.xml \
   --series rogaining=choice.xml \
   --series relay=relay.xml
 ```
+
+Підтримуються джерела `individual`, `side-by-side-rogaining` (`rogaining` або `choice` як короткі alias-и) та `relay`. Кожне джерело використовує власні scoring і `teamResults` з config. `summaryTeam.layout` визначає плоский (`flat`) або згрупований (`grouped`) підсумок.
 
 ## Military протоколи
 
 Для військових змагань індивідуальний протокол формується через `--report individual` з `individual.scoring: "military"` у конфігурації. Естафета формується через спільний `--report relay` з `relay.scoring: "military"`.
 
 - `relay` - протокол естафети; спосіб підрахунку та командний підсумок задаються в секції `relay`
-- `military-team` - загальнокомандний підсумок, який об'єднує індивідуальні та естафетні очки
+- `summary-team` з military-конфігом - загальнокомандний підсумок, який об'єднує індивідуальні та естафетні очки
 
 Індивідуальний military-протокол очікує звичайний IOF XML з індивідуальними результатами:
 
@@ -104,10 +100,12 @@ iof-reports results-long.xml --report individual --config config-individual-mili
 iof-reports results-relay.xml --report relay --config config-relay-military.json --html view
 ```
 
-Загальнокомандний military-протокол потребує два XML-файли: основний файл індивідуальної дистанції та файл естафети через `--relay`:
+Загальнокомандний military-протокол приймає обидва XML-файли через `--series`:
 
 ```bash
-iof-reports results-long.xml --report military-team --relay results-relay.xml
+iof-reports --report summary-team --config config-summary-team-military.json \
+  --series individual=results-long.xml \
+  --series relay=results-relay.xml
 ```
 
 Тип нарахування балів для індивідуального протоколу вибирається в `config.json` у секції `individual`. Доступні значення: `regular`, `side-by-side` та `military`.
@@ -119,6 +117,8 @@ iof-reports results-long.xml --report military-team --relay results-relay.xml
 - `config-individual-military.json` - військовий вигляд і grouped-командний підсумок, близький до старого `military-individual`
 - `config-relay-side-by-side.json` - підрахунок і плоский командний підсумок Пліч-о-пліч
 - `config-relay-military.json` - військовий підрахунок і grouped-командний підсумок
+- `config-summary-team-side-by-side.json` - плоский командний підсумок Пліч-о-пліч
+- `config-summary-team-military.json` - grouped військовий командний підсумок
 
 ```bash
 iof-reports results.xml --report individual --config config-individual-regular.json
@@ -126,6 +126,8 @@ iof-reports results.xml --report individual --config config-individual-side-by-s
 iof-reports results.xml --report individual --config config-individual-military.json
 iof-reports relay.xml --report relay --config config-relay-side-by-side.json
 iof-reports relay.xml --report relay --config config-relay-military.json
+iof-reports --report summary-team --config config-summary-team-side-by-side.json --series individual=long.xml --series relay=relay.xml
+iof-reports --report summary-team --config config-summary-team-military.json --series individual=long.xml --series relay=relay.xml
 ```
 
 Приклад military-конфігурації:
@@ -171,6 +173,8 @@ iof-reports relay.xml --report relay --config config-relay-military.json
 - `individual.scoring` - alias scoring-файлу з `src/scoring`: `regular`, `side-by-side` або `military`.
 - `relay.scoring` - alias scoring-файлу естафети: `side-by-side` або `military`.
 - `relay.teamResults` - формат командного підсумку: `none`, `flat` або `grouped`.
+- `summaryTeam.layout` - формат сумарного командного звіту: `flat` або `grouped`.
+- `summaryTeam.groupOrder`, `summaryTeam.sourceLabels`, `summaryTeam.reportTitle`, `summaryTeam.title`, `summaryTeam.subtitle` - порядок груп, назви колонок та заголовок сумарного звіту.
 - Для всіх `relay.scoring` використовується одна live-логіка статусів, місць і незавершених етапів.
 - `individual.classOrder` - порядок класів: `name` за назвою або `grouped` за `individual.classOrderGroups`.
 - `individual.teamResults` - тип командного підсумку в PDF: `none`, `gender` або `grouped`.

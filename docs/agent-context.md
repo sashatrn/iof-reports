@@ -11,7 +11,7 @@ Main user-facing reports:
 - `individual` and `team`
 - `relay`
 - `side-by-side-rogaining`
-- `side-by-side-summary`
+- `summary-team`
 - `rogaining`
 - `rogaining-awards`
 - `rogaining-diplomas`
@@ -19,7 +19,6 @@ Main user-facing reports:
 - `rogaining-results`
 - `rogaining-results-score`
 - `rogaining-splits`
-- `military-team`
 
 The README is in Ukrainian and is the source of truth for CLI examples and user-facing behavior.
 
@@ -73,6 +72,7 @@ Notable config areas:
 - `individual.scoring` selects the individual scoring implementation: `regular`, `side-by-side`, or `military`. `regular` is the default and calculates rounded `1000 * leader time / participant time` points per class.
 - `individual.classOrder`, `individual.teamResults`, `individual.teamFilterRegex`, `individual.classFilterRegex`, `individual.classOrderGroups`, `individual.reportTitle`, `individual.title`, and `individual.subtitle` control individual report layout/text independently from scoring.
 - `relay.scoring` selects `side-by-side` or `military`; both use the same live relay status/ranking pipeline. `relay.teamResults` selects `none`, `flat`, or `grouped`.
+- `summaryTeam` controls the shared `summary-team` report. It consumes repeated `--series` inputs and combines the configured team results exported by each source report.
 - `side-by-side.teamRules` controls regular team report composition.
 - `military` controls military point filters and grouping.
 - `rogaining.controlGateRule`, `rogaining.scorePoints`, `rogaining.scoreReport`, and `rogaining.resultsReport` control rogaining-specific reports.
@@ -88,8 +88,7 @@ CLI validations require:
 
 - `rogaining-splits`: `--courses <courses.xml>`
 - `rogaining-results`: `--baza <baza.xml>`
-- `military-team`: `--relay <relay.xml>`
-- `side-by-side-summary`: PDF-only report with optional companion XML files via `--rogaining`, `--relay`, or explicit repeated `--series type=file.xml`
+- `summary-team`: PDF-only report requiring at least one repeated `--series type=file.xml`
 
 `rogaining-results-score` also requires `bazaXml` in generation code, but normal CLI validation currently only enforces `--baza` for `rogaining-results`; verify this before changing related behavior.
 
@@ -97,7 +96,7 @@ CLI validations require:
 
 Watch mode is started with `iof-reports watch ...`.
 
-Watch accepts `--report individual` and `--report relay`; their scoring modes are selected by `individual.scoring` and `relay.scoring`. Watch also accepts `side-by-side-rogaining`. PDF-only reports such as `military-team` and `side-by-side-summary` are not watch-mode options.
+Watch accepts `--report individual` and `--report relay`; their scoring modes are selected by `individual.scoring` and `relay.scoring`. Watch also accepts `side-by-side-rogaining`. The PDF-only `summary-team` report is not a watch-mode option.
 
 Key files:
 

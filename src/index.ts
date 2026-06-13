@@ -39,8 +39,6 @@ async function main(): Promise<void> {
 
   const {
     inputPath,
-    relayInputPath,
-    rogainingInputPath,
     seriesInputPaths,
     courseDataPath,
     bazaPath,
@@ -54,8 +52,6 @@ async function main(): Promise<void> {
     {
       file: inputPath,
       configPath,
-      relayInputPath,
-      rogainingInputPath,
       seriesInputPaths,
       courseDataPath,
       bazaPath,
@@ -68,11 +64,9 @@ async function main(): Promise<void> {
   );
 
   const xml = fs.readFileSync(inputPath, "utf-8");
-  const relayXml = relayInputPath ? fs.readFileSync(relayInputPath, "utf-8") : undefined;
-  const rogainingXml = rogainingInputPath ? fs.readFileSync(rogainingInputPath, "utf-8") : undefined;
   const courseDataXml = courseDataPath ? fs.readFileSync(courseDataPath, "utf-8") : undefined;
   const bazaXml = bazaPath ? fs.readFileSync(bazaPath) : undefined;
-  const sideBySideSeriesXmls = seriesInputPaths.map((input) => ({
+  const summaryTeamSeriesXmls = seriesInputPaths.map((input) => ({
     type: input.type,
     xml: fs.readFileSync(input.path, "utf-8"),
   }));
@@ -81,9 +75,7 @@ async function main(): Promise<void> {
     includeDiplomaBackground: diplomaTemplate === "on",
     courseDataXml,
     bazaXml,
-    relayXml,
-    rogainingXml,
-    sideBySideSeriesXmls,
+    summaryTeamSeriesXmls,
   });
 
   for (const generatedReport of generatedReports) {

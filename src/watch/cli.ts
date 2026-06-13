@@ -81,8 +81,7 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
       if (
         value === "rogaining-results" ||
         value === "rogaining-results-score" ||
-        value === "military-team" ||
-        value === "side-by-side-summary"
+        value === "summary-team"
       ) {
         logger.error(`${value} is not supported in watch mode yet. Use the regular CLI with the required companion XML file.`);
         printUsage(logger);

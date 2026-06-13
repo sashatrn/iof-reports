@@ -4,10 +4,6 @@ import { parseCourseData } from "../io/parse-course-data";
 import { parseIof } from "../io/parse-iof";
 import { parseTeamIof } from "../io/parse-team-iof";
 import { parseUofBaza } from "../io/parse-uof-baza";
-import {
-  buildMilitaryTeamHtml,
-  buildMilitaryTeamStandingGroups,
-} from "../reports/military-report";
 import { buildIndividualHtml } from "../reports/individual-report";
 import {
   buildRogainingAwardsHtml,
@@ -21,27 +17,26 @@ import {
   buildRogainingSplitTeamEntries,
   buildRogainingSplitsHtml,
 } from "../reports/rogaining-report";
-import {
-  buildFlatRelayTeamResults,
-  buildRelayClasses,
-  buildRelayHtml,
-} from "../reports/relay-report";
+import { buildRelayClasses, buildRelayHtml } from "../reports/relay-report";
 import {
   buildSideBySideRogainingClasses,
   buildSideBySideRogainingHtml,
-  buildSideBySideRogainingTeamResults,
 } from "../reports/side-by-side-rogaining-report";
-import {
-  buildSideBySideSummaryHtml,
-  buildSideBySideSummaryStandings,
-  type SideBySideSummarySource,
-  type SideBySideSummarySourceType,
-} from "../reports/side-by-side-summary-report";
 import { buildSideBySideTeamHtml } from "../reports/side-by-side-team-report";
 import { isPdfVisibleParticipant, isPdfVisibleRelayTeam } from "../reports/pdf-status-filter";
 import { buildGenderIndividualTeamResults } from "../reports/individual-gender-team-results";
+import {
+  buildSummaryTeamHtml,
+  buildSummaryTeamStandingGroupsFromSources,
+  type SummaryTeamSource,
+} from "../reports/summary-team-report";
+import {
+  buildIndividualSummaryTeamGroups,
+  buildRelaySummaryTeamGroups,
+  buildRogainingSummaryTeamGroups,
+  type SummaryTeamSourceType,
+} from "../reports/summary-team-source";
 import { getIndividualScoring } from "../scoring/individual-scoring";
-import { applyMilitaryIndividualPoints } from "../scoring/military-individual-points";
 import { pointsFromPosition } from "../scoring/side-by-side-points";
 import { computeTeamResults } from "../scoring/side-by-side-team";
 import { ReportType, SingleReportType } from "../report-types";
@@ -62,10 +57,8 @@ type GenerateReportOptions = {
   includeDiplomaBackground?: boolean;
   courseDataXml?: string;
   bazaXml?: string | Buffer;
-  relayXml?: string;
-  rogainingXml?: string;
-  sideBySideSeriesXmls?: Array<{
-    type: SideBySideSummarySourceType;
+  summaryTeamSeriesXmls?: Array<{
+    type: SummaryTeamSourceType;
     xml: string;
   }>;
 };
@@ -226,34 +219,14 @@ export function generateRelayReportHtml(
   };
 }
 
-function mergeTeamResultPoints(
-  results: Array<{ organisation?: string; club?: string; points: number }>,
-): Array<{ organisation: string; points: number }> {
-  const pointsByOrganisation = new Map<string, number>();
-
-  for (const result of results) {
-    const organisation =
-      (result.organisation ?? result.club ?? "Unknown").trim() || "Unknown";
-    pointsByOrganisation.set(
-      organisation,
-      (pointsByOrganisation.get(organisation) ?? 0) + result.points,
-    );
-  }
-
-  return [...pointsByOrganisation.entries()].map(([organisation, points]) => ({
-    organisation,
-    points,
-  }));
-}
-
-function buildSideBySideSummarySourceFromXml(
+function buildSummaryTeamSourceFromXml(
   input: {
-    type: SideBySideSummarySourceType;
+    type: SummaryTeamSourceType;
     xml: string;
   },
   logger?: Logger,
 ): {
-  source: SideBySideSummarySource;
+  source: SummaryTeamSource;
   eventDate: Date;
   eventName?: string;
 } {
@@ -261,12 +234,12 @@ function buildSideBySideSummarySourceFromXml(
 
   if (input.type === "relay") {
     const { teams, eventDate, eventName } = parseTeamResultsXml(input.xml, logger, true);
-    const classes = buildRelayClasses(teams.filter(isPdfVisibleRelayTeam), undefined, "side-by-side");
+    const classes = buildRelayClasses(teams.filter(isPdfVisibleRelayTeam));
 
     return {
       source: {
         type: input.type,
-        results: buildFlatRelayTeamResults(classes),
+        groups: buildRelaySummaryTeamGroups(classes, config),
       },
       eventDate,
       eventName,
@@ -276,112 +249,53 @@ function buildSideBySideSummarySourceFromXml(
   const { participants, eventDate } = parseParticipantsXml(
     input.xml,
     logger,
-    pointsFromPosition,
+    () => 0,
     true,
   );
   const pdfParticipants = participants.filter(isPdfVisibleParticipant);
 
-  if (input.type === "rogaining") {
+  if (input.type === "side-by-side-rogaining") {
     const classes = buildSideBySideRogainingClasses(pdfParticipants);
 
     return {
       source: {
         type: input.type,
-        results: buildSideBySideRogainingTeamResults(classes),
+        groups: buildRogainingSummaryTeamGroups(classes),
       },
       eventDate,
     };
   }
 
-  const teamResults = pdfParticipants.length > 0
-    ? computeTeamResults(pdfParticipants, config, logger)
-    : { men: [], women: [] };
+  getIndividualScoring(config.individual.scoring).applyPoints(pdfParticipants, config);
 
   return {
     source: {
       type: input.type,
-      results: mergeTeamResultPoints([
-        ...teamResults.men.map((result) => ({
-          organisation: result.club,
-          points: result.points,
-        })),
-        ...teamResults.women.map((result) => ({
-          organisation: result.club,
-          points: result.points,
-        })),
-      ]),
+      groups: buildIndividualSummaryTeamGroups(pdfParticipants, config, logger),
     },
     eventDate,
   };
 }
 
-export function generateSideBySideSummaryReportHtml(
-  xml: string,
+export function generateSummaryTeamReportHtml(
+  _xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
-  const { logger } = options;
-  const inputs = options.sideBySideSeriesXmls?.length
-    ? options.sideBySideSeriesXmls
-    : [
-        { type: "individual" as const, xml },
-        ...(options.rogainingXml
-          ? [{ type: "rogaining" as const, xml: options.rogainingXml }]
-          : []),
-        ...(options.relayXml
-          ? [{ type: "relay" as const, xml: options.relayXml }]
-          : []),
-      ];
+  const { logger, summaryTeamSeriesXmls: inputs = [] } = options;
 
   if (inputs.length === 0) {
-    throw new Error("side-by-side-summary report requires at least one source XML file.");
+    throw new Error("summary-team report requires at least one --series source.");
   }
 
-  const parsedSources = inputs.map((input) => buildSideBySideSummarySourceFromXml(input, logger));
+  const parsedSources = inputs.map((input) => buildSummaryTeamSourceFromXml(input, logger));
   const eventDate = parsedSources[0].eventDate;
   const eventName = parsedSources.find((parsedSource) => parsedSource.eventName)?.eventName;
   const sources = parsedSources.map((parsedSource) => parsedSource.source);
-  const standings = buildSideBySideSummaryStandings(sources);
-  const html = buildSideBySideSummaryHtml(sources, eventDate);
+  const standingGroups = buildSummaryTeamStandingGroupsFromSources(sources);
+  const html = buildSummaryTeamHtml(sources, eventDate);
 
   return {
-    reportType: "side-by-side-summary",
-    viewHtml: html,
-    pdfHtml: html,
-    supportsView: false,
-    eventName,
-    eventDate: toIsoDate(eventDate),
-    itemCount: standings.length,
-  };
-}
-
-export function generateMilitaryTeamReportHtml(
-  individualXml: string,
-  options: GenerateReportOptions = {},
-): GeneratedReport {
-  const { logger, relayXml } = options;
-
-  if (!relayXml) {
-    throw new Error("military-team report requires a relay/team IOF XML file.");
-  }
-
-  const { participants, eventDate } = parseParticipantsXml(
-    individualXml,
-    logger,
-    pointsFromPosition,
-    true,
-  );
-  const config = loadConfig();
-  applyMilitaryIndividualPoints(
-    participants,
-    config.military.teamFilterRegex,
-    config.military.classFilterRegex,
-  );
-  const { teams: relayTeams, eventName } = parseTeamResultsXml(relayXml, logger, true);
-  const standingGroups = buildMilitaryTeamStandingGroups(participants, relayTeams);
-  const html = buildMilitaryTeamHtml(participants, relayTeams, eventDate);
-
-  return {
-    reportType: "military-team",
+    reportType: "summary-team",
     viewHtml: html,
     pdfHtml: html,
     supportsView: false,
@@ -589,8 +503,8 @@ export function generateReportHtml(
       return generateSideBySideRogainingReportHtml(xml, options);
     case "relay":
       return generateRelayReportHtml(xml, options);
-    case "side-by-side-summary":
-      return generateSideBySideSummaryReportHtml(xml, options);
+    case "summary-team":
+      return generateSummaryTeamReportHtml(xml, options);
     case "rogaining":
       return generateRogainingReportHtml(xml, options);
     case "rogaining-awards":
@@ -605,8 +519,6 @@ export function generateReportHtml(
       return generateRogainingResultsScoreReportHtml(xml, options);
     case "rogaining-splits":
       return generateRogainingSplitsReportHtml(xml, options);
-    case "military-team":
-      return generateMilitaryTeamReportHtml(xml, options);
   }
 }
 

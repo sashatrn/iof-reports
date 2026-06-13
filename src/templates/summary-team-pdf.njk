@@ -2,7 +2,10 @@
 
 {% block content %}
 
-{% if standings.length %}
+{% for group in standingGroups %}
+{% if group.name %}<h3>{{ group.name }}</h3>{% endif %}
+
+{% if group.standings.length %}
 <table>
   <thead>
     <tr>
@@ -15,12 +18,12 @@
     </tr>
   </thead>
   <tbody>
-    {% for standing in standings %}
+    {% for standing in group.standings %}
     <tr>
       <td class="place-cell"><strong>{{ standing.place }}</strong></td>
       <td>{{ standing.organisation }}</td>
       {% for sourcePoint in standing.sourcePoints %}
-      <td class="points-cell">{% if sourcePoint.points > 0 %}{{ sourcePoint.points }}{% endif %}</td>
+      <td class="points-cell">{% if summaryTeam.showZeroPoints or sourcePoint.points > 0 %}{{ sourcePoint.points }}{% endif %}</td>
       {% endfor %}
       <td class="points-cell"><strong>{{ standing.totalPoints }}</strong></td>
     </tr>
@@ -28,5 +31,6 @@
   </tbody>
 </table>
 {% endif %}
+{% endfor %}
 
 {% endblock %}

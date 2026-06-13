@@ -86,7 +86,7 @@ describe("parseWatchArgs", () => {
     expect(options.requestedReportType).toBe("side-by-side-rogaining");
   });
 
-  it("rejects side-by-side-summary in watch mode", () => {
+  it("rejects summary-team in watch mode", () => {
     const inputDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-watch-input-"));
     const outputDir = path.join(os.tmpdir(), "iof-watch-output");
     const exitSpy = vi
@@ -106,7 +106,7 @@ describe("parseWatchArgs", () => {
           "--output-dir",
           outputDir,
           "--report",
-          "side-by-side-summary",
+          "summary-team",
         ],
         testLogger(),
       ),

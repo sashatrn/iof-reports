@@ -28,6 +28,7 @@ export type IndividualClassOrderType = "name" | "grouped";
 export type IndividualTeamResultsType = "none" | "gender" | "grouped";
 export type RelayScoringType = "side-by-side" | "military";
 export type RelayTeamResultsType = "none" | "flat" | "grouped";
+export type SummaryTeamLayoutType = "flat" | "grouped";
 
 type IndividualConfig = {
   scoring: IndividualScoringType;
@@ -53,6 +54,16 @@ type RelayConfig = {
   subtitle?: string;
   organisationLabel: string;
   teamResultsTitle: string;
+  showZeroPoints: boolean;
+};
+
+type SummaryTeamConfig = {
+  layout: SummaryTeamLayoutType;
+  groupOrder: string[];
+  reportTitle: string;
+  title?: string;
+  subtitle?: string;
+  sourceLabels: Record<string, string>;
   showZeroPoints: boolean;
 };
 
@@ -101,6 +112,7 @@ export type AppConfig = {
   rightLogo?: string;
   individual: IndividualConfig;
   relay: RelayConfig;
+  summaryTeam: SummaryTeamConfig;
   "side-by-side": SideBySideConfig;
   military: {
     teamFilterRegex: string;
@@ -202,6 +214,17 @@ const defaultConfig: AppConfig = {
     reportTitle: "Естафета",
     organisationLabel: "Заклад освіти",
     teamResultsTitle: "Командні результати",
+    showZeroPoints: false,
+  },
+  summaryTeam: {
+    layout: "flat",
+    groupOrder: [],
+    reportTitle: "Командний підсумок",
+    sourceLabels: {
+      individual: "Індивідуальна",
+      "side-by-side-rogaining": "По вибору",
+      relay: "Естафета",
+    },
     showZeroPoints: false,
   },
   "side-by-side": {
@@ -630,6 +653,17 @@ export function loadConfig(configPath?: string): AppConfig {
       classOrderGroups:
         parsed.relay?.classOrderGroups ??
         defaultConfig.relay.classOrderGroups,
+    },
+    summaryTeam: {
+      ...defaultConfig.summaryTeam,
+      ...parsed.summaryTeam,
+      groupOrder:
+        parsed.summaryTeam?.groupOrder ??
+        defaultConfig.summaryTeam.groupOrder,
+      sourceLabels: {
+        ...defaultConfig.summaryTeam.sourceLabels,
+        ...parsed.summaryTeam?.sourceLabels,
+      },
     },
     rogaining: {
       ...defaultConfig.rogaining,

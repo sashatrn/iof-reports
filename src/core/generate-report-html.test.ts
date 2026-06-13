@@ -6,7 +6,6 @@ import { setConfigPath } from "../config";
 import { imageToBase64 } from "../utils/image";
 import {
   generateIndividualReportHtml,
-  generateMilitaryTeamReportHtml,
   generateRelayReportHtml,
   generateReportHtml,
   generateReportsHtml,
@@ -18,7 +17,7 @@ import {
   generateRogainingScoreReportHtml,
   generateRogainingSplitsReportHtml,
   generateSideBySideRogainingReportHtml,
-  generateSideBySideSummaryReportHtml,
+  generateSummaryTeamReportHtml,
   generateSideBySideTeamReportHtml,
 } from "./generate-report-html";
 
@@ -322,14 +321,18 @@ describe("generateSideBySideRogainingReportHtml", () => {
   });
 });
 
-describe("generateSideBySideSummaryReportHtml", () => {
-  it("builds a side-by-side team summary from individual, rogaining and relay XML files", () => {
-    const report = generateSideBySideSummaryReportHtml(sampleXml, {
-      rogainingXml: sideBySideRogainingXml,
-      relayXml: rogainingXml,
+describe("generateSummaryTeamReportHtml", () => {
+  it("builds a team summary from configured report sources", () => {
+    setConfigPath(path.resolve(__dirname, "../../config-summary-team-side-by-side.json"));
+    const report = generateSummaryTeamReportHtml(sampleXml, {
+      summaryTeamSeriesXmls: [
+        { type: "individual", xml: sampleXml },
+        { type: "side-by-side-rogaining", xml: sideBySideRogainingXml },
+        { type: "relay", xml: rogainingXml },
+      ],
     });
 
-    expect(report.reportType).toBe("side-by-side-summary");
+    expect(report.reportType).toBe("summary-team");
     expect(report.supportsView).toBe(false);
     expect(report.itemCount).toBeGreaterThan(0);
     expect(report.pdfHtml).toContain('<th class="points-cell">В заданому напрямку</th>');
@@ -339,15 +342,16 @@ describe("generateSideBySideSummaryReportHtml", () => {
     expect(report.pdfHtml).toContain("@page");
   });
 
-  it("uses an explicit side-by-side series list when provided", () => {
-    const report = generateSideBySideSummaryReportHtml(sampleXml, {
-      sideBySideSeriesXmls: [
-        { type: "rogaining", xml: sideBySideRogainingXml },
+  it("uses the explicit series order", () => {
+    setConfigPath(path.resolve(__dirname, "../../config-summary-team-side-by-side.json"));
+    const report = generateSummaryTeamReportHtml(sampleXml, {
+      summaryTeamSeriesXmls: [
+        { type: "side-by-side-rogaining", xml: sideBySideRogainingXml },
         { type: "relay", xml: rogainingXml },
       ],
     });
 
-    expect(report.reportType).toBe("side-by-side-summary");
+    expect(report.reportType).toBe("summary-team");
     expect(report.pdfHtml).not.toContain('<th class="points-cell">В заданому напрямку</th>');
     expectInOrder(report.pdfHtml, [
       '<th class="points-cell">По вибору</th>',
@@ -460,13 +464,17 @@ describe("military relay config", () => {
   });
 });
 
-describe("generateMilitaryTeamReportHtml", () => {
-  it("builds military team summary html from individual and relay XML files", () => {
-    const report = generateMilitaryTeamReportHtml(militaryLongXml, {
-      relayXml: militaryRelayXml,
+describe("generateSummaryTeamReportHtml with military config", () => {
+  it("builds grouped military team summary from configured sources", () => {
+    setConfigPath(path.resolve(__dirname, "../../config-summary-team-military.json"));
+    const report = generateSummaryTeamReportHtml(militaryLongXml, {
+      summaryTeamSeriesXmls: [
+        { type: "individual", xml: militaryLongXml },
+        { type: "relay", xml: militaryRelayXml },
+      ],
     });
 
-    expect(report.reportType).toBe("military-team");
+    expect(report.reportType).toBe("summary-team");
     expect(report.supportsView).toBe(false);
     expect(report.itemCount).toBeGreaterThan(0);
     expect(report.pdfHtml).toContain("Командний підсумок");
@@ -476,18 +484,22 @@ describe("generateMilitaryTeamReportHtml", () => {
     expect(report.pdfHtml).toContain('<th class="points-cell">Естафетні очки</th>');
   });
 
-  it("requires relay/team XML", () => {
-    expect(() => generateMilitaryTeamReportHtml(sampleXml)).toThrow(
-      "relay/team IOF XML",
+  it("requires at least one series source", () => {
+    expect(() => generateSummaryTeamReportHtml(sampleXml)).toThrow(
+      "at least one --series source",
     );
   });
 
-  it("builds an empty military team summary when the relay XML has no teams yet", () => {
-    const report = generateMilitaryTeamReportHtml(emptyIndividualXml, {
-      relayXml: emptyRelayXml,
+  it("builds an empty grouped summary when all sources are empty", () => {
+    setConfigPath(path.resolve(__dirname, "../../config-summary-team-military.json"));
+    const report = generateSummaryTeamReportHtml(emptyIndividualXml, {
+      summaryTeamSeriesXmls: [
+        { type: "individual", xml: emptyIndividualXml },
+        { type: "relay", xml: emptyRelayXml },
+      ],
     });
 
-    expect(report.reportType).toBe("military-team");
+    expect(report.reportType).toBe("summary-team");
     expect(report.itemCount).toBe(0);
     expect(report.pdfHtml).toContain("Командний підсумок");
     expect(report.pdfHtml).not.toContain("<tbody>");
@@ -610,12 +622,12 @@ describe("configured PDF signatures", () => {
     const reports = [
       generateIndividualReportHtml(sampleXml),
       generateRelayReportHtml(rogainingXml),
-      generateSideBySideSummaryReportHtml(sampleXml, {
-        rogainingXml: sideBySideRogainingXml,
-        relayXml: rogainingXml,
+      generateSummaryTeamReportHtml(sampleXml, {
+        summaryTeamSeriesXmls: [
+          { type: "side-by-side-rogaining", xml: sideBySideRogainingXml },
+          { type: "relay", xml: rogainingXml },
+        ],
       }),
-      generateRelayReportHtml(rogainingXml),
-      generateMilitaryTeamReportHtml(militaryLongXml, { relayXml: militaryRelayXml }),
       generateRogainingReportHtml(rogainingXml),
       generateRogainingAwardsReportHtml(rogainingXml),
       generateRogainingSplitsReportHtml(rogainingXml, { courseDataXml: coursesXml }),
@@ -692,13 +704,15 @@ describe("generateReportHtml", () => {
     expect(report.viewHtml).toContain('Дистанція "За вибором"');
   });
 
-  it("dispatches to side-by-side summary report generator", () => {
-    const report = generateReportHtml(sampleXml, "side-by-side-summary", {
-      rogainingXml: sideBySideRogainingXml,
-      relayXml: rogainingXml,
+  it("dispatches to summary-team report generator", () => {
+    const report = generateReportHtml(sampleXml, "summary-team", {
+      summaryTeamSeriesXmls: [
+        { type: "side-by-side-rogaining", xml: sideBySideRogainingXml },
+        { type: "relay", xml: rogainingXml },
+      ],
     });
 
-    expect(report.reportType).toBe("side-by-side-summary");
+    expect(report.reportType).toBe("summary-team");
     expect(report.pdfHtml).toContain("Командний підсумок");
   });
 
@@ -741,14 +755,15 @@ describe("generateReportHtml", () => {
     expect(report.viewHtml).toContain("Спліти рогейну");
   });
 
-  it("dispatches to military reports", () => {
-    setConfigPath(path.resolve(__dirname, "../../config-relay-military.json"));
-    const relayReport = generateReportHtml(rogainingXml, "relay");
-    const teamReport = generateReportHtml(sampleXml, "military-team", {
-      relayXml: rogainingXml,
+  it("dispatches to grouped summary-team with military config", () => {
+    setConfigPath(path.resolve(__dirname, "../../config-summary-team-military.json"));
+    const teamReport = generateReportHtml(sampleXml, "summary-team", {
+      summaryTeamSeriesXmls: [
+        { type: "individual", xml: sampleXml },
+        { type: "relay", xml: rogainingXml },
+      ],
     });
 
-    expect(relayReport.reportType).toBe("relay");
-    expect(teamReport.reportType).toBe("military-team");
+    expect(teamReport.reportType).toBe("summary-team");
   });
 });

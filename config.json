@@ -35,6 +35,17 @@
     "teamResultsTitle": "Командні результати",
     "showZeroPoints": false
   },
+  "summaryTeam": {
+    "layout": "flat",
+    "groupOrder": [],
+    "reportTitle": "Командний підсумок",
+    "sourceLabels": {
+      "individual": "Індивідуальна",
+      "side-by-side-rogaining": "По вибору",
+      "relay": "Естафета"
+    },
+    "showZeroPoints": false
+  },
   "side-by-side": {
     "teamRules": {
       "menCount": 3,
