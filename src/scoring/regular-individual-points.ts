@@ -1,6 +1,8 @@
 import { type AppConfig } from "../config";
 import { type Participant } from "../io/parse-iof";
 
+const SCORE_BASE = 1000;
+
 export function applyRegularIndividualPoints(
   participants: Participant[],
   _config: AppConfig,
@@ -31,7 +33,7 @@ export function applyRegularIndividualPoints(
       participant.timeSec !== undefined &&
       participant.timeSec > 0 &&
       leaderTime !== undefined
-        ? Math.round((1000 * leaderTime) / participant.timeSec)
+        ? Math.round((SCORE_BASE * leaderTime) / participant.timeSec)
         : 0;
   }
 }
