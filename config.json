@@ -53,6 +53,7 @@
     }
   },
   "rogaining": {
+    "scoreClassMode": "promoted",
     "controlGateRule": {
       "enabled": true,
       "gateControl": "22",

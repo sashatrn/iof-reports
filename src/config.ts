@@ -120,6 +120,7 @@ export type AppConfig = {
     individualTeamGroups: MilitaryIndividualTeamGroupConfig[];
   };
   rogaining: {
+    scoreClassMode: "promoted" | "declared";
     controlGateRule: {
       enabled: boolean;
       gateControl: string;
@@ -248,6 +249,7 @@ const defaultConfig: AppConfig = {
     ],
   },
   rogaining: {
+    scoreClassMode: "promoted",
     controlGateRule: {
       enabled: false,
       gateControl: "22",

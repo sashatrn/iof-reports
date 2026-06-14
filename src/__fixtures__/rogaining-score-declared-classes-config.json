@@ -1,0 +1,15 @@
+{
+  "rogaining": {
+    "scoreClassMode": "declared",
+    "scorePoints": {
+      "adult": {
+        "1": 300,
+        "2": 250
+      },
+      "masters": {
+        "1": 90,
+        "2": 72
+      }
+    }
+  }
+}

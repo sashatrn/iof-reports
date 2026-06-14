@@ -603,6 +603,15 @@ function buildDeclaredRogainingClasses(
     .filter((classGroup) => classGroup.teams.length > 0);
 }
 
+function buildRogainingScoreClasses(
+  teams: TeamIofTeam[],
+  config: AppConfig,
+): RogainingClassGroup[] {
+  return config.rogaining.scoreClassMode === "declared"
+    ? buildDeclaredRogainingClasses(teams, config)
+    : buildRogainingClasses(teams, config);
+}
+
 function buildOpenRogainingResultsClasses(
   teams: TeamIofTeam[],
   config: AppConfig,
@@ -835,7 +844,7 @@ function createRogainingScoreEntries(
   config: AppConfig,
   options: { includeZeroPoints?: boolean } = {},
 ): RogainingScoreEntry[] {
-  return buildRogainingClasses(teams, config)
+  return buildRogainingScoreClasses(teams, config)
     .filter((classGroup) => classGroup.name !== AGGREGATE_OPEN_CLASS)
     .flatMap((classGroup) => {
       const pointsMap = getRogainingScorePointsMap(classGroup.name, config);
@@ -1813,7 +1822,7 @@ function buildRogainingResultsScoreClasses(
   const bazaIndex = buildBazaIndex(baza);
   const resultsReport = config.rogaining.resultsReport;
 
-  const eligibleClasses = buildRogainingClasses(teams, config)
+  const eligibleClasses = buildRogainingScoreClasses(teams, config)
     .filter((classGroup) => classGroup.name !== AGGREGATE_OPEN_CLASS)
     .filter((classGroup) => getRogainingScorePointsMap(classGroup.name, config) !== undefined);
 

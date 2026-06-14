@@ -6,6 +6,7 @@ import {
   buildRogainingAwardsHtml,
   buildRogainingDiplomasHtml,
   buildRogainingHtml,
+  buildRogainingScoreEntries,
   buildRogainingScoreHtml,
   buildRogainingSplitTeamEntries,
   buildRogainingSplitsHtml,
@@ -567,6 +568,55 @@ describe("buildRogainingScoreHtml", () => {
     expect(html).toMatch(/Ветеран учасник[\s\S]*<td>Ч \(рогейн\)<\/td>[\s\S]*<td class="score-doc-place-cell">1<\/td>[\s\S]*<td class="score-doc-points-cell">300<\/td>/);
     expect(html).toMatch(/Дорослий учасник[\s\S]*<td>Ч \(рогейн\)<\/td>[\s\S]*<td class="score-doc-place-cell">2<\/td>[\s\S]*<td class="score-doc-points-cell">250<\/td>/);
     expect(html).not.toContain("<td>Ч45 (рогейн)</td>");
+  });
+
+  it("can score teams only within their declared classes", () => {
+    setConfigPath(
+      path.resolve(__dirname, "../__fixtures__/rogaining-score-declared-classes-config.json"),
+    );
+    const teams: TeamIofTeam[] = [
+      {
+        className: "Ч",
+        teamName: "Відкритий",
+        organisation: "Київська",
+        members: ["Дорослий учасник"],
+        memberCount: 1,
+        score: 30,
+        penalty: 0,
+        totalScore: 30,
+        timeSec: 10000,
+        status: "OK",
+      },
+      {
+        className: "Ч45",
+        teamName: "Ветеран",
+        organisation: "Львівська",
+        members: ["Ветеран учасник"],
+        memberCount: 1,
+        score: 40,
+        penalty: 0,
+        totalScore: 40,
+        timeSec: 9000,
+        status: "OK",
+      },
+    ];
+
+    expect(buildRogainingScoreEntries(teams)).toEqual([
+      {
+        participantName: "Ветеран учасник",
+        region: "Львівська",
+        className: "Ч45",
+        place: "1",
+        points: 90,
+      },
+      {
+        participantName: "Дорослий учасник",
+        region: "Київська",
+        className: "Ч",
+        place: "1",
+        points: 300,
+      },
+    ]);
   });
 
   it("scores only masters when only masters score category is configured", () => {
