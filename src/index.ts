@@ -45,6 +45,7 @@ async function main(): Promise<void> {
     report,
     format,
     html,
+    awards,
     diplomaTemplate,
   } = parseCliArgs(process.argv, logger);
 
@@ -58,6 +59,7 @@ async function main(): Promise<void> {
       report,
       format,
       html,
+      awards,
       diplomaTemplate,
     },
     "Reading XML file",
@@ -75,12 +77,17 @@ async function main(): Promise<void> {
     includeDiplomaBackground: diplomaTemplate === "on",
     courseDataXml,
     bazaXml,
+    awardsOnly: awards,
     summaryTeamSeriesXmls,
   });
 
   for (const generatedReport of generatedReports) {
+    const outputReportType = awards
+      ? `${generatedReport.reportType}-awards`
+      : generatedReport.reportType;
+
     writeHtmlOutputs(
-      generatedReport.reportType,
+      outputReportType,
       html,
       generatedReport.viewHtml,
       generatedReport.pdfHtml,
@@ -88,22 +95,12 @@ async function main(): Promise<void> {
     );
 
     if (format === "pdf") {
-      await htmlToPdf(generatedReport.pdfHtml, `${generatedReport.reportType}.pdf`);
+      await htmlToPdf(generatedReport.pdfHtml, `${outputReportType}.pdf`);
       logger.info(
-        `${generatedReport.reportType[0].toUpperCase()}${generatedReport.reportType.slice(1)} PDF generated`,
+        `${outputReportType[0].toUpperCase()}${outputReportType.slice(1)} PDF generated`,
       );
     }
 
-    if (format === "docx") {
-      if (!generatedReport.docx) {
-        throw new Error(`${generatedReport.reportType} does not support DOCX export yet.`);
-      }
-
-      fs.writeFileSync(`${generatedReport.reportType}.docx`, generatedReport.docx);
-      logger.info(
-        `${generatedReport.reportType[0].toUpperCase()}${generatedReport.reportType.slice(1)} DOCX generated`,
-      );
-    }
   }
 
   logger.info("Report generation completed successfully");

@@ -13,6 +13,13 @@ import {
   buildGroupedIndividualTeamResults,
   type GroupedIndividualTeamResults,
 } from "./individual-team-results";
+import {
+  type AwardsModeOptions,
+  filterAwardPlaces,
+  filterAwardTop,
+  isAwardPlace,
+  withAwardsSubtitle,
+} from "./awards-mode";
 
 type HtmlVariant = "view" | "pdf";
 
@@ -109,10 +116,14 @@ function renderIndividualTemplateText(
     .replaceAll("{{year}}", formatDate(eventDate, "yyyy"));
 }
 
-function buildEvent(eventDate: Date, config: AppConfig) {
+function buildEvent(
+  eventDate: Date,
+  config: AppConfig,
+  options: AwardsModeOptions = {},
+) {
   return {
     reportTitle: config.individual.reportTitle,
-    event: {
+    event: withAwardsSubtitle({
       title:
         config.reportHeader.title ??
         renderIndividualTemplateText(config.individual.title, eventDate, config),
@@ -125,7 +136,7 @@ function buildEvent(eventDate: Date, config: AppConfig) {
       date: formatDate(eventDate),
       logo1: getLeftLogo(config, "logo1.png"),
       logo2: config.rightLogo,
-    },
+    }, options),
     officials: config.officials,
   };
 }
@@ -158,11 +169,37 @@ function buildTeamResults(
   };
 }
 
+function filterAwardTeamResults(
+  teamResults: IndividualTeamResults | undefined,
+  options: AwardsModeOptions,
+): IndividualTeamResults | undefined {
+  if (!teamResults || !options.awardsOnly) {
+    return teamResults;
+  }
+
+  if (teamResults.mode === "gender") {
+    return {
+      mode: "gender",
+      men: filterAwardTop(teamResults.men, options),
+      women: filterAwardTop(teamResults.women, options),
+    };
+  }
+
+  return {
+    mode: "grouped",
+    groups: teamResults.groups.map((group) => ({
+      ...group,
+      teams: filterAwardPlaces(group.teams, (team) => team.place, options),
+    })),
+  };
+}
+
 export function buildIndividualHtml(
   participants: Participant[],
   eventDate: Date,
   variant: HtmlVariant = "pdf",
   genderTeamResults?: GenderIndividualTeamResults,
+  options: AwardsModeOptions = {},
 ): string {
   const config = loadConfig();
   const groupMatchers = buildClassGroupMatchers(config.individual.classOrderGroups);
@@ -195,16 +232,18 @@ export function buildIndividualHtml(
           timeBehind: formatTimeBehind(participant.timeBehindSec),
           points: participant.points,
           status: participant.status,
-        })),
+        }))
+        .filter((participant) => !options.awardsOnly || isAwardPlace(participant.position)),
     }));
+  const teamResults = buildTeamResults(
+    reportParticipants,
+    config,
+    genderTeamResults,
+  );
 
   return renderTemplate(`individual-${variant}.njk`, {
-    ...buildEvent(eventDate, config),
+    ...buildEvent(eventDate, config, options),
     classes,
-    teamResults: buildTeamResults(
-      reportParticipants,
-      config,
-      genderTeamResults,
-    ),
+    teamResults: filterAwardTeamResults(teamResults, options),
   });
 }

@@ -5,6 +5,11 @@ import { pointsFromPosition } from "../scoring/side-by-side-points";
 import { isPdfVisibleParticipant } from "./pdf-status-filter";
 import { formatDate } from "../utils/date";
 import { getLeftLogo, getRightLogo } from "./report-logos";
+import {
+  type AwardsModeOptions,
+  filterAwardPlaces,
+  withAwardsSubtitle,
+} from "./awards-mode";
 
 type HtmlVariant = "view" | "pdf";
 
@@ -209,12 +214,15 @@ export function buildSideBySideRogainingTeamResults(
     }));
 }
 
-function buildSideBySideEvent(eventDate: Date) {
+function buildSideBySideEvent(
+  eventDate: Date,
+  options: AwardsModeOptions = {},
+) {
   const config = loadConfig();
 
   return {
     reportTitle: 'Дистанція "За вибором"',
-    event: {
+    event: withAwardsSubtitle({
       title:
         config.reportHeader.title ??
         `Всеукраїнські змагання<br/>
@@ -227,7 +235,7 @@ function buildSideBySideEvent(eventDate: Date) {
       date: formatDate(eventDate),
       logo1: getLeftLogo(config, "logo1.png"),
       logo2: getRightLogo(config, "logo2.png"),
-    },
+    }, options),
     officials: config.officials,
   };
 }
@@ -236,14 +244,31 @@ export function buildSideBySideRogainingHtml(
   participants: Participant[],
   eventDate: Date,
   variant: HtmlVariant = "pdf",
+  options: AwardsModeOptions = {},
 ): string {
   const reportParticipants =
     variant === "pdf" ? participants.filter(isPdfVisibleParticipant) : participants;
   const classes = buildSideBySideRogainingClasses(reportParticipants);
+  const displayClasses = classes.map((classGroup) => ({
+    ...classGroup,
+    participants: filterAwardPlaces(
+      classGroup.participants,
+      (participant) => participant.position,
+      options,
+    ),
+  }));
+  const teamResults =
+    variant === "pdf"
+      ? filterAwardPlaces(
+          buildSideBySideRogainingTeamResults(classes),
+          (team) => team.place,
+          options,
+        )
+      : undefined;
 
   return renderTemplate(`side-by-side-rogaining-${variant}.njk`, {
-    ...buildSideBySideEvent(eventDate),
-    classes,
-    teamResults: variant === "pdf" ? buildSideBySideRogainingTeamResults(classes) : undefined,
+    ...buildSideBySideEvent(eventDate, options),
+    classes: displayClasses,
+    teamResults,
   });
 }

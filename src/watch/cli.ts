@@ -15,12 +15,13 @@ export type WatchOptions = {
   pollMs: number;
   settleMs: number;
   port: number;
+  awards: boolean;
   diplomaTemplate: "off" | "on";
 };
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <individual|individual-rogaining|team|side-by-side-rogaining|relay|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-splits> [--config config.json] [--courses courses.xml] [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
+    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <individual|individual-rogaining|team|side-by-side-rogaining|relay|rogaining|rogaining-diplomas|rogaining-score|rogaining-splits> [--awards] [--config config.json] [--courses courses.xml] [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
   );
 }
 
@@ -38,6 +39,7 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
   let pollMs = 3000;
   let settleMs = 1000;
   let port = 4173;
+  let awards = false;
   let diplomaTemplate: WatchOptions["diplomaTemplate"] = "off";
 
   for (let i = 3; i < argv.length; i += 1) {
@@ -72,7 +74,7 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
       if (!value || !isWatchReportType(value)) {
         logger.error(
           { report: value },
-          "Invalid watch report type. Expected one of: individual, individual-rogaining, team, side-by-side-rogaining, relay, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-splits.",
+          "Invalid watch report type. Expected one of: individual, individual-rogaining, team, side-by-side-rogaining, relay, rogaining, rogaining-diplomas, rogaining-score, rogaining-splits.",
         );
         printUsage(logger);
         process.exit(1);
@@ -91,6 +93,11 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
       reportType = value;
       requestedReportType = value;
       i += 1;
+      continue;
+    }
+
+    if (arg === "--awards") {
+      awards = true;
       continue;
     }
 
@@ -196,6 +203,7 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
     pollMs,
     settleMs,
     port,
+    awards,
     diplomaTemplate,
   };
 }

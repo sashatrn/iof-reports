@@ -150,6 +150,9 @@
     {% endfor %}
     <div class="results-competition">{{ header.competitionName }}</div>
     <div class="results-title">{{ header.title }}</div>
+    {% if header.subtitle %}
+    <div class="results-program">{{ header.subtitle }}</div>
+    {% endif %}
     <div class="results-program">{{ header.programName }}</div>
   </div>
   <div class="logo-slot right">

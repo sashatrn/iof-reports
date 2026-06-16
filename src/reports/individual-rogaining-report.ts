@@ -5,6 +5,11 @@ import { formatDate } from "../utils/date";
 import { isPdfVisibleParticipant } from "./pdf-status-filter";
 import { getLeftLogo, getRightLogo } from "./report-logos";
 import { applyRogainingTimeLimit } from "./rogaining-time-limit";
+import {
+  type AwardsModeOptions,
+  filterAwardPlaces,
+  withAwardsSubtitle,
+} from "./awards-mode";
 
 type HtmlVariant = "view" | "pdf";
 
@@ -86,6 +91,7 @@ function buildClassParticipants(
 export function buildIndividualRogainingClasses(
   participants: Participant[],
   config = loadConfig(),
+  options: AwardsModeOptions = {},
 ): IndividualRogainingClass[] {
   const byClass = new Map<string, Participant[]>();
 
@@ -99,7 +105,11 @@ export function buildIndividualRogainingClasses(
     .sort((left, right) => left.localeCompare(right, "uk"))
     .map((className) => ({
       name: className,
-      participants: buildClassParticipants(byClass.get(className) ?? []),
+      participants: filterAwardPlaces(
+        buildClassParticipants(byClass.get(className) ?? []),
+        (participant) => participant.position,
+        options,
+      ),
     }));
 }
 
@@ -107,6 +117,7 @@ export function buildIndividualRogainingHtml(
   participants: Participant[],
   eventDate: Date,
   variant: HtmlVariant = "pdf",
+  options: AwardsModeOptions = {},
 ): string {
   const config = loadConfig();
   const reportParticipants =
@@ -114,7 +125,7 @@ export function buildIndividualRogainingHtml(
 
   return renderTemplate(`individual-rogaining-${variant}.njk`, {
     reportTitle: config.rogaining.reportTitle,
-    event: {
+    event: withAwardsSubtitle({
       title:
         config.reportHeader.title ??
         `Протокол результатів рогейну, ${formatDate(eventDate)}`,
@@ -123,8 +134,8 @@ export function buildIndividualRogainingHtml(
       date: formatDate(eventDate),
       logo1: getLeftLogo(config, "logo1.png"),
       logo2: getRightLogo(config, "irf-logo.png"),
-    },
+    }, options),
     officials: config.officials,
-    classes: buildIndividualRogainingClasses(reportParticipants, config),
+    classes: buildIndividualRogainingClasses(reportParticipants, config, options),
   });
 }

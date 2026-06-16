@@ -102,6 +102,12 @@
       text-transform: uppercase;
     }
 
+    .event-subtitle {
+      font-weight: 700;
+      color: var(--muted);
+      margin: 0 0 10px 0;
+    }
+
     .header-row {
       display: flex;
       justify-content: space-between;
@@ -224,6 +230,12 @@
           <div class="report-title">
             {{ reportTitle }}
           </div>
+
+          {% if event.subtitle %}
+          <div class="event-subtitle">
+            {{ event.subtitle | safe }}
+          </div>
+          {% endif %}
 
         </div>
         <div class="logo-slot right">

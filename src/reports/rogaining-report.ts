@@ -3,11 +3,15 @@ import { AppConfig, loadConfig } from "../config";
 import { CourseControlPoint, ParsedCourseData } from "../io/parse-course-data";
 import { TeamIofSplit, TeamIofTeam } from "../io/parse-team-iof";
 import { ParsedUofBaza, UofBazaSportsman } from "../io/parse-uof-baza";
-import { DocxBlock, renderDocx } from "../render/docx";
 import { renderTemplate } from "../render/template-engine";
 import { isPdfVisibleTeam } from "./pdf-status-filter";
 import { formatDate } from "../utils/date";
 import { imageToBase64 } from "../utils/image";
+import {
+  type AwardsModeOptions,
+  filterAwardPlaces,
+  withAwardsSubtitle,
+} from "./awards-mode";
 import { getLeftLogo, getRightLogo } from "./report-logos";
 
 type HtmlVariant = "view" | "pdf";
@@ -296,10 +300,6 @@ function formatRogainingScoreDateText(date: Date): string {
   const monthName = getUkrainianMonthName(date.getMonth());
 
   return `з "${day}" по "${day}" ${monthName} ${date.getFullYear()} року`;
-}
-
-function stripHtml(value: string): string {
-  return value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
 function rankTeams(teams: TeamIofTeam[]): RankedRogainingTeam[] {
@@ -1630,12 +1630,17 @@ function sortRogainingSplitsTeams(teams: TeamIofTeam[]): RankedRogainingTeam[] {
 export function buildRogainingSplitTeamEntries(
   teams: TeamIofTeam[],
   courseData: ParsedCourseData,
+  options: AwardsModeOptions = {},
 ): RogainingSplitTeamEntry[] {
   const controlMap = buildCourseControlMap(courseData);
   const startControl = getStartControl(controlMap);
   const finishControl = getFinishControl(controlMap, startControl);
 
-  return sortRogainingSplitsTeams(teams).map((team) => {
+  return filterAwardPlaces(
+    sortRogainingSplitsTeams(teams),
+    (team) => team.place,
+    options,
+  ).map((team) => {
     const splitSequence = selectTeamSplitSequence(team);
     let previousControl = startControl;
     let previousTimeSec = 0;
@@ -1707,6 +1712,7 @@ export function buildRogainingHtml(
   eventDate: Date,
   eventName?: string,
   variant: HtmlVariant = "pdf",
+  options: AwardsModeOptions = {},
 ): string {
   const config = loadConfig();
   const normalizedTeams = applyRogainingRules(teams, config);
@@ -1716,11 +1722,14 @@ export function buildRogainingHtml(
 
   const classes = buildRogainingClasses(reportTeams, config).filter((classGroup) => {
     return variant === "view" || classGroup.name !== AGGREGATE_OPEN_CLASS;
-  });
+  }).map((classGroup) => ({
+    ...classGroup,
+    teams: filterAwardPlaces(classGroup.teams, (team) => team.place, options),
+  })).filter((classGroup) => classGroup.teams.length > 0);
 
   return renderTemplate(`rogaining-${variant}.njk`, {
     reportTitle: config.rogaining.reportTitle,
-    event: {
+    event: withAwardsSubtitle({
       title:
         config.reportHeader.title ??
         eventName ??
@@ -1731,7 +1740,7 @@ export function buildRogainingHtml(
       date: formatDate(eventDate),
       logo1: getLeftLogo(config, "logo1.png"),
       logo2: getRightLogo(config, "irf-logo.png"),
-    },
+    }, options),
     officials: config.officials,
     classes,
     showControlGateColumn: config.rogaining.controlGateRule.enabled,
@@ -1744,13 +1753,18 @@ export function buildRogainingScoreHtml(
   eventDate: Date,
   eventName?: string,
   variant: HtmlVariant = "pdf",
+  options: AwardsModeOptions = {},
 ): string {
   const config = loadConfig();
   const normalizedTeams = applyRogainingRules(teams, config);
   const allEntries = createRogainingScoreEntries(normalizedTeams, config, {
     includeZeroPoints: true,
   });
-  const entries = allEntries.filter((entry) => entry.points !== 0);
+  const entries = filterAwardPlaces(
+    allEntries.filter((entry) => entry.points !== 0),
+    (entry) => entry.place,
+    options,
+  );
   const regionScores = buildRogainingRegionScoreEntries(entries);
   const scoreReport = buildRogainingScoreReportInfo(
     config,
@@ -1767,6 +1781,7 @@ export function buildRogainingScoreHtml(
     showDefaultFooter: false,
     officials: config.officials,
     scoreReport,
+    awardsSubtitle: options.awardsOnly ? "Нагородний" : "",
     regionTables,
     entries,
   });
@@ -1778,6 +1793,7 @@ export function buildRogainingResultsHtml(
   eventDate: Date,
   eventName?: string,
   variant: HtmlVariant = "pdf",
+  options: AwardsModeOptions = {},
 ): string {
   const config = loadConfig();
   const normalizedTeams = applyRogainingRules(teams, config);
@@ -1799,17 +1815,19 @@ export function buildRogainingResultsHtml(
         baza.eventName ??
         `Протокол результатів рогейну, ${formatDate(eventDate)}`,
       title: resultsReport.title,
+      subtitle: options.awardsOnly ? "Нагородний" : "",
       programName: resultsReport.programName,
       date: formatDate(eventDate),
       location: config.reportHeader.location,
     },
     officials: config.officials,
-    classes: buildRogainingResultsClasses(normalizedTeams, baza, eventDate, config).map(
-      (classGroup) => ({
+    classes: buildRogainingResultsClasses(normalizedTeams, baza, eventDate, config)
+      .map((classGroup) => ({
         ...classGroup,
         formattedCourseRank: formatCourseRank(classGroup.courseRank),
-      }),
-    ),
+        teams: filterAwardPlaces(classGroup.teams, (team) => team.place, options),
+      }))
+      .filter((classGroup) => classGroup.teams.length > 0),
   });
 }
 
@@ -1884,6 +1902,7 @@ export function buildRogainingResultsScoreHtml(
   eventDate: Date,
   eventName?: string,
   variant: HtmlVariant = "pdf",
+  options: AwardsModeOptions = {},
 ): string {
   const config = loadConfig();
   const normalizedTeams = applyRogainingRules(teams, config);
@@ -1905,12 +1924,18 @@ export function buildRogainingResultsScoreHtml(
         baza.eventName ??
         `Протокол результатів рогейну, ${formatDate(eventDate)}`,
       title: resultsReport.title,
+      subtitle: options.awardsOnly ? "Нагородний" : "",
       programName: resultsReport.programName,
       date: formatDate(eventDate),
       location: config.reportHeader.location,
     },
     officials: config.officials,
-    classes: buildRogainingResultsScoreClasses(normalizedTeams, baza, eventDate, config),
+    classes: buildRogainingResultsScoreClasses(normalizedTeams, baza, eventDate, config)
+      .map((classGroup) => ({
+        ...classGroup,
+        teams: filterAwardPlaces(classGroup.teams, (team) => team.place, options),
+      }))
+      .filter((classGroup) => classGroup.teams.length > 0),
   });
 }
 
@@ -1920,15 +1945,16 @@ export function buildRogainingSplitsHtml(
   eventDate: Date,
   eventName?: string,
   variant: HtmlVariant = "pdf",
+  options: AwardsModeOptions = {},
 ): string {
   const config = loadConfig();
   const normalizedTeams = applyRogainingRules(teams, config);
-  const splitTeams = buildRogainingSplitTeamEntries(normalizedTeams, courseData);
+  const splitTeams = buildRogainingSplitTeamEntries(normalizedTeams, courseData, options);
   void variant;
 
   return renderTemplate("rogaining-splits-pdf.njk", {
     reportTitle: "Спліти рогейну",
-    event: {
+    event: withAwardsSubtitle({
       title:
         config.reportHeader.title ??
         eventName ??
@@ -1938,119 +1964,10 @@ export function buildRogainingSplitsHtml(
       date: formatDate(eventDate),
       logo1: getLeftLogo(config, "logo1.png"),
       logo2: getRightLogo(config, "irf-logo.png"),
-    },
+    }, options),
     officials: config.officials,
     teams: splitTeams,
   });
-}
-
-export function buildRogainingAwardsHtml(
-  teams: TeamIofTeam[],
-  eventDate: Date,
-  eventName?: string,
-  variant: HtmlVariant = "pdf",
-): string {
-  const config = loadConfig();
-  const normalizedTeams = applyRogainingRules(teams, config);
-  void variant;
-  const classes = buildAwardsClasses(normalizedTeams, config);
-
-  return renderTemplate("rogaining-awards-pdf.njk", {
-    reportTitle: "Нагородний протокол рогейну",
-    event: {
-      title:
-        config.reportHeader.title ??
-        eventName ??
-        `Нагородний протокол рогейну, ${formatDate(eventDate)}`,
-      subtitle: "",
-      location: config.reportHeader.location,
-      date: formatDate(eventDate),
-      logo1: getLeftLogo(config, "logo1.png"),
-      logo2: getRightLogo(config, "irf-logo.png"),
-    },
-    officials: config.officials,
-    classes,
-  });
-}
-
-export function buildRogainingAwardsDocx(
-  teams: TeamIofTeam[],
-  eventDate: Date,
-  eventName?: string,
-): Buffer {
-  const config = loadConfig();
-  const normalizedTeams = applyRogainingRules(teams, config);
-  const classes = buildAwardsClasses(normalizedTeams, config);
-  const eventTitle = stripHtml(
-    config.reportHeader.title ??
-      eventName ??
-      `Нагородний протокол рогейну, ${formatDate(eventDate)}`,
-  );
-  const blocks: DocxBlock[] = [
-    {
-      type: "paragraph",
-      text: eventTitle,
-      style: "title",
-    },
-    {
-      type: "paragraph",
-      text: "Нагородний протокол рогейну",
-      style: "subtitle",
-    },
-    {
-      type: "paragraph",
-      text: `${config.reportHeader.location}    ${formatDate(eventDate)}`,
-    },
-  ];
-
-  for (const classGroup of classes) {
-    blocks.push({
-      type: "paragraph",
-      text: classGroup.name,
-      style: "heading",
-    });
-    blocks.push({
-      type: "table",
-      columnWidths: [700, 2300, 1100, 4200, 2200, 900, 1200],
-      rows: [
-        [
-          { text: "Місце" },
-          { text: "Команда" },
-          { text: "Заявл. клас" },
-          { text: "Учасники" },
-          { text: "Регіон" },
-          { text: "Разом" },
-          { text: "Час" },
-        ],
-        ...classGroup.teams.map((team) => [
-          { text: team.place, bold: true },
-          { text: team.teamName, bold: true },
-          { text: team.sourceClassName },
-          { text: team.membersLine },
-          { text: team.organisation },
-          { text: String(team.totalScore), bold: true },
-          { text: team.formattedTime },
-        ]),
-      ],
-    });
-  }
-
-  blocks.push(
-    {
-      type: "paragraph",
-      text: "",
-    },
-    {
-      type: "paragraph",
-      text: `Головний суддя    ${config.officials.chiefJudge.name}`,
-    },
-    {
-      type: "paragraph",
-      text: `Головний секретар    ${config.officials.chiefSecretary.name}`,
-    },
-  );
-
-  return renderDocx(blocks, { orientation: "landscape" });
 }
 
 export function buildRogainingDiplomasHtml(

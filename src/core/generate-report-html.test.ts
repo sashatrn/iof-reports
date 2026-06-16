@@ -10,7 +10,6 @@ import {
   generateRelayReportHtml,
   generateReportHtml,
   generateReportsHtml,
-  generateRogainingAwardsReportHtml,
   generateRogainingDiplomasReportHtml,
   generateRogainingReportHtml,
   generateRogainingResultsReportHtml,
@@ -537,19 +536,17 @@ describe("generateRogainingReportHtml", () => {
     expect(report.viewHtml).toContain('class="page"');
     expect(report.pdfHtml).toContain("@page");
   });
-});
 
-describe("generateRogainingAwardsReportHtml", () => {
-  it("builds rogaining awards html from TeamResult IOF XML", () => {
-    const report = generateRogainingAwardsReportHtml(rogainingXml);
+  it("builds awards mode from the regular rogaining report", () => {
+    const regularReport = generateRogainingReportHtml(rogainingXml);
+    const awardsReport = generateRogainingReportHtml(rogainingXml, {
+      awardsOnly: true,
+    });
 
-    expect(report.reportType).toBe("rogaining-awards");
-    expect(report.itemCount).toBeGreaterThan(0);
-    expect(report.viewHtml).toContain("Нагородний протокол рогейну");
-    expect(report.viewHtml).toContain(">ALL</h3>");
-    expect(report.pdfHtml).toContain("Нагородний протокол рогейну");
-    expect(report.pdfHtml).toContain(">ALL</h3>");
-    expect(report.docx?.subarray(0, 2).toString()).toBe("PK");
+    expect(awardsReport.reportType).toBe("rogaining");
+    expect(awardsReport.pdfHtml).toContain("Нагородний");
+    expect(regularReport.pdfHtml).toContain('<td class="place-cell"><strong>4</strong></td>');
+    expect(awardsReport.pdfHtml).not.toContain('<td class="place-cell"><strong>4</strong></td>');
   });
 });
 
@@ -645,7 +642,6 @@ describe("configured PDF signatures", () => {
         ],
       }),
       generateRogainingReportHtml(rogainingXml),
-      generateRogainingAwardsReportHtml(rogainingXml),
       generateRogainingSplitsReportHtml(rogainingXml, { courseDataXml: coursesXml }),
     ];
 
@@ -747,13 +743,6 @@ describe("generateReportHtml", () => {
 
     expect(report.reportType).toBe("summary-team");
     expect(report.pdfHtml).toContain("Командний підсумок");
-  });
-
-  it("dispatches to rogaining awards report generator", () => {
-    const report = generateReportHtml(rogainingXml, "rogaining-awards");
-
-    expect(report.reportType).toBe("rogaining-awards");
-    expect(report.viewHtml).toContain("Нагородний протокол рогейну");
   });
 
   it("dispatches to rogaining diplomas report generator", () => {

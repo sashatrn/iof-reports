@@ -6,6 +6,11 @@ import { isPdfVisibleRelayTeam } from "./pdf-status-filter";
 import { formatDate } from "../utils/date";
 import { formatResultStatus } from "../utils/result-status";
 import { getLeftLogo } from "./report-logos";
+import {
+  type AwardsModeOptions,
+  filterAwardPlaces,
+  withAwardsSubtitle,
+} from "./awards-mode";
 
 type HtmlVariant = "view" | "pdf";
 
@@ -464,11 +469,15 @@ function renderRelayTemplateText(template: string | undefined, eventDate: Date, 
     .replaceAll("{{year}}", formatDate(eventDate, "yyyy"));
 }
 
-function buildRelayEvent(eventDate: Date, config: AppConfig) {
+function buildRelayEvent(
+  eventDate: Date,
+  config: AppConfig,
+  options: AwardsModeOptions = {},
+) {
 
   return {
     reportTitle: config.relay.reportTitle,
-    event: {
+    event: withAwardsSubtitle({
       title:
         config.reportHeader.title ??
         renderRelayTemplateText(config.relay.title, eventDate, config),
@@ -477,7 +486,7 @@ function buildRelayEvent(eventDate: Date, config: AppConfig) {
       date: formatDate(eventDate),
       logo1: getLeftLogo(config, "logo1.png"),
       logo2: config.rightLogo,
-    },
+    }, options),
     officials: config.officials,
   };
 }
@@ -486,6 +495,7 @@ export function buildRelayHtml(
   teams: TeamIofTeam[],
   eventDate: Date,
   variant: HtmlVariant = "pdf",
+  options: AwardsModeOptions = {},
 ): string {
   const reportTeams = variant === "pdf" ? teams.filter(isPdfVisibleRelayTeam) : teams;
   const config = loadConfig();
@@ -497,12 +507,30 @@ export function buildRelayHtml(
       : config.relay.teamResults === "grouped"
         ? { mode: "grouped", groups: buildGroupedRelayTeamResults(classes, config) }
         : undefined;
+  const displayClasses = classes.map((classGroup) => ({
+    ...classGroup,
+    teams: filterAwardPlaces(classGroup.teams, (team) => team.place, options),
+  }));
+  const displayTeamResults = !teamResults || !options.awardsOnly
+    ? teamResults
+    : teamResults.mode === "flat"
+      ? {
+          mode: "flat" as const,
+          teams: filterAwardPlaces(teamResults.teams ?? [], (team) => team.place, options),
+        }
+      : {
+          mode: "grouped" as const,
+          groups: (teamResults.groups ?? []).map((group) => ({
+            ...group,
+            teams: filterAwardPlaces(group.teams, (team) => team.place, options),
+          })),
+        };
 
   return renderTemplate(`relay-${variant}.njk`, {
-    ...buildRelayEvent(eventDate, config),
-    classes,
+    ...buildRelayEvent(eventDate, config, options),
+    classes: displayClasses,
     stageNumbers: getStageNumbers(stageCount),
-    teamResults,
+    teamResults: displayTeamResults,
     relay: config.relay,
   });
 }

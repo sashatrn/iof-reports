@@ -38,19 +38,21 @@ CLI-інструмент для перетворення результатів 
 
 1. Відкрийте командний рядок Windows
 1. Виконайте `iof-reports <results.xml>`, де `<results.xml>` - IOF XML файл результатів.
-1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report individual-rogaining`, `--report team`, `--report relay`, `--report side-by-side-rogaining`, `--report summary-team`, `--report rogaining`, `--report rogaining-awards`, `--report rogaining-diplomas`, `--report rogaining-score`, `--report rogaining-results` або `--report rogaining-splits`.
+1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report individual-rogaining`, `--report team`, `--report relay`, `--report side-by-side-rogaining`, `--report summary-team`, `--report rogaining`, `--report rogaining-diplomas`, `--report rogaining-score`, `--report rogaining-results` або `--report rogaining-splits`.
 1. За потреби вкажіть інший файл конфігурації: `--config my-config.json`. За замовчуванням використовується `config.json` з поточної теки.
-1. За потреби виберіть формат файлу: `--format pdf` або `--format docx`. DOCX наразі підтримується для `rogaining-awards`.
+1. За потреби виберіть формат файлу: `--format pdf`.
+1. Для нагородного PDF-протоколу додайте `--awards`: він використовує той самий PDF-шаблон, додає підзаголовок `Нагородний` і залишає тільки 1-3 місця.
 1. За потреби згенеруйте HTML-файл: `--html view` або `--html pdf`.
 1. Для `rogaining-diplomas` за потреби увімкніть друк фону диплома через `--diploma-template on`. За замовчуванням `off`.
 
-Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `individual-rogaining`, `team`, `relay`, `side-by-side-rogaining`, `summary-team`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`, `rogaining-score`, `rogaining-results`, `rogaining-results-score`, `rogaining-splits`.
+Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `individual-rogaining`, `team`, `relay`, `side-by-side-rogaining`, `summary-team`, `rogaining`, `rogaining-diplomas`, `rogaining-score`, `rogaining-results`, `rogaining-results-score`, `rogaining-splits`.
 Доступні значення для `--html`: `none` (за замовчуванням), `view`, `pdf`.
 
 Приклади:
 
 - `iof-reports results.xml --report rogaining --html view` - створити `rogaining.html` для перегляду
 - `iof-reports results.xml --report rogaining --html pdf` - створити `rogaining.pdf.html` для PDF-рендерингу
+- `iof-reports results.xml --report rogaining --awards` - створити `rogaining-awards.pdf` з першими трьома місцями
 - `iof-reports results.xml --report rogaining-diplomas` - створити PDF для друку на готові дипломи
 - `iof-reports results.xml --report rogaining-diplomas --diploma-template on` - створити дипломи разом із фоновим бланком у PDF
 - `iof-reports results.xml --report rogaining-score` - створити протокол балів учасників рогейну
@@ -58,7 +60,6 @@ CLI-інструмент для перетворення результатів 
 - `iof-reports results.xml --report rogaining-results --baza baza.xml` - створити офіційний протокол результатів рогейну з розрахунком виконаних розрядів
 - `iof-reports results.xml --report rogaining-splits --courses courses.xml` - створити протокол сплітів рогейну з відстанями між КП
 - `iof-reports results.xml --report individual-rogaining` - створити індивідуальний протокол рогейну з балами та штрафами з XML
-- `iof-reports results.xml --report rogaining-awards --format docx` - створити редагований DOCX нагородного протоколу
 - `iof-reports relay.xml --report relay --config config-relay-side-by-side.json --html view` - створити естафетний HTML-протокол Пліч-о-пліч
 - `iof-reports choice.xml --report side-by-side-rogaining --html view` - створити HTML-протокол вибору Пліч-о-пліч
 - `iof-reports --report summary-team --config config-summary-team-side-by-side.json --series individual=long.xml --series rogaining=choice.xml --series relay=relay.xml` - створити загальнокомандний підсумок Пліч-о-пліч
@@ -229,6 +230,7 @@ iof-reports watch \
 - `--report relay` - естафетний протокол для live-перегляду; тип нарахування балів задається через `relay.scoring`
 - `--report side-by-side-rogaining` - протокол вибору Пліч-о-пліч; учасники зі статусом `OK` сортуються за часом, `MissingPunch` - нижче за кількістю взятих КП і часом
 - `--report individual-rogaining` - індивідуальний протокол рогейну; показує бал до штрафу, штраф і підсумковий бал з XML, учасники зі статусом `OK` сортуються за підсумковим балом, потім за часом
+- `--awards` - нагородний режим для PDF-протоколу; додає підзаголовок `Нагородний` і залишає 1-3 місця
 - `--diploma-template off|on` - чи вкладати фон диплома в `rogaining-diplomas`
 - `--courses courses.xml` - файл `CourseData` для `rogaining-splits`
 - `--baza baza.xml` - файл бази УФО для `rogaining-results`; з нього беруться поточні кваліфікації, дати народження, регіони та тренери

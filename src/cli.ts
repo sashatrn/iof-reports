@@ -16,14 +16,15 @@ export type CliOptions = {
   courseDataPath?: string;
   bazaPath?: string;
   report: ReportType;
-  format: "pdf" | "docx";
+  format: "pdf";
   html: "none" | "view" | "pdf";
+  awards: boolean;
   diplomaTemplate: "off" | "on";
 };
 
 const REPORT_VALUES = new Set<string>(REPORT_TYPES);
 const HTML_VALUES = new Set<string>(["none", "view", "pdf"]);
-const FORMAT_VALUES = new Set<string>(["pdf", "docx"]);
+const FORMAT_VALUES = new Set<string>(["pdf"]);
 const DIPLOMA_TEMPLATE_VALUES = new Set<string>(["off", "on"]);
 const SERIES_TYPE_ALIASES = new Map<string, SummaryTeamSourceType>([
   ["individual", "individual"],
@@ -35,7 +36,7 @@ const SERIES_TYPE_ALIASES = new Map<string, SummaryTeamSourceType>([
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|individual-rogaining|team|side-by-side-rogaining|relay|summary-team|rogaining|rogaining-awards|rogaining-diplomas|rogaining-score|rogaining-results|rogaining-results-score|rogaining-splits] [--format pdf|docx] [--courses courses.xml] [--baza baza.xml] [--series individual=long.xml] [--html none|view|pdf] [--diploma-template off|on]",
+    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|individual-rogaining|team|side-by-side-rogaining|relay|summary-team|rogaining|rogaining-diplomas|rogaining-score|rogaining-results|rogaining-results-score|rogaining-splits] [--awards] [--format pdf] [--courses courses.xml] [--baza baza.xml] [--series individual=long.xml] [--html none|view|pdf] [--diploma-template off|on]",
   );
 }
 
@@ -94,6 +95,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
   let bazaPath: string | undefined;
   let format: CliOptions["format"] = "pdf";
   let html: CliOptions["html"] = "none";
+  let awards = false;
   let diplomaTemplate: CliOptions["diplomaTemplate"] = "off";
 
   for (let i = 2; i < argv.length; i += 1) {
@@ -116,7 +118,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       if (!value || !REPORT_VALUES.has(value)) {
         logger.error(
           { report: value },
-          "Invalid report type. Expected one of: all, individual, individual-rogaining, team, side-by-side-rogaining, relay, summary-team, rogaining, rogaining-awards, rogaining-diplomas, rogaining-score, rogaining-results, rogaining-results-score, rogaining-splits.",
+          "Invalid report type. Expected one of: all, individual, individual-rogaining, team, side-by-side-rogaining, relay, summary-team, rogaining, rogaining-diplomas, rogaining-score, rogaining-results, rogaining-results-score, rogaining-splits.",
         );
         printUsage(logger);
         process.exit(1);
@@ -182,6 +184,11 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       continue;
     }
 
+    if (arg === "--awards") {
+      awards = true;
+      continue;
+    }
+
     if (arg === "--html") {
       const value = argv[i + 1];
 
@@ -205,7 +212,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
       if (!value || !FORMAT_VALUES.has(value)) {
         logger.error(
           { format: value },
-          "Invalid format. Expected one of: pdf, docx.",
+          "Invalid format. Expected: pdf.",
         );
         printUsage(logger);
         process.exit(1);
@@ -302,6 +309,7 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
     report,
     format,
     html,
+    awards,
     diplomaTemplate,
   };
 }

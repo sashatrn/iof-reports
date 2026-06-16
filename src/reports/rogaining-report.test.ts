@@ -3,7 +3,6 @@ import { afterEach, describe, expect, it } from "vitest";
 import { setConfigPath } from "../config";
 import { TeamIofTeam } from "../io/parse-team-iof";
 import {
-  buildRogainingAwardsHtml,
   buildRogainingDiplomasHtml,
   buildRogainingHtml,
   buildRogainingScoreEntries,
@@ -806,8 +805,8 @@ describe("buildRogainingSplitsHtml", () => {
   });
 });
 
-describe("buildRogainingAwardsHtml", () => {
-  it("keeps only top three teams and sorts classes by youth, veterans, main, open with gender order", () => {
+describe("buildRogainingHtml awards mode", () => {
+  it("uses the regular report template with awards subtitle and only top three places", () => {
     const teams: TeamIofTeam[] = [
       {
         className: "Ч18",
@@ -967,21 +966,12 @@ describe("buildRogainingAwardsHtml", () => {
       },
     ];
 
-    const html = buildRogainingAwardsHtml(teams, new Date(2026, 3, 11), "Рогейн", "view");
+    const html = buildRogainingHtml(teams, new Date(2026, 3, 11), "Рогейн", "view", {
+      awardsOnly: true,
+    });
 
-    expectInOrder(html, [
-      "<h3>Ч55</h3>",
-      "<h3>Ж45</h3>",
-      "<h3>Мікси-старі</h3>",
-      "<h3>Ж18</h3>",
-      "<h3>Мікс18</h3>",
-      "<h3>Ч18</h3>",
-      "<h3>Ж</h3>",
-      "<h3>Мікси</h3>",
-      "<h3>Ч</h3>",
-      "<h3>ALL</h3>",
-    ]);
-
+    expect(html).toContain("Нагородний");
+    expect(html).toContain("<th>Команда</th>");
     const menOpenSection = getClassSection(html, "Ч");
     expect(menOpenSection).toContain(">1<");
     expect(menOpenSection).toContain(">2<");
@@ -989,7 +979,7 @@ describe("buildRogainingAwardsHtml", () => {
     expect(menOpenSection).not.toContain(">4<");
   });
 
-  it("applies control gate disqualification to awards without adding a gate column", () => {
+  it("applies control gate disqualification before filtering awards places", () => {
     const teams: TeamIofTeam[] = [
       {
         className: "Ч",
@@ -1019,11 +1009,12 @@ describe("buildRogainingAwardsHtml", () => {
       },
     ];
 
-    const html = buildRogainingAwardsHtml(teams, new Date(2026, 3, 11), "Рогейн", "pdf");
+    const html = buildRogainingHtml(teams, new Date(2026, 3, 11), "Рогейн", "pdf", {
+      awardsOnly: true,
+    });
 
     expect(html).toContain("Коректний вхід");
     expect(html).not.toContain("Порушник");
-    expect(html).not.toContain("КП 22");
   });
 });
 

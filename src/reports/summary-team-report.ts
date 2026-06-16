@@ -6,6 +6,11 @@ import {
   type SummaryTeamSourceGroup,
 } from "../scoring/summary-team";
 import { formatDate } from "../utils/date";
+import {
+  type AwardsModeOptions,
+  filterAwardPlaces,
+  withAwardsSubtitle,
+} from "./awards-mode";
 import { getLeftLogo } from "./report-logos";
 import { type SummaryTeamSourceType } from "./summary-team-source";
 
@@ -26,10 +31,14 @@ function renderTemplateText(
     .replaceAll("{{year}}", formatDate(eventDate, "yyyy"));
 }
 
-function buildEvent(eventDate: Date, config: AppConfig) {
+function buildEvent(
+  eventDate: Date,
+  config: AppConfig,
+  options: AwardsModeOptions = {},
+) {
   return {
     reportTitle: config.summaryTeam.reportTitle,
-    event: {
+    event: withAwardsSubtitle({
       title:
         config.reportHeader.title ??
         renderTemplateText(config.summaryTeam.title, eventDate, config),
@@ -38,7 +47,7 @@ function buildEvent(eventDate: Date, config: AppConfig) {
       date: formatDate(eventDate),
       logo1: getLeftLogo(config, "logo1.png"),
       logo2: config.rightLogo,
-    },
+    }, options),
     officials: config.officials,
   };
 }
@@ -85,21 +94,26 @@ export function buildSummaryTeamStandingGroupsFromSources(
 export function buildSummaryTeamHtml(
   sources: SummaryTeamSource[],
   eventDate: Date,
+  options: AwardsModeOptions = {},
 ): string {
   const config = loadConfig();
   const pointSources = buildPointSources(sources, config);
+  const standingGroups = buildSummaryTeamStandingGroups(
+    pointSources,
+    config.summaryTeam.layout,
+    config.summaryTeam.groupOrder,
+  ).map((group) => ({
+    ...group,
+    standings: filterAwardPlaces(group.standings, (standing) => standing.place, options),
+  })).filter((group) => group.standings.length > 0);
 
   return renderTemplate("summary-team-pdf.njk", {
-    ...buildEvent(eventDate, config),
+    ...buildEvent(eventDate, config, options),
     sources: pointSources.map((source) => ({
       key: source.key,
       label: source.label,
     })),
-    standingGroups: buildSummaryTeamStandingGroups(
-      pointSources,
-      config.summaryTeam.layout,
-      config.summaryTeam.groupOrder,
-    ),
+    standingGroups,
     summaryTeam: config.summaryTeam,
   });
 }

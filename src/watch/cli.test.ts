@@ -109,6 +109,29 @@ describe("parseWatchArgs", () => {
     expect(options.requestedReportType).toBe("individual-rogaining");
   });
 
+  it("accepts awards mode in watch mode", () => {
+    const inputDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-watch-input-"));
+    const outputDir = path.join(os.tmpdir(), "iof-watch-output");
+
+    const options = parseWatchArgs(
+      [
+        "node",
+        "dist/index.js",
+        "watch",
+        "--input-dir",
+        inputDir,
+        "--output-dir",
+        outputDir,
+        "--report",
+        "rogaining",
+        "--awards",
+      ],
+      testLogger(),
+    );
+
+    expect(options.awards).toBe(true);
+  });
+
   it("rejects summary-team in watch mode", () => {
     const inputDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-watch-input-"));
     const outputDir = path.join(os.tmpdir(), "iof-watch-output");

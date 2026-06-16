@@ -48,4 +48,26 @@ describe("parseCliArgs", () => {
 
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
+
+  it("accepts awards mode", () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-awards-"));
+    const inputPath = path.join(tempDir, "results.xml");
+    fs.writeFileSync(inputPath, "<ResultList />");
+
+    const options = parseCliArgs(
+      [
+        "node",
+        "dist/index.js",
+        inputPath,
+        "--report",
+        "rogaining",
+        "--awards",
+      ],
+      testLogger(),
+    );
+
+    expect(options.awards).toBe(true);
+
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
 });
