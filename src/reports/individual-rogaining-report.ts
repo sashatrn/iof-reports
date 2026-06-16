@@ -8,6 +8,7 @@ import { applyRogainingTimeLimit } from "./rogaining-time-limit";
 import {
   type AwardsModeOptions,
   filterAwardPlaces,
+  sortAwardClasses,
   withAwardsSubtitle,
 } from "./awards-mode";
 
@@ -101,7 +102,7 @@ export function buildIndividualRogainingClasses(
     byClass.set(participant.className, classParticipants);
   }
 
-  return [...byClass.keys()]
+  return sortAwardClasses([...byClass.keys()]
     .sort((left, right) => left.localeCompare(right, "uk"))
     .map((className) => ({
       name: className,
@@ -110,7 +111,7 @@ export function buildIndividualRogainingClasses(
         (participant) => participant.position,
         options,
       ),
-    }));
+    })), config.awards.classOrder, options);
 }
 
 export function buildIndividualRogainingHtml(

@@ -10,6 +10,7 @@ import { imageToBase64 } from "../utils/image";
 import {
   type AwardsModeOptions,
   filterAwardPlaces,
+  sortAwardClasses,
   withAwardsSubtitle,
 } from "./awards-mode";
 import { getLeftLogo, getRightLogo } from "./report-logos";
@@ -1720,12 +1721,12 @@ export function buildRogainingHtml(
     ? normalizedTeams.filter(isPdfVisibleTeam)
     : normalizedTeams;
 
-  const classes = buildRogainingClasses(reportTeams, config).filter((classGroup) => {
+  const classes = sortAwardClasses(buildRogainingClasses(reportTeams, config).filter((classGroup) => {
     return variant === "view" || classGroup.name !== AGGREGATE_OPEN_CLASS;
   }).map((classGroup) => ({
     ...classGroup,
     teams: filterAwardPlaces(classGroup.teams, (team) => team.place, options),
-  })).filter((classGroup) => classGroup.teams.length > 0);
+  })).filter((classGroup) => classGroup.teams.length > 0), config.awards.classOrder, options);
 
   return renderTemplate(`rogaining-${variant}.njk`, {
     reportTitle: config.rogaining.reportTitle,
@@ -1821,13 +1822,13 @@ export function buildRogainingResultsHtml(
       location: config.reportHeader.location,
     },
     officials: config.officials,
-    classes: buildRogainingResultsClasses(normalizedTeams, baza, eventDate, config)
+    classes: sortAwardClasses(buildRogainingResultsClasses(normalizedTeams, baza, eventDate, config)
       .map((classGroup) => ({
         ...classGroup,
         formattedCourseRank: formatCourseRank(classGroup.courseRank),
         teams: filterAwardPlaces(classGroup.teams, (team) => team.place, options),
       }))
-      .filter((classGroup) => classGroup.teams.length > 0),
+      .filter((classGroup) => classGroup.teams.length > 0), config.awards.classOrder, options),
   });
 }
 
@@ -1930,12 +1931,12 @@ export function buildRogainingResultsScoreHtml(
       location: config.reportHeader.location,
     },
     officials: config.officials,
-    classes: buildRogainingResultsScoreClasses(normalizedTeams, baza, eventDate, config)
+    classes: sortAwardClasses(buildRogainingResultsScoreClasses(normalizedTeams, baza, eventDate, config)
       .map((classGroup) => ({
         ...classGroup,
         teams: filterAwardPlaces(classGroup.teams, (team) => team.place, options),
       }))
-      .filter((classGroup) => classGroup.teams.length > 0),
+      .filter((classGroup) => classGroup.teams.length > 0), config.awards.classOrder, options),
   });
 }
 

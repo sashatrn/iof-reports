@@ -67,6 +67,10 @@ type SummaryTeamConfig = {
   showZeroPoints: boolean;
 };
 
+type AwardsConfig = {
+  classOrder: string[];
+};
+
 type OfficialPersonConfig = {
   name: string;
   signatureFile?: string;
@@ -113,6 +117,7 @@ export type AppConfig = {
   individual: IndividualConfig;
   relay: RelayConfig;
   summaryTeam: SummaryTeamConfig;
+  awards: AwardsConfig;
   "side-by-side": SideBySideConfig;
   military: {
     teamFilterRegex: string;
@@ -230,6 +235,9 @@ const defaultConfig: AppConfig = {
       relay: "Естафета",
     },
     showZeroPoints: false,
+  },
+  awards: {
+    classOrder: [],
   },
   "side-by-side": {
     teamRules: {
@@ -670,6 +678,13 @@ export function loadConfig(configPath?: string): AppConfig {
         ...defaultConfig.summaryTeam.sourceLabels,
         ...parsed.summaryTeam?.sourceLabels,
       },
+    },
+    awards: {
+      ...defaultConfig.awards,
+      ...parsed.awards,
+      classOrder:
+        parsed.awards?.classOrder ??
+        defaultConfig.awards.classOrder,
     },
     rogaining: {
       ...defaultConfig.rogaining,

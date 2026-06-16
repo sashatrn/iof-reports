@@ -41,3 +41,36 @@ export function filterAwardTop<T>(
 ): T[] {
   return options.awardsOnly ? entries.slice(0, 3) : entries;
 }
+
+function normalizeClassName(className: string): string {
+  return className.trim().toLowerCase();
+}
+
+export function sortAwardClasses<T extends { name: string }>(
+  classes: T[],
+  classOrder: string[],
+  options: AwardsModeOptions = {},
+): T[] {
+  if (!options.awardsOnly || classOrder.length === 0) {
+    return classes;
+  }
+
+  const order = new Map(
+    classOrder.map((className, index) => [normalizeClassName(className), index]),
+  );
+
+  return classes
+    .map((classGroup, originalIndex) => ({
+      classGroup,
+      originalIndex,
+      orderIndex: order.get(normalizeClassName(classGroup.name)) ?? Number.MAX_SAFE_INTEGER,
+    }))
+    .sort((left, right) => {
+      if (left.orderIndex !== right.orderIndex) {
+        return left.orderIndex - right.orderIndex;
+      }
+
+      return left.originalIndex - right.originalIndex;
+    })
+    .map((entry) => entry.classGroup);
+}

@@ -46,6 +46,9 @@
     },
     "showZeroPoints": false
   },
+  "awards": {
+    "classOrder": []
+  },
   "side-by-side": {
     "teamRules": {
       "menCount": 3,

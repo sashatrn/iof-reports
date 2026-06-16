@@ -9,6 +9,7 @@ import { getLeftLogo } from "./report-logos";
 import {
   type AwardsModeOptions,
   filterAwardPlaces,
+  sortAwardClasses,
   withAwardsSubtitle,
 } from "./awards-mode";
 
@@ -507,10 +508,10 @@ export function buildRelayHtml(
       : config.relay.teamResults === "grouped"
         ? { mode: "grouped", groups: buildGroupedRelayTeamResults(classes, config) }
         : undefined;
-  const displayClasses = classes.map((classGroup) => ({
+  const displayClasses = sortAwardClasses(classes.map((classGroup) => ({
     ...classGroup,
     teams: filterAwardPlaces(classGroup.teams, (team) => team.place, options),
-  }));
+  })), config.awards.classOrder, options);
   const displayTeamResults = !teamResults || !options.awardsOnly
     ? teamResults
     : teamResults.mode === "flat"

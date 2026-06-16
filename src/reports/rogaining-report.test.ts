@@ -979,6 +979,43 @@ describe("buildRogainingHtml awards mode", () => {
     expect(menOpenSection).not.toContain(">4<");
   });
 
+  it("uses configured awards class order", () => {
+    setConfigPath(path.resolve(__dirname, "../__fixtures__/awards-class-order-config.json"));
+
+    const teams: TeamIofTeam[] = [
+      {
+        className: "Ж",
+        teamName: "Ж команда",
+        organisation: "A",
+        members: ["A1", "A2"],
+        memberCount: 2,
+        score: 20,
+        penalty: 0,
+        totalScore: 20,
+        timeSec: 10000,
+        status: "OK",
+      },
+      {
+        className: "Ч",
+        teamName: "Ч команда",
+        organisation: "B",
+        members: ["B1", "B2"],
+        memberCount: 2,
+        score: 30,
+        penalty: 0,
+        totalScore: 30,
+        timeSec: 9000,
+        status: "OK",
+      },
+    ];
+
+    const html = buildRogainingHtml(teams, new Date(2026, 3, 11), "Рогейн", "view", {
+      awardsOnly: true,
+    });
+
+    expectInOrder(html, ["<h3>Ч</h3>", "<h3>Ж</h3>", "<h3>ALL</h3>"]);
+  });
+
   it("applies control gate disqualification before filtering awards places", () => {
     const teams: TeamIofTeam[] = [
       {

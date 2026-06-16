@@ -8,6 +8,7 @@ import { getLeftLogo, getRightLogo } from "./report-logos";
 import {
   type AwardsModeOptions,
   filterAwardPlaces,
+  sortAwardClasses,
   withAwardsSubtitle,
 } from "./awards-mode";
 
@@ -246,17 +247,18 @@ export function buildSideBySideRogainingHtml(
   variant: HtmlVariant = "pdf",
   options: AwardsModeOptions = {},
 ): string {
+  const config = loadConfig();
   const reportParticipants =
     variant === "pdf" ? participants.filter(isPdfVisibleParticipant) : participants;
   const classes = buildSideBySideRogainingClasses(reportParticipants);
-  const displayClasses = classes.map((classGroup) => ({
+  const displayClasses = sortAwardClasses(classes.map((classGroup) => ({
     ...classGroup,
     participants: filterAwardPlaces(
       classGroup.participants,
       (participant) => participant.position,
       options,
     ),
-  }));
+  })), config.awards.classOrder, options);
   const teamResults =
     variant === "pdf"
       ? filterAwardPlaces(

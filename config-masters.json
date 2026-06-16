@@ -10,6 +10,9 @@
       "womenCount": 3
     }
   },
+  "awards": {
+    "classOrder": []
+  },
   "rogaining": {
     "reportTitle": "Рогейн",
     "scoreClassMode": "declared",

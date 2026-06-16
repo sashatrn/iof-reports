@@ -18,6 +18,7 @@ import {
   filterAwardPlaces,
   filterAwardTop,
   isAwardPlace,
+  sortAwardClasses,
   withAwardsSubtitle,
 } from "./awards-mode";
 
@@ -213,7 +214,7 @@ export function buildIndividualHtml(
     byClass.set(participant.className, classParticipants);
   }
 
-  const classes = [...byClass.keys()]
+  const classes = sortAwardClasses([...byClass.keys()]
     .sort((left, right) =>
       compareClassNames(left, right, config.individual.classOrder, groupMatchers),
     )
@@ -234,7 +235,7 @@ export function buildIndividualHtml(
           status: participant.status,
         }))
         .filter((participant) => !options.awardsOnly || isAwardPlace(participant.position)),
-    }));
+    })), config.awards.classOrder, options);
   const teamResults = buildTeamResults(
     reportParticipants,
     config,
