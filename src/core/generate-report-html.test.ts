@@ -328,7 +328,7 @@ describe("generateIndividualRogainingReportHtml", () => {
 
     expect(report.reportType).toBe("individual-rogaining");
     expect(report.itemCount).toBeGreaterThan(0);
-    expect(report.viewHtml).toContain("Індивідуальний рогейн");
+    expect(report.viewHtml).toContain("Рогейн");
     expect(report.viewHtml).toContain("<th>Бал</th>");
     expect(report.viewHtml).not.toContain("<th>Команда</th>");
     expect(report.viewHtml).not.toContain("<th>Кількість КП</th>");
@@ -529,10 +529,10 @@ describe("generateRogainingReportHtml", () => {
 
     expect(report.reportType).toBe("rogaining");
     expect(report.itemCount).toBeGreaterThan(0);
-    expect(report.viewHtml).toContain("Протокол результатів рогейну");
+    expect(report.viewHtml).toContain("Рогейн");
     expect(report.viewHtml).toContain("<th>Команда</th>");
     expect(report.viewHtml).toContain(">ALL</h3>");
-    expect(report.pdfHtml).toContain("Протокол результатів рогейну");
+    expect(report.pdfHtml).toContain("Рогейн");
     expect(report.pdfHtml).not.toContain(">ALL</h3>");
     expect(report.viewHtml).toContain('class="page"');
     expect(report.pdfHtml).toContain("@page");
@@ -707,7 +707,17 @@ describe("generateReportHtml", () => {
     const report = generateReportHtml(sideBySideRogainingXml, "individual-rogaining");
 
     expect(report.reportType).toBe("individual-rogaining");
-    expect(report.viewHtml).toContain("Індивідуальний рогейн");
+    expect(report.viewHtml).toContain("Рогейн");
+  });
+
+  it("uses configured rogaining report title for rogaining reports", () => {
+    setConfigPath(path.resolve(__dirname, "../__fixtures__/rogaining-report-title-config.json"));
+
+    const individualReport = generateIndividualRogainingReportHtml(sideBySideRogainingXml);
+    const teamReport = generateRogainingReportHtml(rogainingXml);
+
+    expect(individualReport.viewHtml).toContain("Кастомний рогейн");
+    expect(teamReport.viewHtml).toContain("Кастомний рогейн");
   });
 
   it("dispatches to relay report generator", () => {

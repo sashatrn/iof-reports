@@ -1719,7 +1719,7 @@ export function buildRogainingHtml(
   });
 
   return renderTemplate(`rogaining-${variant}.njk`, {
-    reportTitle: "Протокол результатів рогейну",
+    reportTitle: config.rogaining.reportTitle,
     event: {
       title:
         config.reportHeader.title ??

@@ -11,6 +11,7 @@
     }
   },
   "rogaining": {
+    "reportTitle": "Рогейн",
     "scoreClassMode": "declared",
     "controlTime": "12:00:00",
     "allowedOvertime": "00:30:00",

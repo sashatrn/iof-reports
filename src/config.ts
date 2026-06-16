@@ -120,6 +120,7 @@ export type AppConfig = {
     individualTeamGroups: MilitaryIndividualTeamGroupConfig[];
   };
   rogaining: {
+    reportTitle: string;
     scoreClassMode: "promoted" | "declared";
     controlTime?: string;
     allowedOvertime?: string;
@@ -251,6 +252,7 @@ const defaultConfig: AppConfig = {
     ],
   },
   rogaining: {
+    reportTitle: "Рогейн",
     scoreClassMode: "promoted",
     controlGateRule: {
       enabled: false,

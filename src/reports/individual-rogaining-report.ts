@@ -113,7 +113,7 @@ export function buildIndividualRogainingHtml(
     variant === "pdf" ? participants.filter(isPdfVisibleParticipant) : participants;
 
   return renderTemplate(`individual-rogaining-${variant}.njk`, {
-    reportTitle: "Індивідуальний рогейн",
+    reportTitle: config.rogaining.reportTitle,
     event: {
       title:
         config.reportHeader.title ??
