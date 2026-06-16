@@ -6,6 +6,7 @@ import { setConfigPath } from "../config";
 import { imageToBase64 } from "../utils/image";
 import {
   generateIndividualReportHtml,
+  generateIndividualRogainingReportHtml,
   generateRelayReportHtml,
   generateReportHtml,
   generateReportsHtml,
@@ -318,6 +319,21 @@ describe("generateSideBySideRogainingReportHtml", () => {
     expect(report.viewHtml).not.toContain("Командні результати");
     expect(report.pdfHtml).toContain("Командні результати");
     expect(report.pdfHtml).toContain("@page");
+  });
+});
+
+describe("generateIndividualRogainingReportHtml", () => {
+  it("builds an individual rogaining report from XML scores", () => {
+    const report = generateIndividualRogainingReportHtml(sideBySideRogainingXml);
+
+    expect(report.reportType).toBe("individual-rogaining");
+    expect(report.itemCount).toBeGreaterThan(0);
+    expect(report.viewHtml).toContain("Індивідуальний рогейн");
+    expect(report.viewHtml).toContain("<th>Бал</th>");
+    expect(report.viewHtml).not.toContain("<th>Команда</th>");
+    expect(report.viewHtml).not.toContain("<th>Кількість КП</th>");
+    expect(report.viewHtml).not.toContain("<th>Відст.</th>");
+    expect(report.pdfHtml).not.toContain("Командні результати");
   });
 });
 
@@ -685,6 +701,13 @@ describe("generateReportHtml", () => {
     expect(report.reportType).toBe("individual");
     expect(report.viewHtml).toContain("Індивідуальні результати");
     expect(report.pdfHtml).toContain("Індивідуальні результати");
+  });
+
+  it("dispatches to individual rogaining report generator", () => {
+    const report = generateReportHtml(sideBySideRogainingXml, "individual-rogaining");
+
+    expect(report.reportType).toBe("individual-rogaining");
+    expect(report.viewHtml).toContain("Індивідуальний рогейн");
   });
 
   it("dispatches to relay report generator", () => {

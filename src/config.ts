@@ -121,6 +121,8 @@ export type AppConfig = {
   };
   rogaining: {
     scoreClassMode: "promoted" | "declared";
+    controlTime?: string;
+    allowedOvertime?: string;
     controlGateRule: {
       enabled: boolean;
       gateControl: string;

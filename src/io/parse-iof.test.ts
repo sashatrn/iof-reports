@@ -54,7 +54,7 @@ describe("parseIof", () => {
     expect(shouldExcludeResultStatus("DidNotEnter", ignoredStatuses)).toBe(false);
   });
 
-  it("reads control count from score or split controls", () => {
+  it("reads result score separately and uses it as the control count fallback", () => {
     const parsed = parseIof(`
       <ResultList>
         <ClassResult>
@@ -71,6 +71,7 @@ describe("parseIof", () => {
             <Result>
               <Status>OK</Status>
               <Score type="Score">7</Score>
+              <Score type="Penalty">3</Score>
               <SplitTime status="Additional">
                 <ControlCode>31</ControlCode>
               </SplitTime>
@@ -101,5 +102,13 @@ describe("parseIof", () => {
     `);
 
     expect(parsed.participants.map((participant) => participant.controlCount)).toEqual([7, 2]);
+    expect(parsed.participants.map((participant) => participant.resultScore)).toEqual([
+      7,
+      undefined,
+    ]);
+    expect(parsed.participants.map((participant) => participant.resultPenalty)).toEqual([
+      3,
+      undefined,
+    ]);
   });
 });

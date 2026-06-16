@@ -5,6 +5,7 @@ import { parseIof } from "../io/parse-iof";
 import { parseTeamIof } from "../io/parse-team-iof";
 import { parseUofBaza } from "../io/parse-uof-baza";
 import { buildIndividualHtml } from "../reports/individual-report";
+import { buildIndividualRogainingHtml } from "../reports/individual-rogaining-report";
 import {
   buildRogainingAwardsHtml,
   buildRogainingAwardsDocx,
@@ -153,6 +154,27 @@ export function generateIndividualReportHtml(
     reportType: "individual",
     viewHtml: buildIndividualHtml(participants, eventDate, "view"),
     pdfHtml: buildIndividualHtml(participants, eventDate, "pdf", teamResults),
+    eventDate: toIsoDate(eventDate),
+    itemCount: participants.length,
+  };
+}
+
+export function generateIndividualRogainingReportHtml(
+  xml: string,
+  options: GenerateReportOptions = {},
+): GeneratedReport {
+  const { logger } = options;
+  const { participants, eventDate } = parseParticipantsXml(
+    xml,
+    logger,
+    () => 0,
+    true,
+  );
+
+  return {
+    reportType: "individual-rogaining",
+    viewHtml: buildIndividualRogainingHtml(participants, eventDate, "view"),
+    pdfHtml: buildIndividualRogainingHtml(participants, eventDate, "pdf"),
     eventDate: toIsoDate(eventDate),
     itemCount: participants.length,
   };
@@ -497,6 +519,8 @@ export function generateReportHtml(
   switch (reportType) {
     case "individual":
       return generateIndividualReportHtml(xml, options);
+    case "individual-rogaining":
+      return generateIndividualRogainingReportHtml(xml, options);
     case "team":
       return generateSideBySideTeamReportHtml(xml, options);
     case "side-by-side-rogaining":

@@ -38,13 +38,13 @@ CLI-інструмент для перетворення результатів 
 
 1. Відкрийте командний рядок Windows
 1. Виконайте `iof-reports <results.xml>`, де `<results.xml>` - IOF XML файл результатів.
-1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report team`, `--report relay`, `--report side-by-side-rogaining`, `--report summary-team`, `--report rogaining`, `--report rogaining-awards`, `--report rogaining-diplomas`, `--report rogaining-score`, `--report rogaining-results` або `--report rogaining-splits`.
+1. За потреби виберіть конкретний звіт: `iof-reports <results.xml> --report individual`, `--report individual-rogaining`, `--report team`, `--report relay`, `--report side-by-side-rogaining`, `--report summary-team`, `--report rogaining`, `--report rogaining-awards`, `--report rogaining-diplomas`, `--report rogaining-score`, `--report rogaining-results` або `--report rogaining-splits`.
 1. За потреби вкажіть інший файл конфігурації: `--config my-config.json`. За замовчуванням використовується `config.json` з поточної теки.
 1. За потреби виберіть формат файлу: `--format pdf` або `--format docx`. DOCX наразі підтримується для `rogaining-awards`.
 1. За потреби згенеруйте HTML-файл: `--html view` або `--html pdf`.
 1. Для `rogaining-diplomas` за потреби увімкніть друк фону диплома через `--diploma-template on`. За замовчуванням `off`.
 
-Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `team`, `relay`, `side-by-side-rogaining`, `summary-team`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`, `rogaining-score`, `rogaining-results`, `rogaining-results-score`, `rogaining-splits`.
+Доступні значення для `--report`: `all` (за замовчуванням), `individual`, `individual-rogaining`, `team`, `relay`, `side-by-side-rogaining`, `summary-team`, `rogaining`, `rogaining-awards`, `rogaining-diplomas`, `rogaining-score`, `rogaining-results`, `rogaining-results-score`, `rogaining-splits`.
 Доступні значення для `--html`: `none` (за замовчуванням), `view`, `pdf`.
 
 Приклади:
@@ -57,6 +57,7 @@ CLI-інструмент для перетворення результатів 
 - `iof-reports results.xml --config championship-config.json --report rogaining-score` - створити протокол з іншим файлом конфігурації
 - `iof-reports results.xml --report rogaining-results --baza baza.xml` - створити офіційний протокол результатів рогейну з розрахунком виконаних розрядів
 - `iof-reports results.xml --report rogaining-splits --courses courses.xml` - створити протокол сплітів рогейну з відстанями між КП
+- `iof-reports results.xml --report individual-rogaining` - створити індивідуальний протокол рогейну з балами та штрафами з XML
 - `iof-reports results.xml --report rogaining-awards --format docx` - створити редагований DOCX нагородного протоколу
 - `iof-reports relay.xml --report relay --config config-relay-side-by-side.json --html view` - створити естафетний HTML-протокол Пліч-о-пліч
 - `iof-reports choice.xml --report side-by-side-rogaining --html view` - створити HTML-протокол вибору Пліч-о-пліч
@@ -226,9 +227,23 @@ iof-reports watch \
 - `--report individual` - індивідуальний протокол для live-перегляду; тип нарахування балів задається через `individual.scoring`, звіт коректно працює з XML без учасників
 - `--report relay` - естафетний протокол для live-перегляду; тип нарахування балів задається через `relay.scoring`
 - `--report side-by-side-rogaining` - протокол вибору Пліч-о-пліч; учасники зі статусом `OK` сортуються за часом, `MissingPunch` - нижче за кількістю взятих КП і часом
+- `--report individual-rogaining` - індивідуальний протокол рогейну; показує бал до штрафу, штраф і підсумковий бал з XML, учасники зі статусом `OK` сортуються за підсумковим балом, потім за часом
 - `--diploma-template off|on` - чи вкладати фон диплома в `rogaining-diplomas`
 - `--courses courses.xml` - файл `CourseData` для `rogaining-splits`
 - `--baza baza.xml` - файл бази УФО для `rogaining-results`; з нього беруться поточні кваліфікації, дати народження, регіони та тренери
+
+Для `individual-rogaining` можна налаштувати статус за перевищення часу:
+
+```json
+{
+  "rogaining": {
+    "controlTime": "12:00:00",
+    "allowedOvertime": "00:30:00"
+  }
+}
+```
+
+Якщо час учасника зі статусом `OK` більший за `controlTime + allowedOvertime`, він отримає статус `Перевищено час` без місця. Для нього `Бал` показує всі зібрані бали, `Штраф` дорівнює всім зібраним балам, а `Разом` дорівнює нулю. Обидва значення задаються у форматі `чч:мм:сс`; години можуть бути більшими за 23. Якщо одне з налаштувань відсутнє, правило вимкнене.
 - `--config config.json` - файл конфігурації, за замовчуванням `config.json`
 
 Після запуску відкривайте viewer через браузер:

@@ -86,6 +86,29 @@ describe("parseWatchArgs", () => {
     expect(options.requestedReportType).toBe("side-by-side-rogaining");
   });
 
+  it("accepts individual-rogaining in watch mode", () => {
+    const inputDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-watch-input-"));
+    const outputDir = path.join(os.tmpdir(), "iof-watch-output");
+
+    const options = parseWatchArgs(
+      [
+        "node",
+        "dist/index.js",
+        "watch",
+        "--input-dir",
+        inputDir,
+        "--output-dir",
+        outputDir,
+        "--report",
+        "individual-rogaining",
+      ],
+      testLogger(),
+    );
+
+    expect(options.reportType).toBe("individual-rogaining");
+    expect(options.requestedReportType).toBe("individual-rogaining");
+  });
+
   it("rejects summary-team in watch mode", () => {
     const inputDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-watch-input-"));
     const outputDir = path.join(os.tmpdir(), "iof-watch-output");

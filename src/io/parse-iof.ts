@@ -22,6 +22,8 @@ export type Participant = {
   status: string;
   points: number;
   pointsLabel?: string;
+  resultScore?: number;
+  resultPenalty?: number;
   controlCount?: number;
 };
 
@@ -125,6 +127,8 @@ export function parseIof(xml: string): ParsedIof {
     for (const pr of persons) {
       const result = pr.Result;
       const status = result?.Status ?? "Unknown";
+      const resultScore = findScoreByType(result?.Score, "Score");
+      const resultPenalty = findScoreByType(result?.Score, "Penalty");
 
       if (shouldExcludeResultStatus(status, ignoredStatuses)) {
         continue;
@@ -139,8 +143,10 @@ export function parseIof(xml: string): ParsedIof {
         position: toOptionalNumber(result?.Position),
         status,
         points: 0,
+        resultScore,
+        resultPenalty,
         controlCount:
-          findScoreByType(result?.Score, "Score") ??
+          resultScore ??
           countRecordedControls(result?.SplitTime),
       });
     }

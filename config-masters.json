@@ -12,6 +12,8 @@
   },
   "rogaining": {
     "scoreClassMode": "declared",
+    "controlTime": "12:00:00",
+    "allowedOvertime": "00:30:00",
     "controlGateRule": {
       "enabled": true,
       "gateControl": "22",
