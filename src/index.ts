@@ -47,10 +47,19 @@ async function main(): Promise<void> {
     html,
     awards,
     diplomaTemplate,
-  } = parseCliArgs(process.argv, logger, config.summaryTeam.series.length > 0);
+  } = parseCliArgs(process.argv, logger, {
+    summary: config.summary.series.length > 0,
+    summaryTeam: config.summaryTeam.series.length > 0,
+  });
 
+  const configuredSeriesInputPaths =
+    report === "summary"
+      ? config.summary.series
+      : report === "summary-team"
+        ? config.summaryTeam.series
+        : [];
   const effectiveSeriesInputPaths =
-    seriesInputPaths.length > 0 ? seriesInputPaths : config.summaryTeam.series;
+    seriesInputPaths.length > 0 ? seriesInputPaths : configuredSeriesInputPaths;
   const inputXmlPath = inputPath ?? effectiveSeriesInputPaths[0]?.path;
 
   if (!inputXmlPath) {
@@ -83,17 +92,27 @@ async function main(): Promise<void> {
   const xml = fs.readFileSync(inputXmlPath, "utf-8");
   const courseDataXml = courseDataPath ? fs.readFileSync(courseDataPath, "utf-8") : undefined;
   const bazaXml = bazaPath ? fs.readFileSync(bazaPath) : undefined;
-  const summaryTeamSeriesXmls = effectiveSeriesInputPaths.map((input) => ({
-    type: input.type,
-    label: input.label,
-    xml: fs.readFileSync(input.path, "utf-8"),
-  }));
+  const summaryTeamSeriesXmls = report === "summary-team"
+    ? effectiveSeriesInputPaths.map((input) => ({
+      type: input.type,
+      label: input.label,
+      xml: fs.readFileSync(input.path, "utf-8"),
+    }))
+    : [];
+  const summarySeriesXmls = report === "summary"
+    ? effectiveSeriesInputPaths.map((input) => ({
+      type: "individual" as const,
+      label: input.label,
+      xml: fs.readFileSync(input.path, "utf-8"),
+    }))
+    : [];
   const generatedReports = generateReportsHtml(xml, report, {
     logger,
     includeDiplomaBackground: diplomaTemplate === "on",
     courseDataXml,
     bazaXml,
     awardsOnly: awards,
+    summarySeriesXmls,
     summaryTeamSeriesXmls,
   });
 

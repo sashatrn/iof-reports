@@ -17,6 +17,7 @@ import {
   generateRogainingScoreReportHtml,
   generateRogainingSplitsReportHtml,
   generateSideBySideRogainingReportHtml,
+  generateSummaryReportHtml,
   generateSummaryTeamReportHtml,
   generateSideBySideTeamReportHtml,
 } from "./generate-report-html";
@@ -421,6 +422,63 @@ describe("generateSummaryTeamReportHtml", () => {
   });
 });
 
+describe("generateSummaryReportHtml", () => {
+  it("builds an individual summary from configured report sources", () => {
+    const report = generateSummaryReportHtml(sampleXml, {
+      summarySeriesXmls: [
+        { type: "individual", label: "День 1", xml: sampleXml },
+        { type: "individual", label: "День 2", xml: sampleXml },
+      ],
+    });
+
+    expect(report.reportType).toBe("summary");
+    expect(report.supportsView).toBe(false);
+    expect(report.itemCount).toBeGreaterThan(0);
+    expect(report.pdfHtml).toContain("Підсумкові результати");
+    expect(report.pdfHtml).toContain('<th class="points-cell">День 1</th>');
+    expect(report.pdfHtml).toContain('<th class="points-cell">День 2</th>');
+    expect(report.pdfHtml).toContain('<th class="points-cell">Сума</th>');
+    expect(report.pdfHtml).toContain("Ч 5-6");
+    expect(report.pdfHtml).toContain("@page");
+  });
+
+  it("requires at least one series source", () => {
+    expect(() => generateSummaryReportHtml(sampleXml)).toThrow(
+      "at least one --series source",
+    );
+  });
+
+  it("loads configured summary series with paths relative to the config file", () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-reports-summary-"));
+    const dataDir = path.join(tempDir, "data");
+    const configPath = path.join(tempDir, "config.json");
+    const day1Path = path.join(dataDir, "day1.xml");
+    const day2Path = path.join(dataDir, "day2.xml");
+
+    tempConfigDirs.push(tempDir);
+    fs.mkdirSync(dataDir);
+    fs.writeFileSync(day1Path, "<ResultList />");
+    fs.writeFileSync(day2Path, "<ResultList />");
+    fs.writeFileSync(
+      configPath,
+      JSON.stringify({
+        summary: {
+          series: [
+            { type: "individual", path: "data/day1.xml", label: "День 1" },
+            { type: "individual", path: "data/day2.xml", label: "День 2" },
+          ],
+        },
+      }),
+    );
+    setConfigPath(configPath);
+
+    expect(loadConfig().summary.series).toEqual([
+      { type: "individual", path: day1Path, label: "День 1" },
+      { type: "individual", path: day2Path, label: "День 2" },
+    ]);
+  });
+});
+
 describe("generateIndividualReportHtml with military scoring", () => {
   it("builds military individual report html from IOF XML", () => {
     useIndividualExampleConfig("military");
@@ -788,6 +846,18 @@ describe("generateReportHtml", () => {
 
     expect(report.reportType).toBe("summary-team");
     expect(report.pdfHtml).toContain("Командний підсумок");
+  });
+
+  it("dispatches to summary report generator", () => {
+    const report = generateReportHtml(sampleXml, "summary", {
+      summarySeriesXmls: [
+        { type: "individual", label: "День 1", xml: sampleXml },
+        { type: "individual", label: "День 2", xml: sampleXml },
+      ],
+    });
+
+    expect(report.reportType).toBe("summary");
+    expect(report.pdfHtml).toContain("Підсумкові результати");
   });
 
   it("dispatches to rogaining diplomas report generator", () => {

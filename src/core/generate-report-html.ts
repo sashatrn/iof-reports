@@ -25,6 +25,11 @@ import { buildSideBySideTeamHtml } from "../reports/side-by-side-team-report";
 import { isPdfVisibleParticipant, isPdfVisibleRelayTeam } from "../reports/pdf-status-filter";
 import { buildGenderIndividualTeamResults } from "../reports/individual-gender-team-results";
 import {
+  buildSummaryHtml,
+  buildSummaryStandingGroupsFromSources,
+  type SummarySource,
+} from "../reports/summary-report";
+import {
   buildSummaryTeamHtml,
   buildSummaryTeamStandingGroupsFromSources,
   type SummaryTeamSource,
@@ -56,6 +61,11 @@ type GenerateReportOptions = {
   courseDataXml?: string;
   bazaXml?: string | Buffer;
   awardsOnly?: boolean;
+  summarySeriesXmls?: Array<{
+    type: "individual";
+    label?: string;
+    xml: string;
+  }>;
   summaryTeamSeriesXmls?: Array<{
     type: SummaryTeamSourceType;
     label?: string;
@@ -253,6 +263,64 @@ export function generateRelayReportHtml(
     eventName,
     eventDate: toIsoDate(eventDate),
     itemCount: buildRelayClasses(teams).flatMap((classGroup) => classGroup.teams).length,
+  };
+}
+
+function buildSummarySourceFromXml(
+  input: {
+    type: "individual";
+    label?: string;
+    xml: string;
+  },
+  logger?: Logger,
+): {
+  source: SummarySource;
+  eventDate: Date;
+} {
+  const config = loadConfig();
+  const { participants, eventDate } = parseParticipantsXml(
+    input.xml,
+    logger,
+    () => 0,
+    true,
+  );
+  const pdfParticipants = participants.filter(isPdfVisibleParticipant);
+
+  getIndividualScoring(config.individual.scoring).applyPoints(pdfParticipants, config);
+
+  return {
+    source: {
+      type: input.type,
+      label: input.label,
+      participants: pdfParticipants,
+    },
+    eventDate,
+  };
+}
+
+export function generateSummaryReportHtml(
+  _xml: string,
+  options: GenerateReportOptions = {},
+): GeneratedReport {
+  const { awardsOnly, logger, summarySeriesXmls: inputs = [] } = options;
+
+  if (inputs.length === 0) {
+    throw new Error("summary report requires at least one --series source.");
+  }
+
+  const parsedSources = inputs.map((input) => buildSummarySourceFromXml(input, logger));
+  const eventDate = parsedSources[0].eventDate;
+  const sources = parsedSources.map((parsedSource) => parsedSource.source);
+  const standingGroups = buildSummaryStandingGroupsFromSources(sources);
+  const html = buildSummaryHtml(sources, eventDate, { awardsOnly });
+
+  return {
+    reportType: "summary",
+    viewHtml: html,
+    pdfHtml: html,
+    supportsView: false,
+    eventDate: toIsoDate(eventDate),
+    itemCount: standingGroups.reduce((count, group) => count + group.standings.length, 0),
   };
 }
 
@@ -544,6 +612,8 @@ export function generateReportHtml(
       return generateSideBySideRogainingReportHtml(xml, options);
     case "relay":
       return generateRelayReportHtml(xml, options);
+    case "summary":
+      return generateSummaryReportHtml(xml, options);
     case "summary-team":
       return generateSummaryTeamReportHtml(xml, options);
     case "rogaining":

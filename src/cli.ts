@@ -10,6 +10,11 @@ export type SeriesInputPath = {
   label?: string;
 };
 
+type ConfiguredSeriesReports = {
+  summary: boolean;
+  summaryTeam: boolean;
+};
+
 export type CliOptions = {
   inputPath?: string;
   seriesInputPaths: SeriesInputPath[];
@@ -37,7 +42,7 @@ const SERIES_TYPE_ALIASES = new Map<string, SummaryTeamSourceType>([
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|individual-rogaining|team|side-by-side-rogaining|relay|summary-team|rogaining|rogaining-diplomas|rogaining-score|rogaining-results|rogaining-results-score|rogaining-splits] [--awards] [--format pdf] [--courses courses.xml] [--baza baza.xml] [--series individual=long.xml] [--html none|view|pdf] [--diploma-template off|on]",
+    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|individual-rogaining|team|side-by-side-rogaining|relay|summary|summary-team|rogaining|rogaining-diplomas|rogaining-score|rogaining-results|rogaining-results-score|rogaining-splits] [--awards] [--format pdf] [--courses courses.xml] [--baza baza.xml] [--series individual=long.xml] [--html none|view|pdf] [--diploma-template off|on]",
   );
 }
 
@@ -90,7 +95,10 @@ function parseSeriesInputPath(value: string | undefined): SeriesInputPath {
 export function parseCliArgs(
   argv: string[],
   logger: Logger,
-  hasConfigSummaryTeamSeries = false,
+  configuredSeriesReports: ConfiguredSeriesReports = {
+    summary: false,
+    summaryTeam: false,
+  },
 ): CliOptions {
   let input: string | undefined;
   const seriesInputPaths: SeriesInputPath[] = [];
@@ -123,7 +131,7 @@ export function parseCliArgs(
       if (!value || !REPORT_VALUES.has(value)) {
         logger.error(
           { report: value },
-          "Invalid report type. Expected one of: all, individual, individual-rogaining, team, side-by-side-rogaining, relay, summary-team, rogaining, rogaining-diplomas, rogaining-score, rogaining-results, rogaining-results-score, rogaining-splits.",
+          "Invalid report type. Expected one of: all, individual, individual-rogaining, team, side-by-side-rogaining, relay, summary, summary-team, rogaining, rogaining-diplomas, rogaining-score, rogaining-results, rogaining-results-score, rogaining-splits.",
         );
         printUsage(logger);
         process.exit(1);
@@ -253,8 +261,12 @@ export function parseCliArgs(
   if (
     !input &&
     !(
-      report === "summary-team" &&
-      (seriesInputPaths.length > 0 || hasConfigSummaryTeamSeries)
+      (report === "summary" || report === "summary-team") &&
+      (
+        seriesInputPaths.length > 0 ||
+        (report === "summary" && configuredSeriesReports.summary) ||
+        (report === "summary-team" && configuredSeriesReports.summaryTeam)
+      )
     )
   ) {
     logger.error("No XML file provided.");
@@ -308,9 +320,28 @@ export function parseCliArgs(
   if (
     report === "summary-team" &&
     seriesInputPaths.length === 0 &&
-    !hasConfigSummaryTeamSeries
+    !configuredSeriesReports.summaryTeam
   ) {
     logger.error("summary-team report requires at least one --series type=path.xml or summaryTeam.series entry.");
+    printUsage(logger);
+    process.exit(1);
+  }
+
+  if (
+    report === "summary" &&
+    seriesInputPaths.length === 0 &&
+    !configuredSeriesReports.summary
+  ) {
+    logger.error("summary report requires at least one --series individual=path.xml or summary.series entry.");
+    printUsage(logger);
+    process.exit(1);
+  }
+
+  if (
+    report === "summary" &&
+    seriesInputPaths.some((seriesInputPath) => seriesInputPath.type !== "individual")
+  ) {
+    logger.error("summary report supports only individual series sources.");
     printUsage(logger);
     process.exit(1);
   }

@@ -58,7 +58,23 @@ describe("parseCliArgs", () => {
         "summary-team",
       ],
       testLogger(),
-      true,
+      { summary: false, summaryTeam: true },
+    );
+
+    expect(options.inputPath).toBeUndefined();
+    expect(options.seriesInputPaths).toEqual([]);
+  });
+
+  it("accepts summary without positional XML when series are configured", () => {
+    const options = parseCliArgs(
+      [
+        "node",
+        "dist/index.js",
+        "--report",
+        "summary",
+      ],
+      testLogger(),
+      { summary: true, summaryTeam: false },
     );
 
     expect(options.inputPath).toBeUndefined();

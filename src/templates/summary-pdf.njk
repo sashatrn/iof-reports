@@ -1,0 +1,38 @@
+{% extends "base-pdf.njk" %}
+
+{% block content %}
+
+{% for group in standingGroups %}
+<div class="class-block">
+  <h3>{{ group.name }}</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="place-cell">Місце</th>
+        <th>Учасник</th>
+        <th>Команда</th>
+        {% for source in sources %}
+        <th class="points-cell">{{ source.label }}</th>
+        {% endfor %}
+        <th class="points-cell">Сума</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for standing in group.standings %}
+      <tr>
+        <td class="place-cell"><strong>{{ standing.place }}</strong></td>
+        <td>{{ standing.name }}</td>
+        <td>{{ standing.organisation }}</td>
+        {% for sourcePoint in standing.sourcePoints %}
+        <td class="points-cell">{% if summary.showZeroPoints or sourcePoint.points > 0 %}{{ sourcePoint.points }}{% endif %}</td>
+        {% endfor %}
+        <td class="points-cell"><strong>{{ standing.totalPoints }}</strong></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endfor %}
+
+{% endblock %}

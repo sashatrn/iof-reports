@@ -37,6 +37,12 @@ export type SummaryTeamSeriesConfig = {
   label?: string;
 };
 
+export type SummarySeriesConfig = {
+  type: "individual";
+  path: string;
+  label?: string;
+};
+
 type IndividualConfig = {
   scoring: IndividualScoringType;
   classOrder: IndividualClassOrderType;
@@ -72,6 +78,15 @@ type SummaryTeamConfig = {
   subtitle?: string;
   sourceLabels: Record<string, string>;
   series: SummaryTeamSeriesConfig[];
+  showZeroPoints: boolean;
+};
+
+type SummaryConfig = {
+  reportTitle: string;
+  title?: string;
+  subtitle?: string;
+  sourceLabels: Record<string, string>;
+  series: SummarySeriesConfig[];
   showZeroPoints: boolean;
 };
 
@@ -124,6 +139,7 @@ export type AppConfig = {
   rightLogo?: string;
   individual: IndividualConfig;
   relay: RelayConfig;
+  summary: SummaryConfig;
   summaryTeam: SummaryTeamConfig;
   awards: AwardsConfig;
   "side-by-side": SideBySideConfig;
@@ -241,6 +257,14 @@ const defaultConfig: AppConfig = {
       individual: "Індивідуальна",
       "side-by-side-rogaining": "По вибору",
       relay: "Естафета",
+    },
+    series: [],
+    showZeroPoints: false,
+  },
+  summary: {
+    reportTitle: "Підсумкові результати",
+    sourceLabels: {
+      individual: "Індивідуальна",
     },
     series: [],
     showZeroPoints: false,
@@ -688,6 +712,53 @@ function normalizeSummaryTeamSeries(
   });
 }
 
+function normalizeSummarySeries(
+  rawSeries: unknown,
+  configFilePath: string,
+): SummarySeriesConfig[] {
+  if (rawSeries === undefined) {
+    return defaultConfig.summary.series;
+  }
+
+  if (!Array.isArray(rawSeries)) {
+    throw new Error("summary.series must be an array.");
+  }
+
+  return rawSeries.map((rawItem, index) => {
+    if (!rawItem || typeof rawItem !== "object") {
+      throw new Error(`summary.series[${index}] must be an object.`);
+    }
+
+    const item = rawItem as {
+      type?: unknown;
+      path?: unknown;
+      label?: unknown;
+    };
+
+    if (item.type !== "individual") {
+      throw new Error(`summary.series[${index}].type must be individual.`);
+    }
+
+    if (typeof item.path !== "string" || item.path.trim() === "") {
+      throw new Error(`summary.series[${index}].path is required.`);
+    }
+
+    if (item.label !== undefined && typeof item.label !== "string") {
+      throw new Error(`summary.series[${index}].label must be a string.`);
+    }
+
+    const trimmedLabel = item.label?.trim();
+
+    return {
+      type: "individual",
+      path: path.isAbsolute(item.path)
+        ? item.path
+        : path.resolve(path.dirname(configFilePath), item.path),
+      ...(trimmedLabel ? { label: trimmedLabel } : {}),
+    };
+  });
+}
+
 export function loadConfig(configPath?: string): AppConfig {
   const filePath = configPath ?? activeConfigPath ?? path.resolve(process.cwd(), "config.json");
 
@@ -739,6 +810,15 @@ export function loadConfig(configPath?: string): AppConfig {
       classOrderGroups:
         parsed.relay?.classOrderGroups ??
         defaultConfig.relay.classOrderGroups,
+    },
+    summary: {
+      ...defaultConfig.summary,
+      ...parsed.summary,
+      sourceLabels: {
+        ...defaultConfig.summary.sourceLabels,
+        ...parsed.summary?.sourceLabels,
+      },
+      series: normalizeSummarySeries(parsed.summary?.series, filePath),
     },
     summaryTeam: {
       ...defaultConfig.summaryTeam,
