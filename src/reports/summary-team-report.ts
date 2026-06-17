@@ -67,10 +67,10 @@ function buildPointSources(
     seenCounts.set(source.type, seenCount);
 
     const baseLabel =
-      source.label ??
       config.summaryTeam.sourceLabels[source.type] ??
       source.type;
-    const label = typeCounts.get(source.type) === 1 ? baseLabel : `${baseLabel} ${seenCount}`;
+    const label = source.label ??
+      (typeCounts.get(source.type) === 1 ? baseLabel : `${baseLabel} ${seenCount}`);
 
     return {
       key: `${source.type}-${index}`,

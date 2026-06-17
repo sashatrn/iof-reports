@@ -83,6 +83,35 @@ iof-reports --report summary-team \
 
 Підтримуються джерела `individual`, `side-by-side-rogaining` (`rogaining` або `choice` як короткі alias-и) та `relay`. Кожне джерело використовує власні scoring і `teamResults` з config. `summaryTeam.layout` визначає плоский (`flat`) або згрупований (`grouped`) підсумок.
 
+Серії також можна задати в конфігурації. У цьому випадку шляхи `path` рахуються відносно файлу конфігурації, а `label` задає назву колонки:
+
+```json
+{
+  "summaryTeam": {
+    "series": [
+      {
+        "type": "individual",
+        "path": "d1/results.xml",
+        "label": "День 1"
+      },
+      {
+        "type": "individual",
+        "path": "d2/results.xml",
+        "label": "День 2"
+      }
+    ]
+  }
+}
+```
+
+Після цього достатньо запустити:
+
+```bash
+iof-reports --report summary-team --config config-summary-team-side-by-side.json
+```
+
+Якщо одночасно передати `--series`, CLI-серії мають пріоритет над `summaryTeam.series` з конфігурації.
+
 ## Military протоколи
 
 Для військових змагань індивідуальний протокол формується через `--report individual` з `individual.scoring: "military"` у конфігурації. Естафета формується через спільний `--report relay` з `relay.scoring: "military"`.
@@ -177,6 +206,7 @@ iof-reports --report summary-team --config config-summary-team-military.json --s
 - `relay.teamResults` - формат командного підсумку: `none`, `flat` або `grouped`.
 - `summaryTeam.layout` - формат сумарного командного звіту: `flat` або `grouped`.
 - `summaryTeam.groupOrder`, `summaryTeam.sourceLabels`, `summaryTeam.reportTitle`, `summaryTeam.title`, `summaryTeam.subtitle` - порядок груп, назви колонок та заголовок сумарного звіту.
+- `summaryTeam.series` - список джерел для `summary-team` у форматі `{ "type": "individual", "path": "d1/results.xml", "label": "День 1" }`; `path` відносний до файлу конфігурації, `label` необов'язковий.
 - Для всіх `relay.scoring` використовується одна live-логіка статусів, місць і незавершених етапів.
 - `individual.classOrder` - порядок класів: `name` за назвою або `grouped` за `individual.classOrderGroups`.
 - `individual.teamResults` - тип командного підсумку в PDF: `none`, `gender` або `grouped`.

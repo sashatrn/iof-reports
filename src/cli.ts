@@ -7,10 +7,11 @@ import { type SummaryTeamSourceType } from "./reports/summary-team-source";
 export type SeriesInputPath = {
   type: SummaryTeamSourceType;
   path: string;
+  label?: string;
 };
 
 export type CliOptions = {
-  inputPath: string;
+  inputPath?: string;
   seriesInputPaths: SeriesInputPath[];
   configPath?: string;
   courseDataPath?: string;
@@ -86,7 +87,11 @@ function parseSeriesInputPath(value: string | undefined): SeriesInputPath {
   };
 }
 
-export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
+export function parseCliArgs(
+  argv: string[],
+  logger: Logger,
+  hasConfigSummaryTeamSeries = false,
+): CliOptions {
   let input: string | undefined;
   const seriesInputPaths: SeriesInputPath[] = [];
   let report: CliOptions["report"] = "all";
@@ -245,7 +250,13 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
     process.exit(1);
   }
 
-  if (!input && !(report === "summary-team" && seriesInputPaths.length > 0)) {
+  if (
+    !input &&
+    !(
+      report === "summary-team" &&
+      (seriesInputPaths.length > 0 || hasConfigSummaryTeamSeries)
+    )
+  ) {
     logger.error("No XML file provided.");
     printUsage(logger);
     process.exit(1);
@@ -253,9 +264,9 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
 
   const absolutePath = input
     ? path.resolve(process.cwd(), input)
-    : seriesInputPaths[0].path;
+    : seriesInputPaths[0]?.path;
 
-  if (!fs.existsSync(absolutePath)) {
+  if (absolutePath && !fs.existsSync(absolutePath)) {
     logger.error({ path: absolutePath }, "XML file not found.");
     process.exit(1);
   }
@@ -294,8 +305,12 @@ export function parseCliArgs(argv: string[], logger: Logger): CliOptions {
     process.exit(1);
   }
 
-  if (report === "summary-team" && seriesInputPaths.length === 0) {
-    logger.error("summary-team report requires at least one --series type=path.xml.");
+  if (
+    report === "summary-team" &&
+    seriesInputPaths.length === 0 &&
+    !hasConfigSummaryTeamSeries
+  ) {
+    logger.error("summary-team report requires at least one --series type=path.xml or summaryTeam.series entry.");
     printUsage(logger);
     process.exit(1);
   }

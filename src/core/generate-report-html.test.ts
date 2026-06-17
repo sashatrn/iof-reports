@@ -2,7 +2,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { afterEach, describe, expect, it } from "vitest";
-import { setConfigPath } from "../config";
+import { loadConfig, setConfigPath } from "../config";
 import { imageToBase64 } from "../utils/image";
 import {
   generateIndividualReportHtml,
@@ -372,6 +372,51 @@ describe("generateSummaryTeamReportHtml", () => {
       '<th class="points-cell">По вибору</th>',
       '<th class="points-cell">Естафета</th>',
       '<th class="points-cell">Сума</th>',
+    ]);
+  });
+
+  it("uses explicit labels for duplicate source types", () => {
+    setConfigPath(path.resolve(__dirname, "../../config-summary-team-side-by-side.json"));
+    const report = generateSummaryTeamReportHtml(sampleXml, {
+      summaryTeamSeriesXmls: [
+        { type: "individual", label: "День 1", xml: sampleXml },
+        { type: "individual", label: "День 2", xml: sampleXml },
+      ],
+    });
+
+    expect(report.reportType).toBe("summary-team");
+    expect(report.pdfHtml).toContain('<th class="points-cell">День 1</th>');
+    expect(report.pdfHtml).toContain('<th class="points-cell">День 2</th>');
+    expect(report.pdfHtml).not.toContain('<th class="points-cell">День 1 1</th>');
+  });
+
+  it("loads configured summary series with paths relative to the config file", () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-reports-summary-series-"));
+    const dataDir = path.join(tempDir, "data");
+    const configPath = path.join(tempDir, "config.json");
+    const day1Path = path.join(dataDir, "day1.xml");
+    const day2Path = path.join(dataDir, "day2.xml");
+
+    tempConfigDirs.push(tempDir);
+    fs.mkdirSync(dataDir);
+    fs.writeFileSync(day1Path, "<ResultList />");
+    fs.writeFileSync(day2Path, "<ResultList />");
+    fs.writeFileSync(
+      configPath,
+      JSON.stringify({
+        summaryTeam: {
+          series: [
+            { type: "individual", path: "data/day1.xml", label: "День 1" },
+            { type: "choice", path: "data/day2.xml", label: "Вибір" },
+          ],
+        },
+      }),
+    );
+    setConfigPath(configPath);
+
+    expect(loadConfig().summaryTeam.series).toEqual([
+      { type: "individual", path: day1Path, label: "День 1" },
+      { type: "side-by-side-rogaining", path: day2Path, label: "Вибір" },
     ]);
   });
 });

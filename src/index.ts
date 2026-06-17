@@ -47,13 +47,28 @@ async function main(): Promise<void> {
     html,
     awards,
     diplomaTemplate,
-  } = parseCliArgs(process.argv, logger);
+  } = parseCliArgs(process.argv, logger, config.summaryTeam.series.length > 0);
+
+  const effectiveSeriesInputPaths =
+    seriesInputPaths.length > 0 ? seriesInputPaths : config.summaryTeam.series;
+  const inputXmlPath = inputPath ?? effectiveSeriesInputPaths[0]?.path;
+
+  if (!inputXmlPath) {
+    throw new Error("No XML file provided.");
+  }
+
+  for (const seriesInputPath of effectiveSeriesInputPaths) {
+    if (!fs.existsSync(seriesInputPath.path)) {
+      logger.error({ path: seriesInputPath.path }, "Series IOF XML file not found.");
+      process.exit(1);
+    }
+  }
 
   logger.info(
     {
-      file: inputPath,
+      file: inputXmlPath,
       configPath,
-      seriesInputPaths,
+      seriesInputPaths: effectiveSeriesInputPaths,
       courseDataPath,
       bazaPath,
       report,
@@ -65,11 +80,12 @@ async function main(): Promise<void> {
     "Reading XML file",
   );
 
-  const xml = fs.readFileSync(inputPath, "utf-8");
+  const xml = fs.readFileSync(inputXmlPath, "utf-8");
   const courseDataXml = courseDataPath ? fs.readFileSync(courseDataPath, "utf-8") : undefined;
   const bazaXml = bazaPath ? fs.readFileSync(bazaPath) : undefined;
-  const summaryTeamSeriesXmls = seriesInputPaths.map((input) => ({
+  const summaryTeamSeriesXmls = effectiveSeriesInputPaths.map((input) => ({
     type: input.type,
+    label: input.label,
     xml: fs.readFileSync(input.path, "utf-8"),
   }));
   const generatedReports = generateReportsHtml(xml, report, {

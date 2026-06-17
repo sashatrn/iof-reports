@@ -58,6 +58,7 @@ type GenerateReportOptions = {
   awardsOnly?: boolean;
   summaryTeamSeriesXmls?: Array<{
     type: SummaryTeamSourceType;
+    label?: string;
     xml: string;
   }>;
 };
@@ -258,6 +259,7 @@ export function generateRelayReportHtml(
 function buildSummaryTeamSourceFromXml(
   input: {
     type: SummaryTeamSourceType;
+    label?: string;
     xml: string;
   },
   logger?: Logger,
@@ -275,6 +277,7 @@ function buildSummaryTeamSourceFromXml(
     return {
       source: {
         type: input.type,
+        label: input.label,
         groups: buildRelaySummaryTeamGroups(classes, config),
       },
       eventDate,
@@ -296,6 +299,7 @@ function buildSummaryTeamSourceFromXml(
     return {
       source: {
         type: input.type,
+        label: input.label,
         groups: buildRogainingSummaryTeamGroups(classes),
       },
       eventDate,
@@ -307,6 +311,7 @@ function buildSummaryTeamSourceFromXml(
   return {
     source: {
       type: input.type,
+      label: input.label,
       groups: buildIndividualSummaryTeamGroups(pdfParticipants, config, logger),
     },
     eventDate,

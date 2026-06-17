@@ -49,6 +49,22 @@ describe("parseCliArgs", () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
+  it("accepts summary-team without positional XML when series are configured", () => {
+    const options = parseCliArgs(
+      [
+        "node",
+        "dist/index.js",
+        "--report",
+        "summary-team",
+      ],
+      testLogger(),
+      true,
+    );
+
+    expect(options.inputPath).toBeUndefined();
+    expect(options.seriesInputPaths).toEqual([]);
+  });
+
   it("accepts awards mode", () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-awards-"));
     const inputPath = path.join(tempDir, "results.xml");

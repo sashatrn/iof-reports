@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { imageToBase64 } from "./utils/image";
+import { type SummaryTeamSourceType } from "./reports/summary-team-source";
 
 type RogainingScorePoints = {
   youthUnder18?: Record<string, number>;
@@ -29,6 +30,12 @@ export type IndividualTeamResultsType = "none" | "gender" | "grouped";
 export type RelayScoringType = "side-by-side" | "military";
 export type RelayTeamResultsType = "none" | "flat" | "grouped";
 export type SummaryTeamLayoutType = "flat" | "grouped";
+
+export type SummaryTeamSeriesConfig = {
+  type: SummaryTeamSourceType;
+  path: string;
+  label?: string;
+};
 
 type IndividualConfig = {
   scoring: IndividualScoringType;
@@ -64,6 +71,7 @@ type SummaryTeamConfig = {
   title?: string;
   subtitle?: string;
   sourceLabels: Record<string, string>;
+  series: SummaryTeamSeriesConfig[];
   showZeroPoints: boolean;
 };
 
@@ -234,6 +242,7 @@ const defaultConfig: AppConfig = {
       "side-by-side-rogaining": "По вибору",
       relay: "Естафета",
     },
+    series: [],
     showZeroPoints: false,
   },
   awards: {
@@ -444,6 +453,14 @@ const legacySignatureFileFields: Record<OfficialRole, keyof RawOfficialsConfig> 
   sportResponsible: "sportResponsibleSignatureFile",
 };
 
+const summaryTeamSeriesTypeAliases = new Map<string, SummaryTeamSourceType>([
+  ["individual", "individual"],
+  ["rogaining", "side-by-side-rogaining"],
+  ["choice", "side-by-side-rogaining"],
+  ["side-by-side-rogaining", "side-by-side-rogaining"],
+  ["relay", "relay"],
+]);
+
 export function setConfigPath(configPath?: string): void {
   activeConfigPath = configPath;
 }
@@ -616,6 +633,61 @@ function firstConfigImagePath(...imagePaths: Array<string | undefined>): string 
   return undefined;
 }
 
+function normalizeSummaryTeamSeries(
+  rawSeries: unknown,
+  configFilePath: string,
+): SummaryTeamSeriesConfig[] {
+  if (rawSeries === undefined) {
+    return defaultConfig.summaryTeam.series;
+  }
+
+  if (!Array.isArray(rawSeries)) {
+    throw new Error("summaryTeam.series must be an array.");
+  }
+
+  return rawSeries.map((rawItem, index) => {
+    if (!rawItem || typeof rawItem !== "object") {
+      throw new Error(`summaryTeam.series[${index}] must be an object.`);
+    }
+
+    const item = rawItem as {
+      type?: unknown;
+      path?: unknown;
+      label?: unknown;
+    };
+
+    if (typeof item.type !== "string" || item.type.trim() === "") {
+      throw new Error(`summaryTeam.series[${index}].type is required.`);
+    }
+
+    const type = summaryTeamSeriesTypeAliases.get(item.type.trim());
+
+    if (!type) {
+      throw new Error(
+        `summaryTeam.series[${index}].type must be individual, side-by-side-rogaining, rogaining, choice, or relay.`,
+      );
+    }
+
+    if (typeof item.path !== "string" || item.path.trim() === "") {
+      throw new Error(`summaryTeam.series[${index}].path is required.`);
+    }
+
+    if (item.label !== undefined && typeof item.label !== "string") {
+      throw new Error(`summaryTeam.series[${index}].label must be a string.`);
+    }
+
+    const trimmedLabel = item.label?.trim();
+
+    return {
+      type,
+      path: path.isAbsolute(item.path)
+        ? item.path
+        : path.resolve(path.dirname(configFilePath), item.path),
+      ...(trimmedLabel ? { label: trimmedLabel } : {}),
+    };
+  });
+}
+
 export function loadConfig(configPath?: string): AppConfig {
   const filePath = configPath ?? activeConfigPath ?? path.resolve(process.cwd(), "config.json");
 
@@ -678,6 +750,7 @@ export function loadConfig(configPath?: string): AppConfig {
         ...defaultConfig.summaryTeam.sourceLabels,
         ...parsed.summaryTeam?.sourceLabels,
       },
+      series: normalizeSummaryTeamSeries(parsed.summaryTeam?.series, filePath),
     },
     awards: {
       ...defaultConfig.awards,
