@@ -31,6 +31,7 @@ function buildEvent(
   eventDate: Date,
   config: AppConfig,
   options: AwardsModeOptions = {},
+  eventDateText = formatDate(eventDate),
 ) {
   return {
     reportTitle: config.summary.reportTitle,
@@ -40,7 +41,7 @@ function buildEvent(
         renderTemplateText(config.summary.title, eventDate, config),
       subtitle: renderTemplateText(config.summary.subtitle, eventDate, config),
       location: config.reportHeader.location,
-      date: formatDate(eventDate),
+      date: eventDateText,
       logo1: getLeftLogo(config, "logo1.png"),
       logo2: config.rightLogo,
     }, options),
@@ -96,6 +97,7 @@ export function buildSummaryHtml(
   sources: SummarySource[],
   eventDate: Date,
   options: AwardsModeOptions = {},
+  eventDateText?: string,
 ): string {
   const config = loadConfig();
   const pointSources = buildPointSources(sources, config);
@@ -107,7 +109,7 @@ export function buildSummaryHtml(
     .filter((group) => group.standings.length > 0);
 
   return renderTemplate("summary-pdf.njk", {
-    ...buildEvent(eventDate, config, options),
+    ...buildEvent(eventDate, config, options, eventDateText),
     sources: pointSources.map((source) => ({
       key: source.key,
       label: source.label,

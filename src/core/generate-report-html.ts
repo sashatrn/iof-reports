@@ -44,6 +44,7 @@ import { getIndividualScoring } from "../scoring/individual-scoring";
 import { pointsFromPosition } from "../scoring/side-by-side-points";
 import { computeTeamResults } from "../scoring/side-by-side-team";
 import { ReportType, SingleReportType } from "../report-types";
+import { formatDateRange } from "../utils/date";
 
 export type GeneratedReport = {
   reportType: SingleReportType;
@@ -310,9 +311,10 @@ export function generateSummaryReportHtml(
 
   const parsedSources = inputs.map((input) => buildSummarySourceFromXml(input, logger));
   const eventDate = parsedSources[0].eventDate;
+  const eventDateText = formatDateRange(parsedSources.map((parsedSource) => parsedSource.eventDate));
   const sources = parsedSources.map((parsedSource) => parsedSource.source);
   const standingGroups = buildSummaryStandingGroupsFromSources(sources);
-  const html = buildSummaryHtml(sources, eventDate, { awardsOnly });
+  const html = buildSummaryHtml(sources, eventDate, { awardsOnly }, eventDateText);
 
   return {
     reportType: "summary",
@@ -398,10 +400,11 @@ export function generateSummaryTeamReportHtml(
 
   const parsedSources = inputs.map((input) => buildSummaryTeamSourceFromXml(input, logger));
   const eventDate = parsedSources[0].eventDate;
+  const eventDateText = formatDateRange(parsedSources.map((parsedSource) => parsedSource.eventDate));
   const eventName = parsedSources.find((parsedSource) => parsedSource.eventName)?.eventName;
   const sources = parsedSources.map((parsedSource) => parsedSource.source);
   const standingGroups = buildSummaryTeamStandingGroupsFromSources(sources);
-  const html = buildSummaryTeamHtml(sources, eventDate, { awardsOnly });
+  const html = buildSummaryTeamHtml(sources, eventDate, { awardsOnly }, eventDateText);
 
   return {
     reportType: "summary-team",

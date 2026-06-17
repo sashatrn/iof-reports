@@ -102,6 +102,10 @@ const emptyRelayXml = `<?xml version="1.0" encoding="utf-8"?>
   </ClassResult>
 </ResultList>`;
 
+function withXmlDate(xml: string, date: string): string {
+  return xml.replace(/<Date>[^<]+<\/Date>/, `<Date>${date}</Date>`);
+}
+
 function expectInOrder(text: string, fragments: string[]): void {
   let previousIndex = -1;
 
@@ -391,6 +395,18 @@ describe("generateSummaryTeamReportHtml", () => {
     expect(report.pdfHtml).not.toContain('<th class="points-cell">День 1 1</th>');
   });
 
+  it("renders a date range from all series dates", () => {
+    setConfigPath(path.resolve(__dirname, "../../config-summary-team-side-by-side.json"));
+    const report = generateSummaryTeamReportHtml(sampleXml, {
+      summaryTeamSeriesXmls: [
+        { type: "individual", label: "День 1", xml: withXmlDate(sampleXml, "2026-06-14") },
+        { type: "individual", label: "День 2", xml: withXmlDate(sampleXml, "2026-06-15") },
+      ],
+    });
+
+    expect(report.pdfHtml).toContain("14-15.06.2026");
+  });
+
   it("loads configured summary series with paths relative to the config file", () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-reports-summary-series-"));
     const dataDir = path.join(tempDir, "data");
@@ -446,6 +462,17 @@ describe("generateSummaryReportHtml", () => {
     expect(() => generateSummaryReportHtml(sampleXml)).toThrow(
       "at least one --series source",
     );
+  });
+
+  it("renders a date range from all series dates", () => {
+    const report = generateSummaryReportHtml(sampleXml, {
+      summarySeriesXmls: [
+        { type: "individual", label: "День 1", xml: withXmlDate(sampleXml, "2026-06-14") },
+        { type: "individual", label: "День 2", xml: withXmlDate(sampleXml, "2026-06-15") },
+      ],
+    });
+
+    expect(report.pdfHtml).toContain("14-15.06.2026");
   });
 
   it("loads configured summary series with paths relative to the config file", () => {
