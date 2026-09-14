@@ -7,7 +7,12 @@ import {
   type SummarySourceResult,
 } from "../scoring/summary";
 import { formatDate } from "../utils/date";
-import { type AwardsModeOptions, filterAwardPlaces, withAwardsSubtitle } from "./awards-mode";
+import {
+  type AwardsModeOptions,
+  filterAwardPlaces,
+  sortAwardClasses,
+  withAwardsSubtitle,
+} from "./awards-mode";
 import { getLeftLogo } from "./report-logos";
 
 export type SummarySource = {
@@ -101,12 +106,12 @@ export function buildSummaryHtml(
 ): string {
   const config = loadConfig();
   const pointSources = buildPointSources(sources, config);
-  const standingGroups = buildSummaryStandingGroups(pointSources)
+  const standingGroups = sortAwardClasses(buildSummaryStandingGroups(pointSources)
     .map((group) => ({
       ...group,
       standings: filterAwardPlaces(group.standings, (standing) => standing.place, options),
     }))
-    .filter((group) => group.standings.length > 0);
+    .filter((group) => group.standings.length > 0), config.awards.classOrder, options);
 
   return renderTemplate("summary-pdf.njk", {
     ...buildEvent(eventDate, config, options, eventDateText),
