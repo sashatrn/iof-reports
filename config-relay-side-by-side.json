@@ -2,7 +2,7 @@
   "rightLogo": "src/assets/logo2.png",
   "relay": {
     "scoring": "side-by-side",
-    "teamResults": "flat",
+    "teamResults": "grouped",
     "classOrder": "name",
     "teamFilterRegex": ".*",
     "classFilterRegex": ".*",

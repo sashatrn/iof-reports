@@ -89,6 +89,7 @@ export function buildSummaryTeamStandingGroupsFromSources(
     buildPointSources(sources, config),
     config.summaryTeam.layout,
     config.summaryTeam.groupOrder,
+    config.summaryTeam.tieBreak,
   );
 }
 
@@ -104,6 +105,7 @@ export function buildSummaryTeamHtml(
     pointSources,
     config.summaryTeam.layout,
     config.summaryTeam.groupOrder,
+    config.summaryTeam.tieBreak,
   ).map((group) => ({
     ...group,
     standings: filterAwardPlaces(group.standings, (standing) => standing.place, options),

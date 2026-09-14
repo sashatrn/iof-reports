@@ -3,7 +3,7 @@
   "individual": {
     "scoring": "side-by-side",
     "classOrder": "name",
-    "teamResults": "gender",
+    "teamResults": "side-by-side",
     "teamFilterRegex": ".*",
     "classFilterRegex": ".*",
     "classOrderGroups": [],

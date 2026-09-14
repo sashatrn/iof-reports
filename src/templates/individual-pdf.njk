@@ -89,7 +89,7 @@
   </div>
   {% endif %}
 
-  {% if teamResults.mode == "grouped" and teamResults.groups.length %}
+  {% if (teamResults.mode == "grouped" or teamResults.mode == "side-by-side") and teamResults.groups.length %}
   <div class="class-block">
     <h2>Командні результати</h2>
 

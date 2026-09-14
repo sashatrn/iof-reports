@@ -8,12 +8,14 @@ import { buildGroupedIndividualTeamResults } from "./individual-team-results";
 import {
   buildFlatRelayTeamResults,
   buildGroupedRelayTeamResults,
+  buildSideBySideRelayTeamResults,
   type RelayClass,
 } from "./relay-report";
 import {
   buildSideBySideRogainingTeamResults,
   type SideBySideRogainingClass,
 } from "./side-by-side-rogaining-report";
+import { buildSideBySideIndividualTeamResults } from "../scoring/side-by-side-team";
 
 export type SummaryTeamSourceType =
   | "individual"
@@ -34,6 +36,17 @@ export function buildIndividualSummaryTeamGroups(
   config: AppConfig,
   logger?: Logger,
 ): SummaryTeamSourceGroup[] {
+  if (config.individual.teamResults === "side-by-side") {
+    return buildSideBySideIndividualTeamResults(participants, config).map((group) => ({
+      name: group.name,
+      results: group.teams.map((team) => ({
+        organisation: team.organisation,
+        points: team.points,
+        countedPlaces: team.countedResults.map((result) => result.place),
+      })),
+    }));
+  }
+
   if (config.individual.teamResults === "grouped") {
     return buildGroupedIndividualTeamResults(
       participants,
@@ -64,6 +77,17 @@ export function buildRelaySummaryTeamGroups(
   classes: RelayClass[],
   config: AppConfig,
 ): SummaryTeamSourceGroup[] {
+  if (config.relay.scoring === "side-by-side" && config.relay.teamResults === "grouped") {
+    return buildSideBySideRelayTeamResults(classes, config).map((group) => ({
+      name: group.name,
+      results: group.teams.map((team) => ({
+        organisation: team.organisation,
+        points: team.points,
+        countedPlaces: team.countedResults.map((result) => result.place),
+      })),
+    }));
+  }
+
   if (config.relay.teamResults === "grouped") {
     return buildGroupedRelayTeamResults(classes, config).map((group) => ({
       name: group.name,
@@ -80,6 +104,14 @@ export function buildRelaySummaryTeamGroups(
 
 export function buildRogainingSummaryTeamGroups(
   classes: SideBySideRogainingClass[],
+  config: AppConfig,
 ): SummaryTeamSourceGroup[] {
-  return [{ results: buildSideBySideRogainingTeamResults(classes) }];
+  return buildSideBySideRogainingTeamResults(classes, config).map((group) => ({
+    name: group.name,
+    results: group.teams.map((team) => ({
+      organisation: team.organisation,
+      points: team.points,
+      countedPlaces: team.countedResults.map((result) => result.place),
+    })),
+  }));
 }

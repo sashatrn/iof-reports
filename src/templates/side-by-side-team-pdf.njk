@@ -2,8 +2,8 @@
 
 {% block content %}
 
-<h3>Чоловіки</h3>
-
+{% for group in teamResultGroups %}
+<h3>{{ group.name }}</h3>
 <table>
   <thead>
     <tr>
@@ -13,37 +13,15 @@
     </tr>
   </thead>
   <tbody>
-    {% for t in men %}
+    {% for t in group.teams %}
     <tr>
-      <td class="place-cell">{{ loop.index }}</td>
-      <td>{{ t.club }}</td>
+      <td class="place-cell">{{ t.place }}</td>
+      <td>{{ t.organisation }}</td>
       <td class="points-cell">{% if t.points > 0 %}{{ t.points }}{% endif %}</td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
-
-<br/>
-
-<h3>Жінки</h3>
-
-<table>
-  <thead>
-    <tr>
-      <th class="place-cell">Місце</th>
-      <th>Команда</th>
-      <th class="points-cell">Бал</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for t in women %}
-    <tr>
-      <td class="place-cell">{{ loop.index }}</td>
-      <td>{{ t.club }}</td>
-      <td class="points-cell">{% if t.points > 0 %}{{ t.points }}{% endif %}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+{% endfor %}
 
 {% endblock %}

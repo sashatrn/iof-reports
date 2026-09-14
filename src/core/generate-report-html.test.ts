@@ -256,8 +256,7 @@ describe("generateIndividualReportHtml with side-by-side scoring", () => {
 
     expect(report.viewHtml).toContain("Заданий напрямок");
     expect(report.pdfHtml).toContain("Командні результати");
-    expect(report.pdfHtml).toContain("<h4>Чоловіки</h4>");
-    expect(report.pdfHtml).toContain("<h4>Жінки</h4>");
+    expect(report.pdfHtml).toContain("<h4>5-9 класи</h4>");
   });
 });
 
@@ -268,7 +267,7 @@ describe("generateSideBySideTeamReportHtml", () => {
     expect(report.reportType).toBe("team");
     expect(report.itemCount).toBeGreaterThan(0);
     expect(report.viewHtml).toContain("Командний протокол");
-    expect(report.viewHtml).toContain("Чоловіки");
+    expect(report.viewHtml).toContain("5-9 класи");
     expect(report.pdfHtml).toContain("Командний протокол");
     expect(report.viewHtml).toContain('class="page"');
     expect(report.pdfHtml).toContain("@page");

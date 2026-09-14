@@ -30,22 +30,27 @@ function getSectionAfterHeader(html: string, headerText: string): string {
 }
 
 describe("buildSideBySideTeamHtml", () => {
-  it("renders men and women team tables with ranking positions", () => {
+  it("renders mixed team tables by event age group", () => {
     const html = buildSideBySideTeamHtml(
-      {
-        men: [
-          { club: "Ліцей 1", points: 42 },
-          { club: "Ліцей 2", points: 35 },
+      [{
+        name: "5-9 класи",
+        teams: [
+          { place: 1, organisation: "Ліцей 1", points: 42, countedResults: [] },
+          { place: 2, organisation: "Ліцей 2", points: 35, countedResults: [] },
         ],
-        women: [{ club: "Гімназія 3", points: 30 }],
-      },
+      }, {
+        name: "9-12 класи",
+        teams: [
+          { place: 1, organisation: "Гімназія 3", points: 30, countedResults: [] },
+        ],
+      }],
       new Date(2026, 3, 11),
     );
 
-    expect(html).toContain("<h3>Чоловіки</h3>");
-    expect(html).toContain("<h3>Жінки</h3>");
+    expect(html).toContain("<h3>5-9 класи</h3>");
+    expect(html).toContain("<h3>9-12 класи</h3>");
 
-    const menSection = getSectionAfterHeader(html, "Чоловіки");
+    const menSection = getSectionAfterHeader(html, "5-9 класи");
     expectInOrder(menSection, [
       '<td class="place-cell">1</td>',
       "Ліцей 1",
@@ -54,7 +59,7 @@ describe("buildSideBySideTeamHtml", () => {
       "Ліцей 2",
     ]);
 
-    const womenSection = getSectionAfterHeader(html, "Жінки");
+    const womenSection = getSectionAfterHeader(html, "9-12 класи");
     expectInOrder(womenSection, [
       '<td class="place-cell">1</td>',
       "Гімназія 3",

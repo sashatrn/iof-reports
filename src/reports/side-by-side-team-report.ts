@@ -1,21 +1,18 @@
 import { renderTemplate } from "../render/template-engine";
-import { GenderTeamResult } from "../scoring/side-by-side-team";
+import { type SideBySideTeamResultGroup } from "../scoring/side-by-side-team";
 import { loadConfig } from "../config";
 import { formatDate } from "../utils/date";
 import { getLeftLogo, getRightLogo } from "./report-logos";
 import {
   type AwardsModeOptions,
-  filterAwardTop,
+  filterAwardPlaces,
   withAwardsSubtitle,
 } from "./awards-mode";
 
 type HtmlVariant = "view" | "pdf";
 
 export function buildSideBySideTeamHtml(
-  teamResults: {
-    men: GenderTeamResult[];
-    women: GenderTeamResult[];
-  },
+  teamResultGroups: SideBySideTeamResultGroup[],
   eventDate: Date,
   variant: HtmlVariant = "pdf",
   options: AwardsModeOptions = {},
@@ -39,7 +36,9 @@ export function buildSideBySideTeamHtml(
       logo2: getRightLogo(config, "logo2.png"),
     }, options),
     officials: config.officials,
-    men: filterAwardTop(teamResults.men, options),
-    women: filterAwardTop(teamResults.women, options),
+    teamResultGroups: teamResultGroups.map((group) => ({
+      ...group,
+      teams: filterAwardPlaces(group.teams, (team) => team.place, options),
+    })),
   });
 }

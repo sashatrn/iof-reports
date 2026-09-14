@@ -3,6 +3,7 @@ import { type SummaryTeamLayoutType } from "../config";
 export type SummaryTeamSourceResult = {
   organisation: string;
   points: number;
+  countedPlaces?: number[];
 };
 
 export type SummaryTeamSourceGroup = {
@@ -25,6 +26,7 @@ export type SummaryTeamStanding = {
     points: number;
   }>;
   totalPoints: number;
+  countedPlaces: number[];
 };
 
 export type SummaryTeamStandingGroup = {
@@ -41,20 +43,19 @@ function normalizeOrganisation(organisation: string): string {
 function mergeResults(
   results: SummaryTeamSourceResult[],
 ): SummaryTeamSourceResult[] {
-  const pointsByOrganisation = new Map<string, number>();
+  const resultsByOrganisation = new Map<string, SummaryTeamSourceResult>();
 
   for (const result of results) {
     const organisation = normalizeOrganisation(result.organisation);
-    pointsByOrganisation.set(
+    const current = resultsByOrganisation.get(organisation);
+    resultsByOrganisation.set(organisation, {
       organisation,
-      (pointsByOrganisation.get(organisation) ?? 0) + result.points,
-    );
+      points: (current?.points ?? 0) + result.points,
+      countedPlaces: [...(current?.countedPlaces ?? []), ...(result.countedPlaces ?? [])],
+    });
   }
 
-  return [...pointsByOrganisation.entries()].map(([organisation, points]) => ({
-    organisation,
-    points,
-  }));
+  return [...resultsByOrganisation.values()];
 }
 
 function buildStandings(
@@ -63,8 +64,10 @@ function buildStandings(
     label: string;
     results: SummaryTeamSourceResult[];
   }>,
+  tieBreak: "source-order" | "counted-places",
 ): SummaryTeamStanding[] {
   const pointsByOrganisation = new Map<string, Map<string, number>>();
+  const placesByOrganisation = new Map<string, number[]>();
 
   for (const source of sources) {
     for (const result of source.results) {
@@ -77,6 +80,10 @@ function buildStandings(
 
       sourcePoints.set(source.key, (sourcePoints.get(source.key) ?? 0) + result.points);
       pointsByOrganisation.set(organisation, sourcePoints);
+      placesByOrganisation.set(organisation, [
+        ...(placesByOrganisation.get(organisation) ?? []),
+        ...(result.countedPlaces ?? []),
+      ]);
     }
   }
 
@@ -93,6 +100,7 @@ function buildStandings(
         organisation,
         sourcePoints,
         totalPoints: sourcePoints.reduce((sum, sourcePoint) => sum + sourcePoint.points, 0),
+        countedPlaces: placesByOrganisation.get(organisation) ?? [],
       };
     })
     .filter((standing) => standing.totalPoints > 0)
@@ -101,23 +109,49 @@ function buildStandings(
         return right.totalPoints - left.totalPoints;
       }
 
-      for (const source of sources) {
-        const leftPoints =
-          left.sourcePoints.find((sourcePoint) => sourcePoint.key === source.key)?.points ?? 0;
-        const rightPoints =
-          right.sourcePoints.find((sourcePoint) => sourcePoint.key === source.key)?.points ?? 0;
+      if (tieBreak === "counted-places") {
+        const maxPlace = Math.max(0, ...left.countedPlaces, ...right.countedPlaces);
+        for (let place = 1; place <= maxPlace; place += 1) {
+          const leftCount = left.countedPlaces.filter((value) => value === place).length;
+          const rightCount = right.countedPlaces.filter((value) => value === place).length;
+          if (leftCount !== rightCount) return rightCount - leftCount;
+        }
+      } else {
+        for (const source of sources) {
+          const leftPoints =
+            left.sourcePoints.find((sourcePoint) => sourcePoint.key === source.key)?.points ?? 0;
+          const rightPoints =
+            right.sourcePoints.find((sourcePoint) => sourcePoint.key === source.key)?.points ?? 0;
 
-        if (leftPoints !== rightPoints) {
-          return rightPoints - leftPoints;
+          if (leftPoints !== rightPoints) {
+            return rightPoints - leftPoints;
+          }
         }
       }
 
       return left.organisation.localeCompare(right.organisation, "uk");
     })
-    .map((standing, index) => ({
-      ...standing,
-      place: index + 1,
-    }));
+    .reduce<SummaryTeamStanding[]>((ranked, standing, index) => {
+      const previous = ranked.at(-1);
+      let place = index + 1;
+
+      if (
+        tieBreak === "counted-places" &&
+        previous &&
+        previous.totalPoints === standing.totalPoints
+      ) {
+        const maxPlace = Math.max(0, ...previous.countedPlaces, ...standing.countedPlaces);
+        const placesAreEqual = Array.from({ length: maxPlace }, (_, placeIndex) => placeIndex + 1)
+          .every((candidatePlace) =>
+            previous.countedPlaces.filter((value) => value === candidatePlace).length ===
+            standing.countedPlaces.filter((value) => value === candidatePlace).length,
+          );
+        if (placesAreEqual) place = previous.place;
+      }
+
+      ranked.push({ ...standing, place });
+      return ranked;
+    }, []);
 }
 
 function compareGroupNames(left: string, right: string, groupOrder: string[]): number {
@@ -136,6 +170,7 @@ export function buildSummaryTeamStandingGroups(
   sources: SummaryTeamPointSource[],
   layout: SummaryTeamLayoutType,
   groupOrder: string[] = [],
+  tieBreak: "source-order" | "counted-places" = "source-order",
 ): SummaryTeamStandingGroup[] {
   if (layout === "flat") {
     return [{
@@ -145,6 +180,7 @@ export function buildSummaryTeamStandingGroups(
           label: source.label,
           results: mergeResults(source.groups.flatMap((group) => group.results)),
         })),
+        tieBreak,
       ),
     }];
   }
@@ -169,6 +205,7 @@ export function buildSummaryTeamStandingGroups(
               .flatMap((group) => group.results),
           ),
         })),
+        tieBreak,
       ),
     }))
     .filter((group) => group.standings.length > 0);

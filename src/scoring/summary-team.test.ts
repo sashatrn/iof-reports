@@ -62,6 +62,27 @@ describe("buildSummaryTeamStandingGroups", () => {
     expect(groups[0].standings.map((standing) => standing.organisation)).toEqual(["А", "Б"]);
   });
 
+  it("uses counted places and assigns equal places for the 2026 side-by-side rules", () => {
+    const groups = buildSummaryTeamStandingGroups([
+      {
+        key: "individual",
+        label: "Індивідуальна",
+        groups: [{ results: [
+          { organisation: "А", points: 184, countedPlaces: [1, 5] },
+          { organisation: "Б", points: 184, countedPlaces: [2, 3] },
+          { organisation: "В", points: 184, countedPlaces: [1, 5] },
+        ] }],
+      },
+    ], "flat", [], "counted-places");
+
+    expect(groups[0].standings.map(({ organisation, place }) => ({ organisation, place })))
+      .toEqual([
+        { organisation: "А", place: 1 },
+        { organisation: "В", place: 1 },
+        { organisation: "Б", place: 3 },
+      ]);
+  });
+
   it("keeps configured groups separate and ordered", () => {
     const groups = buildSummaryTeamStandingGroups([
       {

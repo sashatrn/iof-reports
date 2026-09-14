@@ -38,10 +38,12 @@
 </div>
 {% endfor %}
 
-{% if teamResults and teamResults.length %}
+{% if teamResultGroups and teamResultGroups.length %}
 <div class="class-block">
   <h2>Командні результати</h2>
 
+  {% for group in teamResultGroups %}
+  <h3>{{ group.name }}</h3>
   <table>
     <thead>
       <tr>
@@ -51,7 +53,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for team in teamResults %}
+      {% for team in group.teams %}
       <tr>
         <td class="place-cell"><strong>{{ team.place }}</strong></td>
         <td>{{ team.organisation }}</td>
@@ -60,6 +62,7 @@
       {% endfor %}
     </tbody>
   </table>
+  {% endfor %}
 </div>
 {% endif %}
 

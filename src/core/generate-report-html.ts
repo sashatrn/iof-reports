@@ -43,6 +43,7 @@ import {
 import { getIndividualScoring } from "../scoring/individual-scoring";
 import { pointsFromPosition } from "../scoring/side-by-side-points";
 import { computeTeamResults } from "../scoring/side-by-side-team";
+import { buildSideBySideIndividualTeamResults } from "../scoring/side-by-side-team";
 import { ReportType, SingleReportType } from "../report-types";
 import { formatDateRange } from "../utils/date";
 
@@ -205,11 +206,10 @@ export function generateSideBySideTeamReportHtml(
   const { logger, awardsOnly } = options;
   const { participants, eventDate } = parseParticipantsXml(xml, logger);
   const config = loadConfig();
-  const viewTeamResults = computeTeamResults(participants, config, logger);
-  const pdfTeamResults = computeTeamResults(
+  const viewTeamResults = buildSideBySideIndividualTeamResults(participants, config);
+  const pdfTeamResults = buildSideBySideIndividualTeamResults(
     participants.filter(isPdfVisibleParticipant),
     config,
-    logger,
   );
 
   return {
@@ -221,7 +221,7 @@ export function generateSideBySideTeamReportHtml(
       awardsOnly,
     }),
     eventDate: toIsoDate(eventDate),
-    itemCount: pdfTeamResults.men.length + pdfTeamResults.women.length,
+    itemCount: pdfTeamResults.reduce((count, group) => count + group.teams.length, 0),
   };
 }
 
@@ -370,7 +370,7 @@ function buildSummaryTeamSourceFromXml(
       source: {
         type: input.type,
         label: input.label,
-        groups: buildRogainingSummaryTeamGroups(classes),
+        groups: buildRogainingSummaryTeamGroups(classes, config),
       },
       eventDate,
     };

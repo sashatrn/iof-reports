@@ -6,6 +6,10 @@ import { isPdfVisibleParticipant } from "./pdf-status-filter";
 import { formatDate } from "../utils/date";
 import { getLeftLogo, getRightLogo } from "./report-logos";
 import {
+  buildSideBySideTeamResultsFromEntries,
+  type SideBySideTeamResultGroup,
+} from "../scoring/side-by-side-team";
+import {
   type AwardsModeOptions,
   filterAwardPlaces,
   sortAwardClasses,
@@ -28,12 +32,6 @@ type SideBySideRogainingParticipant = {
 export type SideBySideRogainingClass = {
   name: string;
   participants: SideBySideRogainingParticipant[];
-};
-
-type SideBySideRogainingTeamResult = {
-  place: number;
-  organisation: string;
-  points: number;
 };
 
 type RankedParticipant = Participant & {
@@ -172,47 +170,21 @@ export function buildSideBySideRogainingClasses(
 
 export function buildSideBySideRogainingTeamResults(
   classes: SideBySideRogainingClass[],
-): SideBySideRogainingTeamResult[] {
-  const pointsByOrganisation = new Map<string, number>();
-
-  for (const classGroup of classes) {
-    const pointsByOrganisationInClass = new Map<string, number[]>();
-
-    for (const participant of classGroup.participants) {
-      const organisation = normalizeOrganisation(participant.organisation);
-      const points = pointsByOrganisationInClass.get(organisation) ?? [];
-      points.push(participant.points);
-      pointsByOrganisationInClass.set(organisation, points);
-    }
-
-    for (const [organisation, points] of pointsByOrganisationInClass.entries()) {
-      const bestPoints = [...points].sort((left, right) => right - left).slice(0, 2);
-      const classPoints = bestPoints.reduce((sum, point) => sum + point, 0);
-      pointsByOrganisation.set(
-        organisation,
-        (pointsByOrganisation.get(organisation) ?? 0) + classPoints,
-      );
-    }
-  }
-
-  return [...pointsByOrganisation.entries()]
-    .map(([organisation, points]) => ({
-      place: 0,
-      organisation,
-      points,
-    }))
-    .filter((result) => result.points > 0)
-    .sort((left, right) => {
-      if (left.points !== right.points) {
-        return right.points - left.points;
-      }
-
-      return left.organisation.localeCompare(right.organisation, "uk");
-    })
-    .map((result, index) => ({
-      ...result,
-      place: index + 1,
-    }));
+  config = loadConfig(),
+): SideBySideTeamResultGroup[] {
+  return buildSideBySideTeamResultsFromEntries(
+    classes.flatMap((classGroup) =>
+      classGroup.participants.map((participant) => ({
+        className: classGroup.name,
+        organisation: normalizeOrganisation(participant.organisation),
+        label: participant.name,
+        place: participant.position ? Number(participant.position) : undefined,
+        points: participant.points,
+      })),
+    ),
+    config,
+    "individual",
+  );
 }
 
 function buildSideBySideEvent(
@@ -259,18 +231,17 @@ export function buildSideBySideRogainingHtml(
       options,
     ),
   })), config.awards.classOrder, options);
-  const teamResults =
+  const teamResultGroups =
     variant === "pdf"
-      ? filterAwardPlaces(
-          buildSideBySideRogainingTeamResults(classes),
-          (team) => team.place,
-          options,
-        )
+      ? buildSideBySideRogainingTeamResults(classes).map((group) => ({
+          ...group,
+          teams: filterAwardPlaces(group.teams, (team) => team.place, options),
+        }))
       : undefined;
 
   return renderTemplate(`side-by-side-rogaining-${variant}.njk`, {
     ...buildSideBySideEvent(eventDate, options),
     classes: displayClasses,
-    teamResults,
+    teamResultGroups,
   });
 }

@@ -87,8 +87,8 @@ describe("buildSideBySideRogainingClasses", () => {
   it("does not score active or inactive participants", () => {
     const participants = [
       makeParticipant("Фініш", "OK", 10, 900),
-      makeParticipant("На дистанції", "Active", 6, 1000, "Ж", "Ліцей 2"),
-      makeParticipant("Неактивний", "Inactive", 1, 2000, "Ж", "Ліцей 3"),
+      makeParticipant("На дистанції", "Active", 6, 1000, "Ж 5-6", "Ліцей 2"),
+      makeParticipant("Неактивний", "Inactive", 1, 2000, "Ж 5-6", "Ліцей 3"),
     ];
     const rows = getClassRows(participants);
 
@@ -109,13 +109,11 @@ describe("buildSideBySideRogainingClasses", () => {
       },
     ]);
 
-    expect(buildSideBySideRogainingTeamResults([{ name: "Ж", participants: rows }])).toEqual([
-      {
-        place: 1,
-        organisation: "Ліцей",
-        points: 100,
-      },
-    ]);
+    expect(buildSideBySideRogainingTeamResults([{ name: "Ж 5-6", participants: rows }]))
+      .toMatchObject([{
+        name: "5-9 класи",
+        teams: [{ place: 1, organisation: "Ліцей", points: 100 }],
+      }]);
 
     const html = buildSideBySideRogainingHtml(participants, new Date(2026, 3, 11), "view");
 
@@ -127,28 +125,23 @@ describe("buildSideBySideRogainingClasses", () => {
     );
   });
 
-  it("sums only the two best team results by organisation in each class", () => {
+  it("sums mixed results across personal classes in the event age group", () => {
     const classes = buildSideBySideRogainingClasses([
-      makeParticipant("Ліцей 1 швидко", "OK", 10, 900, "Ж", "Ліцей 1"),
-      makeParticipant("Ліцей 2", "OK", 10, 1000, "Ж", "Ліцей 2"),
-      makeParticipant("Ліцей 1 другий Ж", "OK", 10, 950, "Ж", "Ліцей 1"),
-      makeParticipant("Ліцей 1 третій Ж", "OK", 10, 990, "Ж", "Ліцей 1"),
-      makeParticipant("Ліцей 1 ще", "OK", 10, 800, "Ч", "Ліцей 1"),
-      makeParticipant("Ліцей 1 третій", "OK", 10, 850, "Ч", "Ліцей 1"),
+      makeParticipant("Ліцей 1 швидко", "OK", 10, 900, "Ж 5-6", "Ліцей 1"),
+      makeParticipant("Ліцей 2", "OK", 10, 1000, "Ж 5-6", "Ліцей 2"),
+      makeParticipant("Ліцей 1 другий Ж", "OK", 10, 950, "Ж 5-6", "Ліцей 1"),
+      makeParticipant("Ліцей 1 третій Ж", "OK", 10, 990, "Ж 5-6", "Ліцей 1"),
+      makeParticipant("Ліцей 1 ще", "OK", 10, 800, "Ч 7-8", "Ліцей 1"),
+      makeParticipant("Ліцей 1 третій", "OK", 10, 850, "Ч 7-8", "Ліцей 1"),
     ]);
 
-    expect(buildSideBySideRogainingTeamResults(classes)).toEqual([
-      {
-        place: 1,
-        organisation: "Ліцей 1",
-        points: 390,
-      },
-      {
-        place: 2,
-        organisation: "Ліцей 2",
-        points: 85,
-      },
-    ]);
+    expect(buildSideBySideRogainingTeamResults(classes)).toMatchObject([{
+      name: "5-9 класи",
+      teams: [
+        { place: 1, organisation: "Ліцей 1", points: 480 },
+        { place: 2, organisation: "Ліцей 2", points: 85 },
+      ],
+    }]);
   });
 });
 
@@ -157,7 +150,7 @@ function makeParticipant(
   status: string,
   controlCount: number,
   timeSec: number,
-  className = "Ж",
+  className = "Ж 5-6",
   club = "Ліцей",
 ): Participant {
   return {

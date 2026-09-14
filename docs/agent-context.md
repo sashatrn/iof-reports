@@ -73,7 +73,7 @@ Notable config areas:
 - `individual.classOrder`, `individual.teamResults`, `individual.teamFilterRegex`, `individual.classFilterRegex`, `individual.classOrderGroups`, `individual.reportTitle`, `individual.title`, and `individual.subtitle` control individual report layout/text independently from scoring.
 - `relay.scoring` selects `side-by-side` or `military`; both use the same live relay status/ranking pipeline. `relay.teamResults` selects `none`, `flat`, or `grouped`.
 - `summaryTeam` controls the shared `summary-team` report. It consumes repeated `--series` inputs and combines the configured team results exported by each source report.
-- `side-by-side.teamRules` controls regular team report composition.
+- `side-by-side.ageGroups` maps personal and relay class names to the 5-9 and 9-12 event groups and sets the number of counted individual and relay results. Unmatched classes are intentionally ignored only in team standings. `side-by-side.relayCoefficient` controls the relay points multiplier.
 - `military` controls military point filters and grouping.
 - `rogaining.controlGateRule`, `rogaining.scorePoints`, `rogaining.scoreReport`, and `rogaining.resultsReport` control rogaining-specific reports.
 

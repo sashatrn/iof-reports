@@ -3,7 +3,7 @@
   "individual": {
     "scoring": "side-by-side",
     "classOrder": "name",
-    "teamResults": "gender",
+    "teamResults": "side-by-side",
     "teamFilterRegex": ".*",
     "classFilterRegex": ".*",
     "classOrderGroups": [],
@@ -11,7 +11,7 @@
   },
   "relay": {
     "scoring": "side-by-side",
-    "teamResults": "flat",
+    "teamResults": "grouped",
     "classOrder": "name",
     "teamFilterRegex": ".*",
     "classFilterRegex": ".*",
@@ -22,8 +22,8 @@
     "showZeroPoints": false
   },
   "summaryTeam": {
-    "layout": "flat",
-    "groupOrder": [],
+    "layout": "grouped",
+    "groupOrder": ["5-9 класи", "9-12 класи"],
     "reportTitle": "Командний підсумок",
     "title": "Всеукраїнські змагання<br/>\"Пліч-о-пліч всеукраїнські шкільні ліги зі спортивного орієнтування\"<br/>серед учнів закладів загальної середньої освіти \"РАЗОМ ПЕРЕМОЖЕМО\"",
     "subtitle": "Протокол загальнокомандних результатів змагань зі спортивного орієнтування<br/>{{stage}} Пліч-о-пліч, Всеукраїнських шкільних ліг<br/>{{region_of}}, {{year}} р.",
@@ -32,6 +32,7 @@
       "side-by-side-rogaining": "По вибору",
       "relay": "Естафета"
     },
-    "showZeroPoints": false
+    "showZeroPoints": false,
+    "tieBreak": "counted-places"
   }
 }

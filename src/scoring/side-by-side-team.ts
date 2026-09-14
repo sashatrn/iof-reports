@@ -1,106 +1,221 @@
-import { Participant } from "../io/parse-iof";
-import { AppConfig } from "../config";
-import { Logger } from "pino";
+import { type AppConfig, type SideBySideAgeGroupConfig } from "../config";
+import { type Participant } from "../io/parse-iof";
 
+export type SideBySideCountedResult = {
+  place: number;
+  points: number;
+};
+
+export type SideBySideTeamResult = {
+  place: number;
+  organisation: string;
+  points: number;
+  countedResults: SideBySideCountedResult[];
+};
+
+export type SideBySideTeamResultGroup = {
+  name: string;
+  teams: SideBySideTeamResult[];
+};
+
+export type SideBySideScoredEntry = {
+  className: string;
+  organisation: string;
+  label: string;
+  place?: number;
+  points: number;
+};
+
+type AgeGroupMatcher = SideBySideAgeGroupConfig & { regex: RegExp };
+
+function normalizeOrganisation(organisation: string): string {
+  return organisation.trim() || "Unknown";
+}
+
+function buildAgeGroupMatchers(config: AppConfig): AgeGroupMatcher[] {
+  return config["side-by-side"].ageGroups.map((group, index) => {
+    try {
+      return { ...group, regex: new RegExp(group.classRegex) };
+    } catch (error) {
+      throw new Error(
+        `Invalid side-by-side.ageGroups[${index}].classRegex: ${(error as Error).message}`,
+      );
+    }
+  });
+}
+
+function compareCountedPlaces(
+  left: SideBySideCountedResult[],
+  right: SideBySideCountedResult[],
+): number {
+  const maxPlace = Math.max(
+    0,
+    ...left.map((result) => result.place),
+    ...right.map((result) => result.place),
+  );
+
+  for (let place = 1; place <= maxPlace; place += 1) {
+    const leftCount = left.filter((result) => result.place === place).length;
+    const rightCount = right.filter((result) => result.place === place).length;
+
+    if (leftCount !== rightCount) {
+      return rightCount - leftCount;
+    }
+  }
+
+  return 0;
+}
+
+export function compareSideBySideTeamResults(
+  left: Pick<SideBySideTeamResult, "points" | "countedResults">,
+  right: Pick<SideBySideTeamResult, "points" | "countedResults">,
+): number {
+  return right.points - left.points ||
+    compareCountedPlaces(left.countedResults, right.countedResults);
+}
+
+function rankTeamResults(
+  teams: Omit<SideBySideTeamResult, "place">[],
+): SideBySideTeamResult[] {
+  const sorted = [...teams].sort((left, right) =>
+    compareSideBySideTeamResults(left, right) ||
+    left.organisation.localeCompare(right.organisation, "uk"),
+  );
+  let previous: SideBySideTeamResult | undefined;
+
+  return sorted.map((team, index) => {
+    const place = previous && compareSideBySideTeamResults(previous, team) === 0
+      ? previous.place
+      : index + 1;
+    const ranked = { ...team, place };
+    previous = ranked;
+    return ranked;
+  });
+}
+
+function buildTeamResultGroups(
+  entries: SideBySideScoredEntry[],
+  config: AppConfig,
+  countForGroup: (group: SideBySideAgeGroupConfig) => number,
+): SideBySideTeamResultGroup[] {
+  const matchers = buildAgeGroupMatchers(config);
+
+  return matchers.map((group) => {
+    const entriesByOrganisation = new Map<string, SideBySideScoredEntry[]>();
+
+    for (const entry of entries) {
+      if (!group.regex.test(entry.className)) continue;
+      const organisation = normalizeOrganisation(entry.organisation);
+      const organisationEntries = entriesByOrganisation.get(organisation) ?? [];
+      organisationEntries.push(entry);
+      entriesByOrganisation.set(organisation, organisationEntries);
+    }
+
+    const teams = [...entriesByOrganisation.entries()].map(([organisation, teamEntries]) => {
+      const countedResults = teamEntries
+        .filter((entry): entry is SideBySideScoredEntry & { place: number } =>
+          entry.points > 0 && entry.place !== undefined,
+        )
+        .sort((left, right) =>
+          right.points - left.points ||
+          left.place - right.place ||
+          left.label.localeCompare(right.label, "uk"),
+        )
+        .slice(0, countForGroup(group))
+        .map(({ place, points }) => ({ place, points }));
+
+      return {
+        organisation,
+        points: countedResults.reduce((sum, result) => sum + result.points, 0),
+        countedResults,
+      };
+    }).filter((team) => team.points > 0);
+
+    return {
+      name: group.name,
+      teams: rankTeamResults(teams),
+    };
+  }).filter((group) => group.teams.length > 0);
+}
+
+export function buildSideBySideIndividualTeamResults(
+  participants: Participant[],
+  config: AppConfig,
+): SideBySideTeamResultGroup[] {
+  return buildTeamResultGroups(
+    participants.map((participant) => ({
+      className: participant.className,
+      organisation: participant.club,
+      label: participant.name,
+      place: participant.position,
+      points: participant.points,
+    })),
+    config,
+    (group) => group.individualResultCount,
+  );
+}
+
+export function buildSideBySideTeamResultsFromEntries(
+  entries: SideBySideScoredEntry[],
+  config: AppConfig,
+  resultType: "individual" | "relay",
+): SideBySideTeamResultGroup[] {
+  return buildTeamResultGroups(
+    entries,
+    config,
+    resultType === "individual"
+      ? (group) => group.individualResultCount
+      : (group) => group.relayResultCount,
+  );
+}
+
+// Legacy gender-separated mode remains available for older configuration files.
 export type GenderTeamResult = {
   club: string;
   points: number;
 };
 
-function matchesPrefix(value: string, prefixes: string[]) {
+function matchesPrefix(value: string, prefixes: string[]): boolean {
   return prefixes.some((prefix) => value.startsWith(prefix));
 }
 
 export function computeTeamResults(
   participants: Participant[],
   config: AppConfig,
-  logger?: Logger,
-): {
-  men: GenderTeamResult[];
-  women: GenderTeamResult[];
-} {
-  const menClasses = new Set<string>();
-  const womenClasses = new Set<string>();
-  const teamRules = config["side-by-side"].teamRules;
-
-  for (const p of participants) {
-    if (matchesPrefix(p.className, config.genderMapping.menPrefixes)) {
-      menClasses.add(p.className);
-    }
-    if (matchesPrefix(p.className, config.genderMapping.womenPrefixes)) {
-      womenClasses.add(p.className);
-    }
-  }
-
-  logger?.info({ menClasses: [...menClasses] }, "Detected men classes");
-  logger?.info({ womenClasses: [...womenClasses] }, "Detected women classes");
-
-  if (menClasses.size !== teamRules.menCount) {
-    logger?.warn(
-      { count: menClasses.size, expected: teamRules.menCount },
-      `Expected exactly ${teamRules.menCount} men classes`,
+  _logger?: unknown,
+): { men: GenderTeamResult[]; women: GenderTeamResult[] } {
+  const buildGenderResults = (prefixes: string[]) => {
+    const classNames = new Set(
+      participants
+        .filter((participant) => matchesPrefix(participant.className, prefixes))
+        .map((participant) => participant.className),
     );
-  }
+    const byOrganisation = new Map<string, number>();
 
-  if (womenClasses.size !== teamRules.womenCount) {
-    logger?.warn(
-      { count: womenClasses.size, expected: teamRules.womenCount },
-      `Expected exactly ${teamRules.womenCount} women classes`,
-    );
-  }
-
-  const byClub = new Map<string, Participant[]>();
-
-  for (const p of participants) {
-    if (!byClub.has(p.club)) {
-      byClub.set(p.club, []);
-    }
-    byClub.get(p.club)!.push(p);
-  }
-
-  const menResults: GenderTeamResult[] = [];
-  const womenResults: GenderTeamResult[] = [];
-
-  for (const [club, members] of byClub.entries()) {
-    let menPoints = 0;
-    for (const className of menClasses) {
-      const top2 = members
-        .filter((p) => p.className === className)
-        .sort((a, b) => b.points - a.points)
-        .slice(0, 2);
-
-      if (top2.length > 0) {
-        logger?.debug(
-          { club, className, top2: top2.map((p) => ({ name: p.name, points: p.points })) },
-          "Top 2 participants for club and class",
-        );
-      } else {
-        logger?.debug({ club, className }, "No participants for club and class");
+    for (const className of classNames) {
+      const byClub = new Map<string, Participant[]>();
+      for (const participant of participants.filter((entry) => entry.className === className)) {
+        const clubParticipants = byClub.get(participant.club) ?? [];
+        clubParticipants.push(participant);
+        byClub.set(participant.club, clubParticipants);
       }
-      
-      menPoints += top2.reduce((s, p) => s + p.points, 0);
+      for (const [club, clubParticipants] of byClub) {
+        const points = clubParticipants
+          .sort((left, right) => right.points - left.points)
+          .slice(0, 2)
+          .reduce((sum, participant) => sum + participant.points, 0);
+        byOrganisation.set(club, (byOrganisation.get(club) ?? 0) + points);
+      }
     }
 
-    let womenPoints = 0;
-    for (const className of womenClasses) {
-      const top2 = members
-        .filter((p) => p.className === className)
-        .sort((a, b) => b.points - a.points)
-        .slice(0, 2);
-
-      womenPoints += top2.reduce((s, p) => s + p.points, 0);
-    }
-
-    if (menPoints > 0) {
-      menResults.push({ club, points: menPoints });
-    }
-    if (womenPoints > 0) {
-      womenResults.push({ club, points: womenPoints });
-    }
-  }
+    return [...byOrganisation.entries()]
+      .map(([club, points]) => ({ club, points }))
+      .filter((team) => team.points > 0)
+      .sort((left, right) => right.points - left.points || left.club.localeCompare(right.club, "uk"));
+  };
 
   return {
-    men: menResults.sort((a, b) => b.points - a.points),
-    women: womenResults.sort((a, b) => b.points - a.points),
+    men: buildGenderResults(config.genderMapping.menPrefixes),
+    women: buildGenderResults(config.genderMapping.womenPrefixes),
   };
 }

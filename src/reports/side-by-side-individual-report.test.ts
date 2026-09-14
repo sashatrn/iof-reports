@@ -184,23 +184,41 @@ describe("buildIndividualHtml", () => {
     );
   });
 
-  it("renders team results in the PDF variant when provided", () => {
+  it("renders mixed team results by event age group in the PDF variant", () => {
     setConfigPath(path.resolve(__dirname, "../../config-individual-side-by-side.json"));
 
     const html = buildIndividualHtml(
-      [],
+      [{
+        className: "Ч 5-6",
+        name: "Учень",
+        club: "Ліцей 1",
+        position: 1,
+        status: "OK",
+        points: 100,
+      }, {
+        className: "Ж 5-6",
+        name: "Учениця",
+        club: "Ліцей 1",
+        position: 2,
+        status: "OK",
+        points: 95,
+      }, {
+        className: "Тестова",
+        name: "Поза конкурсом",
+        club: "Гімназія 2",
+        position: 1,
+        status: "OK",
+        points: 100,
+      }],
       new Date(2026, 3, 11),
       "pdf",
-      {
-        men: [{ club: "Ліцей 1", points: 120 }],
-        women: [{ club: "Гімназія 2", points: 110 }],
-      },
     );
 
     expect(html).toContain("<h2>Командні результати</h2>");
-    expect(html).toContain("<h4>Чоловіки</h4>");
+    expect(html).toContain("<h4>5-9 класи</h4>");
     expect(html).toContain("Ліцей 1");
-    expect(html).toContain("<h4>Жінки</h4>");
-    expect(html).toContain("Гімназія 2");
+    expect(html).toContain("195");
+    const teamSection = html.slice(html.indexOf("<h2>Командні результати</h2>"));
+    expect(teamSection).not.toContain("Гімназія 2");
   });
 });

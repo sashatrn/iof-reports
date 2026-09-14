@@ -32,17 +32,17 @@ describe("buildRelayClasses", () => {
       {
         teamName: "Ліцей 1",
         place: "1",
-        points: 300,
+        points: 200,
       },
       {
         teamName: "Ліцей 1-2",
         place: "2",
-        points: 285,
+        points: 190,
       },
       {
         teamName: "Ліцей 2",
         place: "3",
-        points: 270,
+        points: 180,
       },
     ]);
   });
@@ -57,7 +57,7 @@ describe("buildRelayClasses", () => {
       {
         teamName: "Фініш",
         place: "1",
-        points: 300,
+        points: 200,
         status: "OK",
       },
       {
@@ -106,7 +106,7 @@ describe("buildRelayClasses", () => {
     ]);
   });
 
-  it("keeps explicit relay did-not-finish status with side-by-side minimum points", () => {
+  it("gives an explicit relay did-not-finish result zero side-by-side points", () => {
     const classes = buildRelayClasses([
       makeRelayTeam("Ж 5-6", "Фініш", "Гімназія", 3000, true, [1500, 1500]),
       makeRelayTeam(
@@ -131,7 +131,7 @@ describe("buildRelayClasses", () => {
       {
         teamName: "Без фінішу",
         place: "",
-        points: 2,
+        points: 0,
         status: "DidNotFinish",
         rowStatus: "DidNotFinish",
         stageTimes: ["38:40", "Не фінішував"],
@@ -184,7 +184,7 @@ describe("buildRelayClasses", () => {
     expect(classes[0].teams).toMatchObject([
       {
         teamName: "Фініш",
-        points: 300,
+        points: 200,
       },
       {
         teamName: "На дистанції",
@@ -204,7 +204,7 @@ describe("buildRelayClasses", () => {
       {
         place: 1,
         organisation: "Гімназія",
-        points: 300,
+        points: 200,
       },
     ]);
     const html = buildRelayHtml(teams, new Date(2026, 3, 11), "view");
@@ -375,12 +375,12 @@ describe("buildFlatRelayTeamResults", () => {
           {
             place: 1,
             organisation: "Ліцей 1",
-            points: 900,
+            points: 600,
           },
           {
             place: 2,
             organisation: "Ліцей 2",
-            points: 255,
+            points: 170,
           },
     ]);
   });

@@ -6,8 +6,7 @@ export function pointsFromPosition(
   position: number | undefined,
   status: string,
 ): number {
-  if (status === "Active" || status === "Inactive") return 0;
-  if (status !== "OK" || position === undefined) return 1;
+  if (status !== "OK" || position === undefined) return 0;
 
   if (position === 1) return 100;
   if (position === 2) return 95;
@@ -27,14 +26,14 @@ export function applySideBySideIndividualPoints(
   }
 }
 
-export const applySideBySideRelayPoints: ApplyRelayPoints = (classes) => {
+export const applySideBySideRelayPoints: ApplyRelayPoints = (classes, config) => {
   for (const classGroup of classes) {
     for (const team of classGroup.teams) {
       const place = team.place ? Number(team.place) : undefined;
       team.points =
         team.completedStageCount === 0
           ? 0
-          : pointsFromPosition(place, team.status) * team.teamStageCount;
+          : pointsFromPosition(place, team.status) * config["side-by-side"].relayCoefficient;
     }
   }
 };

@@ -14,6 +14,10 @@ import {
   type GroupedIndividualTeamResults,
 } from "./individual-team-results";
 import {
+  buildSideBySideIndividualTeamResults,
+  type SideBySideTeamResultGroup,
+} from "../scoring/side-by-side-team";
+import {
   type AwardsModeOptions,
   filterAwardPlaces,
   filterAwardTop,
@@ -33,6 +37,10 @@ type IndividualTeamResults =
   | {
       mode: "grouped";
       groups: GroupedIndividualTeamResults[];
+    }
+  | {
+      mode: "side-by-side";
+      groups: SideBySideTeamResultGroup[];
     };
 
 type ClassGroupMatcher = ClassGroupConfig & { regex: RegExp };
@@ -147,6 +155,13 @@ function buildTeamResults(
   config: AppConfig,
   genderTeamResults?: GenderIndividualTeamResults,
 ): IndividualTeamResults | undefined {
+  if (config.individual.teamResults === "side-by-side") {
+    return {
+      mode: "side-by-side",
+      groups: buildSideBySideIndividualTeamResults(participants, config),
+    };
+  }
+
   if (config.individual.teamResults === "grouped") {
     return {
       mode: "grouped",
@@ -183,6 +198,16 @@ function filterAwardTeamResults(
       mode: "gender",
       men: filterAwardTop(teamResults.men, options),
       women: filterAwardTop(teamResults.women, options),
+    };
+  }
+
+  if (teamResults.mode === "side-by-side") {
+    return {
+      mode: "side-by-side",
+      groups: teamResults.groups.map((group) => ({
+        ...group,
+        teams: filterAwardPlaces(group.teams, (team) => team.place, options),
+      })),
     };
   }
 

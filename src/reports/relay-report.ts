@@ -2,6 +2,10 @@ import { loadConfig, type AppConfig, type ClassGroupConfig, type RelayScoringTyp
 import { TeamIofTeam } from "../io/parse-team-iof";
 import { renderTemplate } from "../render/template-engine";
 import { getRelayScoring } from "../scoring/relay-scoring";
+import {
+  buildSideBySideTeamResultsFromEntries,
+  type SideBySideTeamResultGroup,
+} from "../scoring/side-by-side-team";
 import { isPdfVisibleRelayTeam } from "./pdf-status-filter";
 import { formatDate } from "../utils/date";
 import { formatResultStatus } from "../utils/result-status";
@@ -429,6 +433,25 @@ export function buildFlatRelayTeamResults(
     }));
 }
 
+export function buildSideBySideRelayTeamResults(
+  relayClasses: RelayClass[],
+  config: AppConfig = loadConfig(),
+): SideBySideTeamResultGroup[] {
+  return buildSideBySideTeamResultsFromEntries(
+    relayClasses.flatMap((classGroup) =>
+      classGroup.teams.map((team) => ({
+        className: team.sourceClassName,
+        organisation: team.organisation,
+        label: team.teamName,
+        place: team.place ? Number(team.place) : undefined,
+        points: team.points,
+      })),
+    ),
+    config,
+    "relay",
+  );
+}
+
 export function buildGroupedRelayTeamResults(
   relayClasses: RelayClass[],
   config: AppConfig = loadConfig(),
@@ -506,7 +529,12 @@ export function buildRelayHtml(
     config.relay.teamResults === "flat"
       ? { mode: "flat", teams: buildFlatRelayTeamResults(classes) }
       : config.relay.teamResults === "grouped"
-        ? { mode: "grouped", groups: buildGroupedRelayTeamResults(classes, config) }
+        ? {
+            mode: "grouped",
+            groups: config.relay.scoring === "side-by-side"
+              ? buildSideBySideRelayTeamResults(classes, config)
+              : buildGroupedRelayTeamResults(classes, config),
+          }
         : undefined;
   const displayClasses = sortAwardClasses(classes.map((classGroup) => ({
     ...classGroup,

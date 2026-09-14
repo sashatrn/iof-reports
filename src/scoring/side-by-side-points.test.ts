@@ -9,8 +9,8 @@ describe("pointsFromPosition", () => {
     expect(pointsFromPosition(1, "Inactive")).toBe(0);
   });
 
-  it("keeps minimum points for other unplaced side-by-side statuses", () => {
-    expect(pointsFromPosition(undefined, "DidNotFinish")).toBe(1);
-    expect(pointsFromPosition(undefined, "MissingPunch")).toBe(1);
+  it("gives zero points to invalid or unplaced results", () => {
+    expect(pointsFromPosition(undefined, "DidNotFinish")).toBe(0);
+    expect(pointsFromPosition(undefined, "MissingPunch")).toBe(0);
   });
 });

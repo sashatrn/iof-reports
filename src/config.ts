@@ -17,16 +17,21 @@ export type ClassGroupConfig = {
 
 export type MilitaryIndividualTeamGroupConfig = ClassGroupConfig;
 
+export type SideBySideAgeGroupConfig = {
+  name: string;
+  classRegex: string;
+  individualResultCount: number;
+  relayResultCount: number;
+};
+
 type SideBySideConfig = {
-  teamRules: {
-    menCount: number;
-    womenCount: number;
-  };
+  ageGroups: SideBySideAgeGroupConfig[];
+  relayCoefficient: number;
 };
 
 export type IndividualScoringType = "regular" | "side-by-side" | "military";
 export type IndividualClassOrderType = "name" | "grouped";
-export type IndividualTeamResultsType = "none" | "gender" | "grouped";
+export type IndividualTeamResultsType = "none" | "gender" | "grouped" | "side-by-side";
 export type RelayScoringType = "side-by-side" | "military";
 export type RelayTeamResultsType = "none" | "flat" | "grouped";
 export type SummaryTeamLayoutType = "flat" | "grouped";
@@ -79,6 +84,7 @@ type SummaryTeamConfig = {
   sourceLabels: Record<string, string>;
   series: SummaryTeamSeriesConfig[];
   showZeroPoints: boolean;
+  tieBreak: "source-order" | "counted-places";
 };
 
 type SummaryConfig = {
@@ -260,6 +266,7 @@ const defaultConfig: AppConfig = {
     },
     series: [],
     showZeroPoints: false,
+    tieBreak: "source-order",
   },
   summary: {
     reportTitle: "Підсумкові результати",
@@ -273,10 +280,21 @@ const defaultConfig: AppConfig = {
     classOrder: [],
   },
   "side-by-side": {
-    teamRules: {
-      menCount: 3,
-      womenCount: 3,
-    },
+    ageGroups: [
+      {
+        name: "5-9 класи",
+        classRegex: "^(?:(?:Ч|Ж|Х|Д|M|W|Mix|Мікс(?:и)?)\\s*)?(?:5\\s*[-–]\\s*6|7\\s*[-–]\\s*8|9)$",
+        individualResultCount: 6,
+        relayResultCount: 3,
+      },
+      {
+        name: "9-12 класи",
+        classRegex: "^(?:(?:Ч|Ж|Х|Д|M|W|Mix|Мікс(?:и)?)\\s*)?(?:9\\s*[-–]\\s*10|11\\s*[-–]\\s*12)$",
+        individualResultCount: 4,
+        relayResultCount: 2,
+      },
+    ],
+    relayCoefficient: 2,
   },
   military: {
     teamFilterRegex: ".*",
@@ -896,11 +914,9 @@ export function loadConfig(configPath?: string): AppConfig {
     "side-by-side": {
       ...defaultConfig["side-by-side"],
       ...parsed["side-by-side"],
-      teamRules: {
-        ...defaultConfig["side-by-side"].teamRules,
-        ...parsed.teamRules,
-        ...parsed["side-by-side"]?.teamRules,
-      },
+      ageGroups:
+        parsed["side-by-side"]?.ageGroups ??
+        defaultConfig["side-by-side"].ageGroups,
     },
     reportHeader: {
       ...defaultConfig.reportHeader,
