@@ -20,6 +20,94 @@ function sha256(input: string): string {
   return crypto.createHash("sha256").update(input).digest("hex");
 }
 
+function renderWaitingReportHtml(reportType: string): string {
+  return `<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Очікування XML</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: "Segoe UI", sans-serif;
+      color: #263238;
+      background: #fff;
+    }
+    main {
+      max-width: 560px;
+      padding: 32px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      font-weight: 650;
+    }
+    p {
+      margin: 0;
+      color: #607d8b;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Очікування файлу з MeOS</h1>
+    <p>Watch-режим запущено для звіту ${reportType}. Коли у вхідній папці з'явиться XML, ця сторінка оновиться автоматично.</p>
+  </main>
+</body>
+</html>`;
+}
+
+export function ensureInitialWatchOutput(outputDir: string, reportType: string): void {
+  const updatedAt = new Date().toISOString();
+  const reportPath = path.join(outputDir, "report.html");
+  const reportPdfPath = path.join(outputDir, "report.pdf.html");
+  const metaPath = path.join(outputDir, "meta.json");
+  const viewerPath = path.join(outputDir, "viewer.html");
+
+  if (!fs.existsSync(reportPath)) {
+    fs.writeFileSync(reportPath, renderWaitingReportHtml(reportType));
+  }
+
+  if (!fs.existsSync(reportPdfPath)) {
+    fs.writeFileSync(reportPdfPath, renderWaitingReportHtml(reportType));
+  }
+
+  if (!fs.existsSync(metaPath)) {
+    fs.writeFileSync(
+      metaPath,
+      JSON.stringify(
+        {
+          sourceFilePath: null,
+          sourceFileName: "очікування XML",
+          reportType,
+          updatedAt,
+        },
+        null,
+        2,
+      ),
+    );
+  }
+
+  if (!fs.existsSync(viewerPath)) {
+    fs.writeFileSync(
+      viewerPath,
+      renderViewerPage({
+        title: "Очікування XML",
+        sourceFileName: "очікування XML",
+        reportType,
+        updatedAt,
+      }),
+    );
+  }
+}
+
 async function isFileStable(filePath: string, settleMs: number): Promise<boolean> {
   const before = fs.statSync(filePath).size;
 
@@ -45,6 +133,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
   let stopping = false;
 
   fs.mkdirSync(options.outputDir, { recursive: true });
+  ensureInitialWatchOutput(options.outputDir, options.requestedReportType);
   const httpServer = startWatchHttpServer(options.outputDir, options.port, logger);
 
   logger.info(
