@@ -53,6 +53,7 @@ export function buildIndividualSummaryTeamGroups(
       config.individual.teamFilterRegex,
       config.individual.classFilterRegex,
       config.individual.classOrderGroups,
+      config.individual.teamResultLimits,
     ).map((group) => ({
       name: group.name,
       results: group.teams,

@@ -1,4 +1,4 @@
-import { type ClassGroupConfig } from "../config";
+import { type ClassGroupConfig, type IndividualTeamResultLimit } from "../config";
 import { Participant } from "../io/parse-iof";
 import {
   buildMilitaryClassFilter,
@@ -58,11 +58,22 @@ export function buildGroupedIndividualTeamResults(
   teamFilterRegex: string,
   classFilterRegex: string,
   teamGroups: ClassGroupConfig[],
+  teamResultLimits: IndividualTeamResultLimit[] = [],
 ): GroupedIndividualTeamResults[] {
   const teamFilter = buildMilitaryTeamFilter(teamFilterRegex);
   const classFilter = buildMilitaryClassFilter(classFilterRegex);
   const groupMatchers = buildClassGroupMatchers(teamGroups);
-  const pointsByGroup = new Map<string, Map<string, number>>();
+  const limitMatchers = teamResultLimits.map((limit, index) => {
+    if (!Number.isInteger(limit.count) || limit.count < 0) {
+      throw new Error(`Invalid individual.teamResultLimits[${index}].count: expected a non-negative integer.`);
+    }
+    try {
+      return { ...limit, regex: new RegExp(limit.classRegex) };
+    } catch (error) {
+      throw new Error(`Invalid individual.teamResultLimits[${index}].classRegex: ${(error as Error).message}`);
+    }
+  });
+  const participantsByGroup = new Map<string, Map<string, Participant[]>>();
 
   for (const participant of participants) {
     const organisation = normalizeOrganisation(participant.club);
@@ -74,26 +85,43 @@ export function buildGroupedIndividualTeamResults(
     const groupName =
       groupMatchers.find((group) => group.regex.test(participant.className))?.name ??
       "Загальний залік";
-    const groupPoints = pointsByGroup.get(groupName) ?? new Map<string, number>();
+    const groupParticipants = participantsByGroup.get(groupName) ?? new Map<string, Participant[]>();
 
-    groupPoints.set(
+    groupParticipants.set(
       organisation,
-      (groupPoints.get(organisation) ?? 0) + participant.points,
+      [...(groupParticipants.get(organisation) ?? []), participant],
     );
-    pointsByGroup.set(groupName, groupPoints);
+    participantsByGroup.set(groupName, groupParticipants);
   }
 
-  return [...pointsByGroup.entries()]
+  function countTeamPoints(teamParticipants: Participant[]): number {
+    if (limitMatchers.length === 0) {
+      return teamParticipants.reduce((sum, participant) => sum + participant.points, 0);
+    }
+
+    const counts = limitMatchers.map(() => 0);
+    return [...teamParticipants]
+      .filter((participant) => participant.status === "OK" && participant.points > 0)
+      .sort((left, right) => right.points - left.points)
+      .reduce((sum, participant) => {
+        const index = limitMatchers.findIndex((limit) => limit.regex.test(participant.className));
+        if (index === -1 || counts[index] >= limitMatchers[index].count) return sum;
+        counts[index] += 1;
+        return sum + participant.points;
+      }, 0);
+  }
+
+  return [...participantsByGroup.entries()]
     .sort(([leftGroup], [rightGroup]) =>
       compareConfiguredGroupNames(leftGroup, rightGroup, teamGroups),
     )
-    .map(([name, pointsByOrganisation]) => ({
+    .map(([name, participantsByOrganisation]) => ({
       name,
-      teams: [...pointsByOrganisation.entries()]
-        .map(([organisation, points]) => ({
+      teams: [...participantsByOrganisation.entries()]
+        .map(([organisation, teamParticipants]) => ({
           place: 0,
           organisation,
-          points,
+          points: countTeamPoints(teamParticipants),
         }))
         .sort((left, right) => {
           if (left.points !== right.points) {

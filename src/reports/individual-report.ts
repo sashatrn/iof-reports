@@ -8,6 +8,10 @@ import { renderTemplate } from "../render/template-engine";
 import { formatDate } from "../utils/date";
 import { isPdfVisibleParticipant } from "./pdf-status-filter";
 import { getLeftLogo } from "./report-logos";
+import {
+  buildMilitaryClassFilter,
+  buildMilitaryTeamFilter,
+} from "../scoring/military-individual-points";
 import { type GenderIndividualTeamResults } from "./individual-gender-team-results";
 import {
   buildGroupedIndividualTeamResults,
@@ -170,6 +174,7 @@ function buildTeamResults(
         config.individual.teamFilterRegex,
         config.individual.classFilterRegex,
         config.individual.classOrderGroups,
+        config.individual.teamResultLimits,
       ),
     };
   }
@@ -229,8 +234,13 @@ export function buildIndividualHtml(
 ): string {
   const config = loadConfig();
   const groupMatchers = buildClassGroupMatchers(config.individual.classOrderGroups);
-  const reportParticipants =
-    variant === "pdf" ? participants.filter(isPdfVisibleParticipant) : participants;
+  const teamFilter = buildMilitaryTeamFilter(config.individual.teamFilterRegex);
+  const classFilter = buildMilitaryClassFilter(config.individual.classFilterRegex);
+  const reportParticipants = participants.filter((participant) =>
+    (variant !== "pdf" || isPdfVisibleParticipant(participant)) &&
+    (!config.individual.filterParticipants ||
+      (teamFilter.test(participant.club) && classFilter.test(participant.className))),
+  );
   const byClass = new Map<string, Participant[]>();
 
   for (const participant of reportParticipants) {

@@ -267,6 +267,8 @@ iof-reports --report summary-team --config config-summary-team-military.json --s
 - `individual.classOrder` - порядок класів: `name` за назвою або `grouped` за `individual.classOrderGroups`.
 - `individual.teamResults` - тип командного підсумку в PDF: `none`, `gender`, `grouped` або `side-by-side`.
 - `individual.teamFilterRegex`, `individual.classFilterRegex` - фільтри для grouped-заліку в індивідуальному протоколі.
+- `individual.filterParticipants: true` - показувати в індивідуальному HTML і PDF тільки учасників, які проходять обидва фільтри. За замовчуванням `false`.
+- `individual.teamResultLimits` - квоти для grouped-командного заліку за класами. Наприклад, `[{"classRegex":"^Ч21[АA]$","count":4},{"classRegex":"^Ж21[АA]$","count":2}]` зараховує кожній організації чотири найкращі чоловічі та два найкращі жіночі результати в спільну суму. Квоти не заповнюються учасниками з інших класів; за відсутності квот враховуються всі результати.
 - `individual.classOrderGroups` - групи для порядку класів і grouped-командного підсумку індивідуального протоколу.
 - `individual.reportTitle`, `individual.title`, `individual.subtitle` - тексти заголовка індивідуального протоколу. У `title` та `subtitle` підтримуються плейсхолдери `{{stage}}`, `{{region_of}}`, `{{year}}`.
 - `rogaining.reportTitle` - назва рогейнового протоколу, використовується для `rogaining` та `individual-rogaining`.

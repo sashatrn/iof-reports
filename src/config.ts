@@ -17,6 +17,11 @@ export type ClassGroupConfig = {
 
 export type MilitaryIndividualTeamGroupConfig = ClassGroupConfig;
 
+export type IndividualTeamResultLimit = {
+  classRegex: string;
+  count: number;
+};
+
 export type SideBySideAgeGroupConfig = {
   name: string;
   classRegex: string;
@@ -54,6 +59,8 @@ type IndividualConfig = {
   teamResults: IndividualTeamResultsType;
   teamFilterRegex: string;
   classFilterRegex: string;
+  filterParticipants: boolean;
+  teamResultLimits: IndividualTeamResultLimit[];
   classOrderGroups: ClassGroupConfig[];
   reportTitle: string;
   title?: string;
@@ -231,6 +238,8 @@ const defaultConfig: AppConfig = {
     teamResults: "none",
     teamFilterRegex: ".*",
     classFilterRegex: ".*",
+    filterParticipants: false,
+    teamResultLimits: [],
     classOrderGroups: [
       {
         name: "ВВНЗ",
