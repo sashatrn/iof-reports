@@ -146,6 +146,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
       settleMs: options.settleMs,
       port: options.port,
       awards: options.awards,
+      diplomas: options.diplomas,
       diplomaTemplate: options.diplomaTemplate,
       configPath: options.configPath,
       courseDataPath: options.courseDataPath,
@@ -194,6 +195,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
         includeDiplomaBackground: options.diplomaTemplate === "on",
         courseDataXml,
         awardsOnly: options.awards,
+        diplomas: options.diplomas,
       });
       const updatedAt = new Date().toISOString();
 
@@ -207,6 +209,7 @@ export async function runWatchMode(argv: string[]): Promise<void> {
             sourceFileName: latestFile.name,
             reportType: options.requestedReportType,
             awards: options.awards,
+            diplomas: options.diplomas,
             eventName: generatedReport.eventName,
             eventDate: generatedReport.eventDate,
             itemCount: generatedReport.itemCount,

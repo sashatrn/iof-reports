@@ -1,5 +1,6 @@
 import { loadConfig, type AppConfig } from "../config";
 import { renderTemplate } from "../render/template-engine";
+import { buildDiplomasHtml } from "./diplomas-report";
 import {
   buildSummaryTeamStandingGroups,
   type SummaryTeamPointSource,
@@ -110,6 +111,15 @@ export function buildSummaryTeamHtml(
     ...group,
     standings: filterAwardPlaces(group.standings, (standing) => standing.place, options),
   })).filter((group) => group.standings.length > 0);
+
+  if (options.diplomas) {
+    return buildDiplomasHtml(standingGroups.flatMap((group) => group.standings.map((standing) => ({
+      participantName: "",
+      teamName: standing.organisation,
+      className: group.name ?? "Загальний залік",
+      place: standing.place,
+    }))), config, options);
+  }
 
   return renderTemplate("summary-team-pdf.njk", {
     ...buildEvent(eventDate, config, options, eventDateText),

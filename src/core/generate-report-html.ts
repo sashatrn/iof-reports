@@ -63,6 +63,7 @@ type GenerateReportOptions = {
   courseDataXml?: string;
   bazaXml?: string | Buffer;
   awardsOnly?: boolean;
+  diplomas?: boolean;
   summarySeriesXmls?: Array<{
     type: "individual";
     label?: string;
@@ -144,7 +145,7 @@ export function generateIndividualReportHtml(
   xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
-  const { logger, awardsOnly } = options;
+  const { logger } = options;
   const { participants, eventDate } = parseParticipantsXml(
     xml,
     logger,
@@ -163,12 +164,8 @@ export function generateIndividualReportHtml(
 
   return {
     reportType: "individual",
-    viewHtml: buildIndividualHtml(participants, eventDate, "view", undefined, {
-      awardsOnly,
-    }),
-    pdfHtml: buildIndividualHtml(participants, eventDate, "pdf", teamResults, {
-      awardsOnly,
-    }),
+    viewHtml: buildIndividualHtml(participants, eventDate, "view", undefined, options),
+    pdfHtml: buildIndividualHtml(participants, eventDate, "pdf", teamResults, options),
     eventDate: toIsoDate(eventDate),
     itemCount: participants.length,
   };
@@ -178,7 +175,7 @@ export function generateIndividualRogainingReportHtml(
   xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
-  const { logger, awardsOnly } = options;
+  const { logger } = options;
   const { participants, eventDate } = parseParticipantsXml(
     xml,
     logger,
@@ -188,12 +185,8 @@ export function generateIndividualRogainingReportHtml(
 
   return {
     reportType: "individual-rogaining",
-    viewHtml: buildIndividualRogainingHtml(participants, eventDate, "view", {
-      awardsOnly,
-    }),
-    pdfHtml: buildIndividualRogainingHtml(participants, eventDate, "pdf", {
-      awardsOnly,
-    }),
+    viewHtml: buildIndividualRogainingHtml(participants, eventDate, "view", options),
+    pdfHtml: buildIndividualRogainingHtml(participants, eventDate, "pdf", options),
     eventDate: toIsoDate(eventDate),
     itemCount: participants.length,
   };
@@ -203,7 +196,7 @@ export function generateSideBySideTeamReportHtml(
   xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
-  const { logger, awardsOnly } = options;
+  const { logger } = options;
   const { participants, eventDate } = parseParticipantsXml(xml, logger);
   const config = loadConfig();
   const viewTeamResults = buildSideBySideIndividualTeamResults(participants, config);
@@ -214,12 +207,8 @@ export function generateSideBySideTeamReportHtml(
 
   return {
     reportType: "team",
-    viewHtml: buildSideBySideTeamHtml(viewTeamResults, eventDate, "view", {
-      awardsOnly,
-    }),
-    pdfHtml: buildSideBySideTeamHtml(pdfTeamResults, eventDate, "pdf", {
-      awardsOnly,
-    }),
+    viewHtml: buildSideBySideTeamHtml(viewTeamResults, eventDate, "view", options),
+    pdfHtml: buildSideBySideTeamHtml(pdfTeamResults, eventDate, "pdf", options),
     eventDate: toIsoDate(eventDate),
     itemCount: pdfTeamResults.reduce((count, group) => count + group.teams.length, 0),
   };
@@ -229,7 +218,7 @@ export function generateSideBySideRogainingReportHtml(
   xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
-  const { logger, awardsOnly } = options;
+  const { logger } = options;
   const { participants, eventDate } = parseParticipantsXml(
     xml,
     logger,
@@ -239,12 +228,8 @@ export function generateSideBySideRogainingReportHtml(
 
   return {
     reportType: "side-by-side-rogaining",
-    viewHtml: buildSideBySideRogainingHtml(participants, eventDate, "view", {
-      awardsOnly,
-    }),
-    pdfHtml: buildSideBySideRogainingHtml(participants, eventDate, "pdf", {
-      awardsOnly,
-    }),
+    viewHtml: buildSideBySideRogainingHtml(participants, eventDate, "view", options),
+    pdfHtml: buildSideBySideRogainingHtml(participants, eventDate, "pdf", options),
     eventDate: toIsoDate(eventDate),
     itemCount: participants.length,
   };
@@ -254,13 +239,13 @@ export function generateRelayReportHtml(
   xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
-  const { logger, awardsOnly } = options;
+  const { logger } = options;
   const { teams, eventDate, eventName } = parseTeamResultsXml(xml, logger, true);
 
   return {
     reportType: "relay",
-    viewHtml: buildRelayHtml(teams, eventDate, "view", { awardsOnly }),
-    pdfHtml: buildRelayHtml(teams, eventDate, "pdf", { awardsOnly }),
+    viewHtml: buildRelayHtml(teams, eventDate, "view", options),
+    pdfHtml: buildRelayHtml(teams, eventDate, "pdf", options),
     eventName,
     eventDate: toIsoDate(eventDate),
     itemCount: buildRelayClasses(teams).flatMap((classGroup) => classGroup.teams).length,
@@ -303,7 +288,7 @@ export function generateSummaryReportHtml(
   _xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
-  const { awardsOnly, logger, summarySeriesXmls: inputs = [] } = options;
+  const { logger, summarySeriesXmls: inputs = [] } = options;
 
   if (inputs.length === 0) {
     throw new Error("summary report requires at least one --series source.");
@@ -314,7 +299,7 @@ export function generateSummaryReportHtml(
   const eventDateText = formatDateRange(parsedSources.map((parsedSource) => parsedSource.eventDate));
   const sources = parsedSources.map((parsedSource) => parsedSource.source);
   const standingGroups = buildSummaryStandingGroupsFromSources(sources);
-  const html = buildSummaryHtml(sources, eventDate, { awardsOnly }, eventDateText);
+  const html = buildSummaryHtml(sources, eventDate, options, eventDateText);
 
   return {
     reportType: "summary",
@@ -392,7 +377,7 @@ export function generateSummaryTeamReportHtml(
   _xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
-  const { awardsOnly, logger, summaryTeamSeriesXmls: inputs = [] } = options;
+  const { logger, summaryTeamSeriesXmls: inputs = [] } = options;
 
   if (inputs.length === 0) {
     throw new Error("summary-team report requires at least one --series source.");
@@ -404,7 +389,7 @@ export function generateSummaryTeamReportHtml(
   const eventName = parsedSources.find((parsedSource) => parsedSource.eventName)?.eventName;
   const sources = parsedSources.map((parsedSource) => parsedSource.source);
   const standingGroups = buildSummaryTeamStandingGroupsFromSources(sources);
-  const html = buildSummaryTeamHtml(sources, eventDate, { awardsOnly }, eventDateText);
+  const html = buildSummaryTeamHtml(sources, eventDate, options, eventDateText);
 
   return {
     reportType: "summary-team",
@@ -421,7 +406,7 @@ export function generateRogainingReportHtml(
   xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
-  const { awardsOnly, logger } = options;
+  const { logger } = options;
   const parsed = parseTeamIof(xml);
   const eventDate = normalizeEventDate(parsed.eventDate, logger);
 
@@ -432,12 +417,8 @@ export function generateRogainingReportHtml(
 
   return {
     reportType: "rogaining",
-    viewHtml: buildRogainingHtml(parsed.teams, eventDate, parsed.eventName, "view", {
-      awardsOnly,
-    }),
-    pdfHtml: buildRogainingHtml(parsed.teams, eventDate, parsed.eventName, "pdf", {
-      awardsOnly,
-    }),
+    viewHtml: buildRogainingHtml(parsed.teams, eventDate, parsed.eventName, "view", options),
+    pdfHtml: buildRogainingHtml(parsed.teams, eventDate, parsed.eventName, "pdf", options),
     eventName: parsed.eventName,
     eventDate: toIsoDate(eventDate),
     itemCount: parsed.teams.length,
@@ -475,7 +456,7 @@ export function generateRogainingScoreReportHtml(
   xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
-  const { awardsOnly, logger } = options;
+  const { logger } = options;
   const parsed = parseTeamIof(xml);
   const eventDate = normalizeEventDate(parsed.eventDate, logger);
 
@@ -486,12 +467,8 @@ export function generateRogainingScoreReportHtml(
 
   return {
     reportType: "rogaining-score",
-    viewHtml: buildRogainingScoreHtml(parsed.teams, eventDate, parsed.eventName, "view", {
-      awardsOnly,
-    }),
-    pdfHtml: buildRogainingScoreHtml(parsed.teams, eventDate, parsed.eventName, "pdf", {
-      awardsOnly,
-    }),
+    viewHtml: buildRogainingScoreHtml(parsed.teams, eventDate, parsed.eventName, "view", options),
+    pdfHtml: buildRogainingScoreHtml(parsed.teams, eventDate, parsed.eventName, "pdf", options),
     eventName: parsed.eventName,
     eventDate: toIsoDate(eventDate),
     itemCount: buildRogainingScoreEntries(parsed.teams).length,
@@ -502,7 +479,7 @@ export function generateRogainingResultsReportHtml(
   xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
-  const { awardsOnly, logger, bazaXml } = options;
+  const { logger, bazaXml } = options;
 
   if (!bazaXml) {
     throw new Error("rogaining-results report requires a UOF baza XML file.");
@@ -519,12 +496,8 @@ export function generateRogainingResultsReportHtml(
 
   return {
     reportType: "rogaining-results",
-    viewHtml: buildRogainingResultsHtml(parsed.teams, baza, eventDate, parsed.eventName, "view", {
-      awardsOnly,
-    }),
-    pdfHtml: buildRogainingResultsHtml(parsed.teams, baza, eventDate, parsed.eventName, "pdf", {
-      awardsOnly,
-    }),
+    viewHtml: buildRogainingResultsHtml(parsed.teams, baza, eventDate, parsed.eventName, "view", options),
+    pdfHtml: buildRogainingResultsHtml(parsed.teams, baza, eventDate, parsed.eventName, "pdf", options),
     eventName: parsed.eventName,
     eventDate: toIsoDate(eventDate),
     itemCount: parsed.teams.length,
@@ -535,7 +508,7 @@ export function generateRogainingResultsScoreReportHtml(
   xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
-  const { awardsOnly, logger, bazaXml } = options;
+  const { logger, bazaXml } = options;
 
   if (!bazaXml) {
     throw new Error("rogaining-results-score report requires a UOF baza XML file.");
@@ -552,12 +525,8 @@ export function generateRogainingResultsScoreReportHtml(
 
   return {
     reportType: "rogaining-results-score",
-    viewHtml: buildRogainingResultsScoreHtml(parsed.teams, baza, eventDate, parsed.eventName, "view", {
-      awardsOnly,
-    }),
-    pdfHtml: buildRogainingResultsScoreHtml(parsed.teams, baza, eventDate, parsed.eventName, "pdf", {
-      awardsOnly,
-    }),
+    viewHtml: buildRogainingResultsScoreHtml(parsed.teams, baza, eventDate, parsed.eventName, "view", options),
+    pdfHtml: buildRogainingResultsScoreHtml(parsed.teams, baza, eventDate, parsed.eventName, "pdf", options),
     eventName: parsed.eventName,
     eventDate: toIsoDate(eventDate),
     itemCount: parsed.teams.length,
@@ -568,7 +537,7 @@ export function generateRogainingSplitsReportHtml(
   xml: string,
   options: GenerateReportOptions = {},
 ): GeneratedReport {
-  const { awardsOnly, logger, courseDataXml } = options;
+  const { logger, courseDataXml } = options;
 
   if (!courseDataXml) {
     throw new Error("rogaining-splits report requires a CourseData XML file.");
@@ -585,21 +554,15 @@ export function generateRogainingSplitsReportHtml(
 
   return {
     reportType: "rogaining-splits",
-    viewHtml: buildRogainingSplitsHtml(parsed.teams, courseData, eventDate, parsed.eventName, "view", {
-      awardsOnly,
-    }),
-    pdfHtml: buildRogainingSplitsHtml(parsed.teams, courseData, eventDate, parsed.eventName, "pdf", {
-      awardsOnly,
-    }),
+    viewHtml: buildRogainingSplitsHtml(parsed.teams, courseData, eventDate, parsed.eventName, "view", options),
+    pdfHtml: buildRogainingSplitsHtml(parsed.teams, courseData, eventDate, parsed.eventName, "pdf", options),
     eventName: parsed.eventName,
     eventDate: toIsoDate(eventDate),
-    itemCount: buildRogainingSplitTeamEntries(parsed.teams, courseData, {
-      awardsOnly,
-    }).length,
+    itemCount: buildRogainingSplitTeamEntries(parsed.teams, courseData, options).length,
   };
 }
 
-export function generateReportHtml(
+function generateSourceReportHtml(
   xml: string,
   reportType: SingleReportType,
   options: GenerateReportOptions = {},
@@ -634,13 +597,30 @@ export function generateReportHtml(
   }
 }
 
+export function generateReportHtml(
+  xml: string,
+  reportType: SingleReportType,
+  options: GenerateReportOptions = {},
+): GeneratedReport {
+  const generated = generateSourceReportHtml(xml, reportType, options.diplomas
+    ? { ...options, awardsOnly: true }
+    : options);
+  if (!options.diplomas && reportType !== "rogaining-diplomas") return generated;
+  return {
+    ...generated,
+    viewHtml: generated.pdfHtml,
+    supportsView: true,
+    itemCount: (generated.pdfHtml.match(/class="diploma-page"/g) ?? []).length,
+  };
+}
+
 export function generateReportsHtml(
   xml: string,
   reportType: ReportType,
   options: GenerateReportOptions = {},
 ): GeneratedReport[] {
   if (reportType === "all") {
-    return [generateIndividualReportHtml(xml, options)];
+    return [generateReportHtml(xml, "individual", options)];
   }
 
   return [generateReportHtml(xml, reportType, options)];

@@ -688,7 +688,7 @@ describe("generateRogainingDiplomasReportHtml", () => {
     expect(report.viewHtml).toContain("diploma-page");
     expect(report.pdfHtml).toContain("@page");
     expect(report.pdfHtml).not.toContain(">ALL<");
-    expect(report.pdfHtml).toContain("participant-line");
+    expect(report.pdfHtml).toContain('class="field participantName"');
     expect(report.pdfHtml).not.toContain("Diploma template");
   });
 
@@ -890,7 +890,7 @@ describe("generateReportHtml", () => {
     const report = generateReportHtml(rogainingXml, "rogaining-diplomas");
 
     expect(report.reportType).toBe("rogaining-diplomas");
-    expect(report.pdfHtml).toContain("participant-line");
+    expect(report.pdfHtml).toContain('class="field participantName"');
   });
 
   it("dispatches to rogaining score report generator", () => {

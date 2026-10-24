@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <title>Дипломи призерів</title>
+  <style>
+    {% if fontData %}
+    @font-face {
+      font-family: "Shantell Sans";
+      src: url("data:font/ttf;base64,{{ fontData }}") format("truetype");
+      font-style: normal;
+      font-weight: 300 800;
+    }
+    {% endif %}
+    @page { size: {{ diplomas.page.width }}mm {{ diplomas.page.height }}mm; margin: 0; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: {{ diplomas.fontFamily | escape }}, sans-serif; color: {{ diplomas.color }}; }
+    .diploma-page {
+      position: relative; width: {{ diplomas.page.width }}mm; height: {{ diplomas.page.height }}mm;
+      break-after: page; overflow: hidden;
+    }
+    .diploma-page:last-child { break-after: auto; }
+    .diploma-background { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .field { position: absolute; display: flex; align-items: center; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.08; }
+    {% for field in fields %}
+    .{{ field.key }} {
+      left: {{ field.x }}mm; top: {{ field.y }}mm; width: {{ field.width }}mm; height: {{ field.height }}mm;
+      font-size: {{ field.fontSize }}pt; font-weight: {{ field.fontWeight }}; text-align: {{ field.align }};
+      justify-content: {% if field.align == 'left' %}flex-start{% elif field.align == 'right' %}flex-end{% else %}center{% endif %};
+    }
+    {% endfor %}
+  </style>
+</head>
+<body>
+{% for entry in entries %}
+  <div class="diploma-page">
+    {% if background %}<img class="diploma-background" src="{{ background }}" alt="Diploma template" />{% endif %}
+    {% for field in fields %}
+    {% if field.enabled %}<div class="field {{ field.key }}">{{ entry[field.key] | escape }}</div>{% endif %}
+    {% endfor %}
+  </div>
+{% endfor %}
+</body>
+</html>

@@ -16,12 +16,13 @@ export type WatchOptions = {
   settleMs: number;
   port: number;
   awards: boolean;
+  diplomas: boolean;
   diplomaTemplate: "off" | "on";
 };
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <individual|individual-rogaining|team|side-by-side-rogaining|relay|rogaining|rogaining-diplomas|rogaining-score|rogaining-splits> [--awards] [--config config.json] [--courses courses.xml] [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
+    "Usage: node dist/index.js watch --input-dir <dir> --output-dir <dir> --report <individual|individual-rogaining|team|side-by-side-rogaining|relay|rogaining|rogaining-diplomas|rogaining-score|rogaining-splits> [--awards] [--diplomas] [--config config.json] [--courses courses.xml] [--poll-ms 3000] [--settle-ms 1000] [--port 4173] [--diploma-template off|on]",
   );
 }
 
@@ -40,6 +41,7 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
   let settleMs = 1000;
   let port = 4173;
   let awards = false;
+  let diplomas = false;
   let diplomaTemplate: WatchOptions["diplomaTemplate"] = "off";
 
   for (let i = 3; i < argv.length; i += 1) {
@@ -99,6 +101,11 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
 
     if (arg === "--awards") {
       awards = true;
+      continue;
+    }
+
+    if (arg === "--diplomas") {
+      diplomas = true;
       continue;
     }
 
@@ -205,6 +212,7 @@ export function parseWatchArgs(argv: string[], logger: Logger): WatchOptions {
     settleMs,
     port,
     awards,
+    diplomas,
     diplomaTemplate,
   };
 }

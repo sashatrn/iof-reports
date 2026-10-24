@@ -46,6 +46,7 @@ async function main(): Promise<void> {
     format,
     html,
     awards,
+    diplomas,
     diplomaTemplate,
   } = parseCliArgs(process.argv, logger, {
     summary: config.summary.series.length > 0,
@@ -84,6 +85,7 @@ async function main(): Promise<void> {
       format,
       html,
       awards,
+      diplomas,
       diplomaTemplate,
     },
     "Reading XML file",
@@ -112,12 +114,15 @@ async function main(): Promise<void> {
     courseDataXml,
     bazaXml,
     awardsOnly: awards,
+    diplomas,
     summarySeriesXmls,
     summaryTeamSeriesXmls,
   });
 
   for (const generatedReport of generatedReports) {
-    const outputReportType = awards
+    const outputReportType = diplomas && generatedReport.reportType !== "rogaining-diplomas"
+      ? `${generatedReport.reportType}-diplomas`
+      : awards && generatedReport.reportType !== "rogaining-diplomas"
       ? `${generatedReport.reportType}-awards`
       : generatedReport.reportType;
 

@@ -1088,9 +1088,9 @@ describe("buildRogainingDiplomasHtml", () => {
 
     const html = buildRogainingDiplomasHtml(teams, new Date(2026, 3, 11), "Рогейн");
 
-    expect(html).toContain("Фінішери");
+    expect(html).not.toContain('class="field teamName"');
     expect(html).toContain("A1");
     expect(html).not.toContain("DSQ команда");
-    expect(html).not.toContain("B1");
+    expect(html).not.toContain('class="field participantName">B1</div>');
   });
 });

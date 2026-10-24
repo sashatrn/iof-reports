@@ -17,6 +17,21 @@ afterEach(() => {
 });
 
 describe("parseWatchArgs", () => {
+  it("accepts diplomas for individual watch reports", () => {
+    const inputDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-diplomas-watch-"));
+    try {
+      const options = parseWatchArgs(
+        ["node", "dist/index.js", "watch", "--input-dir", inputDir,
+          "--output-dir", path.join(inputDir, "out"), "--report", "individual", "--diplomas"],
+        testLogger(),
+      );
+      expect(options.diplomas).toBe(true);
+      expect(options.reportType).toBe("individual");
+      expect(options.diplomaTemplate).toBe("off");
+    } finally {
+      fs.rmSync(inputDir, { recursive: true, force: true });
+    }
+  });
   it("accepts individual in watch mode", () => {
     const inputDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-watch-input-"));
     const outputDir = path.join(os.tmpdir(), "iof-watch-output");

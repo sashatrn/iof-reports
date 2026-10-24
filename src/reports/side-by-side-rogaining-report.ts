@@ -1,6 +1,7 @@
 import { loadConfig } from "../config";
 import { Participant } from "../io/parse-iof";
 import { renderTemplate } from "../render/template-engine";
+import { buildDiplomasHtml, participantDiplomaEntries } from "./diplomas-report";
 import { pointsFromPosition } from "../scoring/side-by-side-points";
 import { isPdfVisibleParticipant } from "./pdf-status-filter";
 import { formatDate } from "../utils/date";
@@ -221,7 +222,7 @@ export function buildSideBySideRogainingHtml(
 ): string {
   const config = loadConfig();
   const reportParticipants =
-    variant === "pdf" ? participants.filter(isPdfVisibleParticipant) : participants;
+    variant === "pdf" || options.diplomas ? participants.filter(isPdfVisibleParticipant) : participants;
   const classes = buildSideBySideRogainingClasses(reportParticipants);
   const displayClasses = sortAwardClasses(classes.map((classGroup) => ({
     ...classGroup,
@@ -231,6 +232,8 @@ export function buildSideBySideRogainingHtml(
       options,
     ),
   })), config.awards.classOrder, options);
+  if (options.diplomas) return buildDiplomasHtml(participantDiplomaEntries(displayClasses), config, options);
+
   const teamResultGroups =
     variant === "pdf"
       ? buildSideBySideRogainingTeamResults(classes).map((group) => ({

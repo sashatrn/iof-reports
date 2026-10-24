@@ -1,5 +1,7 @@
 export type AwardsModeOptions = {
   awardsOnly?: boolean;
+  diplomas?: boolean;
+  includeDiplomaBackground?: boolean;
 };
 
 type EventWithSubtitle = {

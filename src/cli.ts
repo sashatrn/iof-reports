@@ -25,6 +25,7 @@ export type CliOptions = {
   format: "pdf";
   html: "none" | "view" | "pdf";
   awards: boolean;
+  diplomas: boolean;
   diplomaTemplate: "off" | "on";
 };
 
@@ -42,7 +43,7 @@ const SERIES_TYPE_ALIASES = new Map<string, SummaryTeamSourceType>([
 
 function printUsage(logger: Logger): void {
   logger.info(
-    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|individual-rogaining|team|side-by-side-rogaining|relay|summary|summary-team|rogaining|rogaining-diplomas|rogaining-score|rogaining-results|rogaining-results-score|rogaining-splits] [--awards] [--format pdf] [--courses courses.xml] [--baza baza.xml] [--series individual=long.xml] [--html none|view|pdf] [--diploma-template off|on]",
+    "Usage: node dist/index.js <file.xml> [--config config.json] [--report all|individual|individual-rogaining|team|side-by-side-rogaining|relay|summary|summary-team|rogaining|rogaining-diplomas|rogaining-score|rogaining-results|rogaining-results-score|rogaining-splits] [--awards] [--diplomas] [--format pdf] [--courses courses.xml] [--baza baza.xml] [--series individual=long.xml] [--html none|view|pdf] [--diploma-template off|on]",
   );
 }
 
@@ -109,6 +110,7 @@ export function parseCliArgs(
   let format: CliOptions["format"] = "pdf";
   let html: CliOptions["html"] = "none";
   let awards = false;
+  let diplomas = false;
   let diplomaTemplate: CliOptions["diplomaTemplate"] = "off";
 
   for (let i = 2; i < argv.length; i += 1) {
@@ -199,6 +201,11 @@ export function parseCliArgs(
 
     if (arg === "--awards") {
       awards = true;
+      continue;
+    }
+
+    if (arg === "--diplomas") {
+      diplomas = true;
       continue;
     }
 
@@ -311,8 +318,8 @@ export function parseCliArgs(
     process.exit(1);
   }
 
-  if (report === "rogaining-results" && !bazaPath) {
-    logger.error("rogaining-results report requires --baza <baza.xml>.");
+  if ((report === "rogaining-results" || report === "rogaining-results-score") && !bazaPath) {
+    logger.error(`${report} report requires --baza <baza.xml>.`);
     printUsage(logger);
     process.exit(1);
   }
@@ -356,6 +363,7 @@ export function parseCliArgs(
     format,
     html,
     awards,
+    diplomas,
     diplomaTemplate,
   };
 }

@@ -1,12 +1,11 @@
-import path from "path";
 import { AppConfig, loadConfig } from "../config";
 import { CourseControlPoint, ParsedCourseData } from "../io/parse-course-data";
 import { TeamIofSplit, TeamIofTeam } from "../io/parse-team-iof";
 import { ParsedUofBaza, UofBazaSportsman } from "../io/parse-uof-baza";
 import { renderTemplate } from "../render/template-engine";
+import { buildDiplomasHtml, teamDiplomaEntries } from "./diplomas-report";
 import { isPdfVisibleTeam } from "./pdf-status-filter";
 import { formatDate } from "../utils/date";
-import { imageToBase64 } from "../utils/image";
 import {
   type AwardsModeOptions,
   filterAwardPlaces,
@@ -43,13 +42,6 @@ type ParsedRogainingClass = {
 type RogainingClassGroup = {
   name: string;
   teams: RankedRogainingTeam[];
-};
-
-type RogainingDiplomaEntry = {
-  participantName: string;
-  teamName: string;
-  className: string;
-  place: string;
 };
 
 export type RogainingScoreEntry = {
@@ -1717,16 +1709,18 @@ export function buildRogainingHtml(
 ): string {
   const config = loadConfig();
   const normalizedTeams = applyRogainingRules(teams, config);
-  const reportTeams = variant === "pdf"
+  const reportTeams = variant === "pdf" || options.diplomas
     ? normalizedTeams.filter(isPdfVisibleTeam)
     : normalizedTeams;
 
   const classes = sortAwardClasses(buildRogainingClasses(reportTeams, config).filter((classGroup) => {
-    return variant === "view" || classGroup.name !== AGGREGATE_OPEN_CLASS;
+    return (variant === "view" && !options.diplomas) || classGroup.name !== AGGREGATE_OPEN_CLASS;
   }).map((classGroup) => ({
     ...classGroup,
     teams: filterAwardPlaces(classGroup.teams, (team) => team.place, options),
   })).filter((classGroup) => classGroup.teams.length > 0), config.awards.classOrder, options);
+
+  if (options.diplomas) return buildDiplomasHtml(teamDiplomaEntries(classes, config), config, options);
 
   return renderTemplate(`rogaining-${variant}.njk`, {
     reportTitle: config.rogaining.reportTitle,
@@ -1767,6 +1761,14 @@ export function buildRogainingScoreHtml(
     options,
   );
   const regionScores = buildRogainingRegionScoreEntries(entries);
+  if (options.diplomas) {
+    return buildDiplomasHtml(entries.map((entry) => ({
+      participantName: entry.participantName,
+      teamName: entry.region,
+      className: entry.className,
+      place: entry.place,
+    })), config, options);
+  }
   const scoreReport = buildRogainingScoreReportInfo(
     config,
     eventDate,
@@ -1800,6 +1802,11 @@ export function buildRogainingResultsHtml(
   const normalizedTeams = applyRogainingRules(teams, config);
   const resultsReport = config.rogaining.resultsReport;
   void variant;
+
+  if (options.diplomas) {
+    const classes = sortAwardClasses(buildRogainingResultsClasses(normalizedTeams, baza, eventDate, config), config.awards.classOrder, options);
+    return buildDiplomasHtml(teamDiplomaEntries(classes, config), config, options);
+  }
 
   return renderTemplate("rogaining-results-pdf.njk", {
     reportTitle: "Протокол результатів змагань з орієнтування",
@@ -1910,6 +1917,11 @@ export function buildRogainingResultsScoreHtml(
   const resultsReport = config.rogaining.resultsReport;
   void variant;
 
+  if (options.diplomas) {
+    const classes = sortAwardClasses(buildRogainingResultsScoreClasses(normalizedTeams, baza, eventDate, config), config.awards.classOrder, options);
+    return buildDiplomasHtml(teamDiplomaEntries(classes, config), config, options);
+  }
+
   return renderTemplate("rogaining-results-score-pdf.njk", {
     reportTitle: "Протокол результатів змагань з орієнтування",
     showDefaultHeader: false,
@@ -1950,6 +1962,17 @@ export function buildRogainingSplitsHtml(
 ): string {
   const config = loadConfig();
   const normalizedTeams = applyRogainingRules(teams, config);
+  if (options.diplomas) {
+    // Splits display the declared class and its ranking, without age-class promotion.
+    const byClass = new Map<string, RankedRogainingTeam[]>();
+    for (const team of sortRogainingSplitsTeams(normalizedTeams)) {
+      const group = byClass.get(team.className) ?? [];
+      group.push(team);
+      byClass.set(team.className, group);
+    }
+    const classes = sortAwardClasses([...byClass].map(([name, teams]) => ({ name, teams })), config.awards.classOrder, options);
+    return buildDiplomasHtml(teamDiplomaEntries(classes, config), config, options);
+  }
   const splitTeams = buildRogainingSplitTeamEntries(normalizedTeams, courseData, options);
   void variant;
 
@@ -1980,37 +2003,8 @@ export function buildRogainingDiplomasHtml(
 ): string {
   const config = loadConfig();
   const normalizedTeams = applyRogainingRules(teams, config);
-  const diplomaTemplatePath = path.resolve(
-    __dirname,
-    "../assets/rogaining-diploma-template.png",
-  );
-  void variant;
-  const entries: RogainingDiplomaEntry[] = buildAwardsClasses(normalizedTeams, config)
-    .filter((classGroup) => classGroup.name !== AGGREGATE_OPEN_CLASS)
-    .flatMap((classGroup) =>
-      classGroup.teams.flatMap((team) =>
-        team.members.map((participantName) => ({
-          participantName,
-          teamName: team.teamName,
-          className: classGroup.name,
-          place: team.place,
-        })),
-      ),
-    );
-
-  return renderTemplate("rogaining-diplomas-pdf.njk", {
-    reportTitle: "Дипломи рогейну",
-    event: {
-      title:
-        config.reportHeader.title ??
-        eventName ??
-        `Дипломи рогейну, ${formatDate(eventDate)}`,
-      subtitle: "",
-      location: config.reportHeader.location,
-      date: formatDate(eventDate),
-    },
-    includeBackground: options.includeBackground,
-    diplomaTemplate: options.includeBackground ? imageToBase64(diplomaTemplatePath) : undefined,
-    entries,
-  });
+  return buildDiplomasHtml(teamDiplomaEntries(
+    buildAwardsClasses(normalizedTeams, config).filter((group) => group.name !== AGGREGATE_OPEN_CLASS),
+    config,
+  ), config, { includeDiplomaBackground: options.includeBackground });
 }

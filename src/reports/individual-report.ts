@@ -5,6 +5,7 @@ import {
 } from "../config";
 import { Participant } from "../io/parse-iof";
 import { renderTemplate } from "../render/template-engine";
+import { buildDiplomasHtml, participantDiplomaEntries } from "./diplomas-report";
 import { formatDate } from "../utils/date";
 import { isPdfVisibleParticipant } from "./pdf-status-filter";
 import { getLeftLogo } from "./report-logos";
@@ -237,7 +238,7 @@ export function buildIndividualHtml(
   const teamFilter = buildMilitaryTeamFilter(config.individual.teamFilterRegex);
   const classFilter = buildMilitaryClassFilter(config.individual.classFilterRegex);
   const reportParticipants = participants.filter((participant) =>
-    (variant !== "pdf" || isPdfVisibleParticipant(participant)) &&
+    ((variant !== "pdf" && !options.diplomas) || isPdfVisibleParticipant(participant)) &&
     (!config.individual.filterParticipants ||
       (teamFilter.test(participant.club) && classFilter.test(participant.className))),
   );
@@ -269,8 +270,11 @@ export function buildIndividualHtml(
           points: participant.points,
           status: participant.status,
         }))
+        .filter((participant) => !options.diplomas || participant.status === "OK")
         .filter((participant) => !options.awardsOnly || isAwardPlace(participant.position)),
     })), config.awards.classOrder, options);
+  if (options.diplomas) return buildDiplomasHtml(participantDiplomaEntries(classes), config, options);
+
   const teamResults = buildTeamResults(
     reportParticipants,
     config,

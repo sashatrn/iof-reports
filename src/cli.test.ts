@@ -13,6 +13,16 @@ function testLogger(): Logger {
 }
 
 describe("parseCliArgs", () => {
+  it("accepts diplomas for summary reports with configured sources", () => {
+    const options = parseCliArgs(
+      ["node", "dist/index.js", "--report", "summary-team", "--diplomas"],
+      testLogger(),
+      { summary: false, summaryTeam: true },
+    );
+    expect(options.report).toBe("summary-team");
+    expect(options.diplomas).toBe(true);
+    expect(options.diplomaTemplate).toBe("off");
+  });
   it("accepts summary-team series inputs without a positional XML", () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-series-"));
     const individualPath = path.join(tempDir, "individual.xml");

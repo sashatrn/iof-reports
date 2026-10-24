@@ -1,6 +1,7 @@
 import { loadConfig, type AppConfig, type ClassGroupConfig, type RelayScoringType } from "../config";
 import { TeamIofTeam } from "../io/parse-team-iof";
 import { renderTemplate } from "../render/template-engine";
+import { buildDiplomasHtml, teamDiplomaEntries } from "./diplomas-report";
 import { getRelayScoring } from "../scoring/relay-scoring";
 import {
   buildSideBySideTeamResultsFromEntries,
@@ -24,6 +25,7 @@ export type RelayEntry = {
   teamName: string;
   sourceClassName: string;
   membersLine: string;
+  members: string[];
   organisation: string;
   stageTimes: string[];
   formattedTime: string;
@@ -313,6 +315,7 @@ function rankRelayTeams(teams: TeamIofTeam[], stageCount: number): RelayEntry[] 
       teamName: team.teamName,
       sourceClassName: team.className,
       membersLine: team.members.join(", "),
+      members: team.members,
       organisation: team.organisation,
       stageTimes: Array.from({ length: stageCount }, (_, index) =>
         formatRelayStage(team.memberTimeSecs?.[index], team.memberStatuses?.[index]),
@@ -521,7 +524,7 @@ export function buildRelayHtml(
   variant: HtmlVariant = "pdf",
   options: AwardsModeOptions = {},
 ): string {
-  const reportTeams = variant === "pdf" ? teams.filter(isPdfVisibleRelayTeam) : teams;
+  const reportTeams = variant === "pdf" || options.diplomas ? teams.filter(isPdfVisibleRelayTeam) : teams;
   const config = loadConfig();
   const stageCount = getRelayStageCount(reportTeams);
   const classes = buildRelayClasses(reportTeams, stageCount);
@@ -554,6 +557,8 @@ export function buildRelayHtml(
             teams: filterAwardPlaces(group.teams, (team) => team.place, options),
           })),
         };
+
+  if (options.diplomas) return buildDiplomasHtml(teamDiplomaEntries(displayClasses, config), config, options);
 
   return renderTemplate(`relay-${variant}.njk`, {
     ...buildRelayEvent(eventDate, config, options),

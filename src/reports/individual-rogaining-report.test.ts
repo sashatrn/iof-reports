@@ -44,6 +44,7 @@ describe("buildIndividualRogainingClasses", () => {
       {
         position: "1",
         name: "Швидший",
+        organisation: "Команда",
         time: "15:00",
         score: 40,
         penalty: 0,
@@ -53,6 +54,7 @@ describe("buildIndividualRogainingClasses", () => {
       {
         position: "2",
         name: "Повільніший",
+        organisation: "Команда",
         time: "16:40",
         score: 40,
         penalty: 0,
@@ -62,6 +64,7 @@ describe("buildIndividualRogainingClasses", () => {
       {
         position: "3",
         name: "Менше балів",
+        organisation: "Команда",
         time: "13:20",
         score: 30,
         penalty: 0,
@@ -71,6 +74,7 @@ describe("buildIndividualRogainingClasses", () => {
       {
         position: "",
         name: "Не фінішував",
+        organisation: "Команда",
         time: "11:40",
         score: 50,
         penalty: 0,

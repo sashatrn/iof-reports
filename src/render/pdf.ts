@@ -10,6 +10,7 @@ export async function htmlToPdf(html: string, outputPath: string) {
     path: outputPath,
     format: "A4",
     printBackground: true,
+    preferCSSPageSize: true,
   });
 
   await browser.close();

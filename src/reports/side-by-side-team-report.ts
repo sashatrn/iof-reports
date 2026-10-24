@@ -1,4 +1,5 @@
 import { renderTemplate } from "../render/template-engine";
+import { buildDiplomasHtml } from "./diplomas-report";
 import { type SideBySideTeamResultGroup } from "../scoring/side-by-side-team";
 import { loadConfig } from "../config";
 import { formatDate } from "../utils/date";
@@ -18,6 +19,15 @@ export function buildSideBySideTeamHtml(
   options: AwardsModeOptions = {},
 ): string {
   const config = loadConfig();
+
+  if (options.diplomas) {
+    return buildDiplomasHtml(teamResultGroups.flatMap((group) => group.teams.map((team) => ({
+      participantName: "",
+      teamName: team.organisation,
+      className: group.name,
+      place: team.place,
+    }))), config, options);
+  }
 
   return renderTemplate(`side-by-side-team-${variant}.njk`, {
     reportTitle: "Командний протокол",

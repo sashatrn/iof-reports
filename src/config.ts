@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { imageToBase64 } from "./utils/image";
 import { type SummaryTeamSourceType } from "./reports/summary-team-source";
+import { defaultDiplomasConfig, normalizeDiplomasConfig, type DiplomasConfig } from "./diplomas-config";
 
 type RogainingScorePoints = {
   youthUnder18?: Record<string, number>;
@@ -155,6 +156,7 @@ export type AppConfig = {
   summary: SummaryConfig;
   summaryTeam: SummaryTeamConfig;
   awards: AwardsConfig;
+  diplomas: DiplomasConfig;
   "side-by-side": SideBySideConfig;
   military: {
     teamFilterRegex: string;
@@ -288,6 +290,7 @@ const defaultConfig: AppConfig = {
   awards: {
     classOrder: [],
   },
+  diplomas: defaultDiplomasConfig,
   "side-by-side": {
     ageGroups: [
       {
@@ -815,6 +818,7 @@ export function loadConfig(configPath?: string): AppConfig {
       "Right logo",
     ),
     ignoredStatuses: parsed.ignoredStatuses ?? defaultConfig.ignoredStatuses,
+    diplomas: normalizeDiplomasConfig(parsed.diplomas),
     individual: {
       ...defaultConfig.individual,
       ...parsed.individual,

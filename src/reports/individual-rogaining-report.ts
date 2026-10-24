@@ -1,6 +1,7 @@
 import { loadConfig } from "../config";
 import { Participant } from "../io/parse-iof";
 import { renderTemplate } from "../render/template-engine";
+import { buildDiplomasHtml, participantDiplomaEntries } from "./diplomas-report";
 import { formatDate } from "../utils/date";
 import { isPdfVisibleParticipant } from "./pdf-status-filter";
 import { getLeftLogo, getRightLogo } from "./report-logos";
@@ -17,6 +18,7 @@ type HtmlVariant = "view" | "pdf";
 type IndividualRogainingParticipant = {
   position: string;
   name: string;
+  organisation: string;
   time: string;
   score: number;
   penalty: number;
@@ -80,6 +82,7 @@ function buildClassParticipants(
     return {
       position,
       name: participant.name,
+      organisation: participant.club,
       time: formatTime(participant.timeSec),
       score: collectedScore,
       penalty: isOverTime ? collectedScore : participant.resultPenalty ?? 0,
@@ -122,7 +125,13 @@ export function buildIndividualRogainingHtml(
 ): string {
   const config = loadConfig();
   const reportParticipants =
-    variant === "pdf" ? participants.filter(isPdfVisibleParticipant) : participants;
+    variant === "pdf" || options.diplomas ? participants.filter(isPdfVisibleParticipant) : participants;
+
+  if (options.diplomas) {
+    return buildDiplomasHtml(participantDiplomaEntries(
+      buildIndividualRogainingClasses(reportParticipants, config, options),
+    ), config, options);
+  }
 
   return renderTemplate(`individual-rogaining-${variant}.njk`, {
     reportTitle: config.rogaining.reportTitle,
