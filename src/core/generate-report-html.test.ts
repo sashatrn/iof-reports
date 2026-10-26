@@ -438,6 +438,39 @@ describe("generateSummaryTeamReportHtml", () => {
 });
 
 describe("generateSummaryReportHtml", () => {
+  it.each(["DidNotFinish", "Disqualified", "OverTime", "MissingPunch", "DidNotStart"])(
+    "keeps %s results with zero daily points, including zero totals",
+    (status) => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), "iof-summary-zero-"));
+      tempConfigDirs.push(dir);
+      const configPath = path.join(dir, "config.json");
+      fs.writeFileSync(configPath, JSON.stringify({ summary: { matchBy: "name", showZeroPoints: true } }));
+      setConfigPath(configPath);
+      const result = (name: string, resultStatus: string, time: number) => `
+        <PersonResult><Person><Name><Given>${name}</Given><Family>Тест</Family></Name></Person>
+        <Organisation><Name>Клуб</Name></Organisation>
+        <Result><Time>${time}</Time><Status>${resultStatus}</Status></Result></PersonResult>`;
+      const day = (mixedStatus: string) => `<ResultList>
+        <Event><StartTime><Date>2026-10-25</Date></StartTime></Event>
+        <ClassResult><Class><Name>Ч</Name></Class>
+          ${result("Лідер", "OK", 100)}
+          ${result("ОдинФініш", mixedStatus, 200)}
+          ${result("БезФінішів", status, 300)}
+        </ClassResult></ResultList>`;
+      const day1 = day(status);
+      const day2 = day("OK");
+      const report = generateSummaryReportHtml(day1, {
+        summarySeriesXmls: [
+          { type: "individual", label: "День 1", xml: day1 },
+          { type: "individual", label: "День 2", xml: day2 },
+        ],
+      });
+      expect(report.itemCount).toBe(3);
+      expect(report.pdfHtml).toMatch(/ОдинФініш Тест<\/td>\s*<td>Клуб<\/td>\s*<td class="points-cell">0<\/td>\s*<td class="points-cell">500<\/td>/);
+      expect(report.pdfHtml).toMatch(/БезФінішів Тест<\/td>\s*<td>Клуб<\/td>\s*<td class="points-cell">0<\/td>\s*<td class="points-cell">0<\/td>\s*<td class="points-cell"><strong>0<\/strong>/);
+    },
+  );
+
   it("builds an individual summary from configured report sources", () => {
     const report = generateSummaryReportHtml(sampleXml, {
       summarySeriesXmls: [

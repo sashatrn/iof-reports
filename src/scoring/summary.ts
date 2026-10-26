@@ -100,7 +100,6 @@ function buildStandingsForClass(
         totalPoints: sourcePoints.reduce((sum, sourcePoint) => sum + sourcePoint.points, 0),
       };
     })
-    .filter((standing) => standing.totalPoints > 0)
     .sort((left, right) => {
       if (left.totalPoints !== right.totalPoints) {
         return right.totalPoints - left.totalPoints;

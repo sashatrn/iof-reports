@@ -33,6 +33,24 @@ function expectInOrder(text: string, fragments: string[]): void {
 }
 
 describe("buildSummaryHtml", () => {
+  it("includes zero totals in the full protocol and keeps them out of awards and diplomas", () => {
+    const sources = [{ type: "individual" as const, participants: [
+      participant("Ч", "Фінішер", 1000),
+      participant("Ч", "Нульовий результат", 0),
+      participant("Ж", "Без результатів", 0),
+    ] }];
+    const date = new Date(2026, 9, 25);
+    const full = buildSummaryHtml(sources, date);
+    expect(full).toContain("Нульовий результат");
+    expect(full).toContain("Без результатів");
+    for (const options of [{ awardsOnly: true }, { diplomas: true }]) {
+      const html = buildSummaryHtml(sources, date, options);
+      expect(html).toContain("Фінішер");
+      expect(html).not.toContain("Нульовий результат");
+      expect(html).not.toContain("Без результатів");
+    }
+  });
+
   it.each([false, true])("uses configured name matching for diplomas=%s and metadata", (diplomas) => {
     setConfigPath(path.resolve(__dirname, "../__fixtures__/summary-name-match-config.json"));
     expect(loadConfig().summary.matchBy).toBe("name");

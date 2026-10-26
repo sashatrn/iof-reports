@@ -110,7 +110,13 @@ export function buildSummaryHtml(
   const standingGroups = sortAwardClasses(buildSummaryStandingGroups(pointSources, config.summary.matchBy)
     .map((group) => ({
       ...group,
-      standings: filterAwardPlaces(group.standings, (standing) => standing.place, options),
+      standings: filterAwardPlaces(
+        options.awardsOnly || options.diplomas
+          ? group.standings.filter((standing) => standing.totalPoints > 0)
+          : group.standings,
+        (standing) => standing.place,
+        options,
+      ),
     }))
     .filter((group) => group.standings.length > 0), config.awards.classOrder, options);
 

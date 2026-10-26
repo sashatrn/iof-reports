@@ -22,6 +22,27 @@ const sources: SummaryPointSource[] = [
 ];
 
 describe("individual summary matching", () => {
+  it("keeps zero-point participants and classes in the full standings", () => {
+    const groups = buildSummaryStandingGroups([
+      { key: "day1", label: "День 1", results: [
+        { className: "Ч", name: "Фінішер", organisation: "Клуб", points: 1000 },
+        { className: "Ч", name: "Без фінішу", organisation: "Клуб", points: 0 },
+        { className: "Ж", name: "Без результату", organisation: "Клуб", points: 0 },
+      ] },
+      { key: "day2", label: "День 2", results: [
+        { className: "Ч", name: "Фінішер", organisation: "Клуб", points: 900 },
+        { className: "Ч", name: "Без фінішу", organisation: "Unknown", points: 0 },
+      ] },
+    ], "name");
+    expect(groups.find((group) => group.name === "Ч")!.standings).toMatchObject([
+      { name: "Фінішер", totalPoints: 1900 },
+      { name: "Без фінішу", organisation: "Клуб", totalPoints: 0, sourcePoints: [{ points: 0 }, { points: 0 }] },
+    ]);
+    expect(groups.find((group) => group.name === "Ж")!.standings).toMatchObject([
+      { name: "Без результату", totalPoints: 0, sourcePoints: [{ points: 0 }, { points: 0 }] },
+    ]);
+  });
+
   it("combines points by name when organisations differ", () => {
     const groups = buildSummaryStandingGroups(sources, "name");
     const standings = groups.find((group) => group.name === "Ч21Е")!.standings;
