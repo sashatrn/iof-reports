@@ -1,8 +1,8 @@
 import path from "path";
 import { afterEach, describe, expect, it } from "vitest";
-import { setConfigPath } from "../config";
+import { loadConfig, setConfigPath } from "../config";
 import { type Participant } from "../io/parse-iof";
-import { buildSummaryHtml } from "./summary-report";
+import { buildSummaryHtml, buildSummaryStandingGroupsFromSources } from "./summary-report";
 
 afterEach(() => {
   setConfigPath(undefined);
@@ -33,6 +33,25 @@ function expectInOrder(text: string, fragments: string[]): void {
 }
 
 describe("buildSummaryHtml", () => {
+  it.each([false, true])("uses configured name matching for diplomas=%s and metadata", (diplomas) => {
+    setConfigPath(path.resolve(__dirname, "../__fixtures__/summary-name-match-config.json"));
+    expect(loadConfig().summary.matchBy).toBe("name");
+    const sources = [
+      { type: "individual" as const, participants: [{ ...participant("Ч", "Призер", 900), club: "Клуб" }] },
+      { type: "individual" as const, participants: [{ ...participant("Ч", "Призер", 800), club: "Unknown" }] },
+    ];
+    const groups = buildSummaryStandingGroupsFromSources(sources);
+    expect(groups[0].standings).toHaveLength(1);
+    expect(groups[0].standings[0].totalPoints).toBe(1700);
+    expect(groups[0].standings[0].organisation).toBe("Клуб");
+    const html = buildSummaryHtml(sources, new Date(2026, 9, 25), { diplomas });
+    expect(html.split("Призер")).toHaveLength(2);
+    if (!diplomas) {
+      expect(html).toContain("1700");
+      expect(html).toContain("<td>Клуб</td>");
+    }
+  });
+
   it("uses configured awards class order", () => {
     setConfigPath(path.resolve(__dirname, "../__fixtures__/awards-class-order-config.json"));
 

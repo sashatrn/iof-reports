@@ -1,3 +1,5 @@
+import { type SummaryMatchBy } from "../config";
+
 export type SummarySourceResult = {
   className: string;
   name: string;
@@ -33,17 +35,23 @@ function normalizeText(value: string): string {
   return value.trim() || "Unknown";
 }
 
-function participantKey(result: SummarySourceResult): string {
+function isKnownOrganisation(organisation: string): boolean {
+  const normalized = normalizeText(organisation).toLowerCase();
+  return normalized !== "unknown" && normalized !== "немає клубу";
+}
+
+function participantKey(result: SummarySourceResult, matchBy: SummaryMatchBy): string {
   return [
     normalizeText(result.className),
     normalizeText(result.name),
-    normalizeText(result.organisation),
+    ...(matchBy === "name-and-organisation" ? [normalizeText(result.organisation)] : []),
   ].join("\u0000");
 }
 
 function buildStandingsForClass(
   className: string,
   sources: SummaryPointSource[],
+  matchBy: SummaryMatchBy,
 ): SummaryStanding[] {
   const participantMeta = new Map<string, {
     name: string;
@@ -57,13 +65,18 @@ function buildStandingsForClass(
         continue;
       }
 
-      const key = participantKey(result);
+      const key = participantKey(result, matchBy);
       const sourcePoints = pointsByParticipant.get(key) ?? new Map<string, number>();
 
-      participantMeta.set(key, {
-        name: normalizeText(result.name),
-        organisation: normalizeText(result.organisation),
-      });
+      const previousMeta = participantMeta.get(key);
+      if (!previousMeta || (
+        !isKnownOrganisation(previousMeta.organisation) && isKnownOrganisation(result.organisation)
+      )) {
+        participantMeta.set(key, {
+          name: normalizeText(result.name),
+          organisation: normalizeText(result.organisation),
+        });
+      }
       sourcePoints.set(source.key, (sourcePoints.get(source.key) ?? 0) + result.points);
       pointsByParticipant.set(key, sourcePoints);
     }
@@ -118,6 +131,7 @@ function buildStandingsForClass(
 
 export function buildSummaryStandingGroups(
   sources: SummaryPointSource[],
+  matchBy: SummaryMatchBy = "name-and-organisation",
 ): SummaryStandingGroup[] {
   const classNames = new Set(
     sources.flatMap((source) =>
@@ -129,7 +143,7 @@ export function buildSummaryStandingGroups(
     .sort((left, right) => left.localeCompare(right, "uk"))
     .map((className) => ({
       name: className,
-      standings: buildStandingsForClass(className, sources),
+      standings: buildStandingsForClass(className, sources, matchBy),
     }))
     .filter((group) => group.standings.length > 0);
 }

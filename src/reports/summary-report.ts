@@ -96,7 +96,7 @@ export function buildSummaryStandingGroupsFromSources(
   sources: SummarySource[],
   config: AppConfig = loadConfig(),
 ) {
-  return buildSummaryStandingGroups(buildPointSources(sources, config));
+  return buildSummaryStandingGroups(buildPointSources(sources, config), config.summary.matchBy);
 }
 
 export function buildSummaryHtml(
@@ -107,7 +107,7 @@ export function buildSummaryHtml(
 ): string {
   const config = loadConfig();
   const pointSources = buildPointSources(sources, config);
-  const standingGroups = sortAwardClasses(buildSummaryStandingGroups(pointSources)
+  const standingGroups = sortAwardClasses(buildSummaryStandingGroups(pointSources, config.summary.matchBy)
     .map((group) => ({
       ...group,
       standings: filterAwardPlaces(group.standings, (standing) => standing.place, options),

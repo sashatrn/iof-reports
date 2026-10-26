@@ -95,6 +95,8 @@ type SummaryTeamConfig = {
   tieBreak: "source-order" | "counted-places";
 };
 
+export type SummaryMatchBy = "name" | "name-and-organisation";
+
 type SummaryConfig = {
   reportTitle: string;
   title?: string;
@@ -102,6 +104,7 @@ type SummaryConfig = {
   sourceLabels: Record<string, string>;
   series: SummarySeriesConfig[];
   showZeroPoints: boolean;
+  matchBy: SummaryMatchBy;
 };
 
 type AwardsConfig = {
@@ -286,6 +289,7 @@ const defaultConfig: AppConfig = {
     },
     series: [],
     showZeroPoints: false,
+    matchBy: "name-and-organisation",
   },
   awards: {
     classOrder: [],
@@ -803,6 +807,10 @@ export function loadConfig(configPath?: string): AppConfig {
 
   const raw = fs.readFileSync(filePath, "utf-8");
   const parsed = JSON.parse(raw);
+  const summaryMatchBy = parsed.summary?.matchBy ?? defaultConfig.summary.matchBy;
+  if (summaryMatchBy !== "name" && summaryMatchBy !== "name-and-organisation") {
+    throw new Error("summary.matchBy must be name or name-and-organisation.");
+  }
 
   return {
     ...defaultConfig,
@@ -845,6 +853,7 @@ export function loadConfig(configPath?: string): AppConfig {
     summary: {
       ...defaultConfig.summary,
       ...parsed.summary,
+      matchBy: summaryMatchBy,
       sourceLabels: {
         ...defaultConfig.summary.sourceLabels,
         ...parsed.summary?.sourceLabels,
